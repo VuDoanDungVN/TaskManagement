@@ -1,0 +1,22 @@
+name = "task-management-api"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Public env vars (visible in code via c.env.*)
+[vars]
+FIREBASE_PROJECT_ID = "task-management-pro-2026"
+ALLOWED_ORIGIN = "http://localhost:3000,http://localhost:3001,http://localhost:3002"
+PUBLIC_FILES_BASE_URL = ""
+
+# D1 database — bound as `DB` in code (c.env.DB)
+[[d1_databases]]
+binding = "DB"
+database_name = "task-management"
+database_id = "a0dff048-6dbc-4227-a225-3e04ae0c22dc"
+migrations_dir = "migrations"
+
+# R2 bucket — bound as `FILES` in code (c.env.FILES)
+[[r2_buckets]]
+binding = "FILES"
+bucket_name = "task-management-files"
