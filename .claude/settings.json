@@ -54,7 +54,12 @@
       "Bash(curl -i -X POST http://localhost:8787/projects -H \"Origin: http://localhost:3000\" -H \"Content-Type: application/json\" --data \"{\\\\\"name\\\\\":\\\\\"test\\\\\"}\" --max-time 5)",
       "Bash(curl -i -s -o NUL -w \"HTTP %{http_code} in %{time_total}s\\\\n\" http://localhost:8787/health)",
       "Bash(curl -i -s -o NUL -w \"HTTP %{http_code} in %{time_total}s\\\\n\" http://127.0.0.1:8787/health)",
-      "Bash(curl -6 -i -s -o NUL -w \"HTTP %{http_code} in %{time_total}s\\\\n\" \"http://[::1]:8787/health\")"
+      "Bash(curl -6 -i -s -o NUL -w \"HTTP %{http_code} in %{time_total}s\\\\n\" \"http://[::1]:8787/health\")",
+      "Bash(mkdir \"c:/Users/Dung/Desktop/All file/Project/task-dashboard/app/dashboard/[projectId]/[taskId]\")",
+      "Bash(echo \"EXIT $?\")"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\Dung\\Desktop\\All file\\Project\\task-dashboard\\app\\dashboard\\[projectId]"
     ]
   }
 }

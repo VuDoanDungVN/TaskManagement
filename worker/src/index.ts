@@ -5,6 +5,7 @@ import type { AppEnv } from "./types"
 import users from "./routes/users"
 import projects from "./routes/projects"
 import tasks from "./routes/tasks"
+import comments from "./routes/comments"
 import uploads from "./routes/uploads"
 import files from "./routes/files"
 
@@ -36,6 +37,7 @@ app.get("/health", (c) =>
 app.route("/users", users)
 app.route("/projects", projects)
 app.route("/tasks", tasks)
+app.route("/comments", comments)
 app.route("/uploads", uploads)
 app.route("/files", files)
 

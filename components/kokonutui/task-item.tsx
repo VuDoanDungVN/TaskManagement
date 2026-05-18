@@ -1,8 +1,9 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { Calendar, ImageIcon, Pencil, Trash2, User2 } from "lucide-react"
+import { Calendar, ImageIcon, MessageSquare, Pencil, Trash2, User2 } from "lucide-react"
 import React from "react"
+import { useRouter } from "next/navigation"
 import type { Task } from "@/lib/tasks/types"
 import { PRIORITY_CONFIG, STATUS_CONFIG, formatDate, isOverdue } from "@/lib/tasks/utils"
 
@@ -14,18 +15,31 @@ interface TaskItemProps {
 }
 
 export default function TaskItem({ task, no, onEdit, onDelete }: TaskItemProps) {
+  const router = useRouter()
   const status = STATUS_CONFIG[task.status]
   const priority = PRIORITY_CONFIG[task.priority]
   const overdue = isOverdue(task)
   const start = formatDate(task.startDate)
   const due = formatDate(task.dueDate)
 
+  const openDetail = () => router.push(`/dashboard/${task.projectId}/${task.id}`)
+
   return (
     <div
+      role="button"
+      tabIndex={0}
+      onClick={openDetail}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault()
+          openDetail()
+        }
+      }}
       className={cn(
-        "group flex items-stretch gap-3",
+        "group flex items-stretch gap-3 cursor-pointer",
         "p-3 rounded-lg",
         "hover:bg-zinc-100 dark:hover:bg-zinc-800/50",
+        "focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500 dark:focus-visible:ring-zinc-400",
         "transition-all duration-200",
       )}
     >
@@ -115,13 +129,24 @@ export default function TaskItem({ task, no, onEdit, onDelete }: TaskItemProps) 
               ))}
             </div>
           )}
+          <span
+            className="inline-flex items-center gap-1 tabular-nums"
+            aria-label={`${task.commentCount} bình luận`}
+            title={`${task.commentCount} bình luận`}
+          >
+            <MessageSquare className="w-3 h-3" />
+            {task.commentCount}
+          </span>
         </div>
       </div>
 
       <div className="flex flex-col gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
         <button
           type="button"
-          onClick={() => onEdit(task)}
+          onClick={(e) => {
+            e.stopPropagation()
+            onEdit(task)
+          }}
           className={cn(
             "p-1.5 rounded-md",
             "text-zinc-600 dark:text-zinc-400",
@@ -135,7 +160,10 @@ export default function TaskItem({ task, no, onEdit, onDelete }: TaskItemProps) 
         </button>
         <button
           type="button"
-          onClick={() => onDelete(task.id)}
+          onClick={(e) => {
+            e.stopPropagation()
+            onDelete(task.id)
+          }}
           className={cn(
             "p-1.5 rounded-md",
             "text-zinc-600 dark:text-zinc-400",

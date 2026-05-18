@@ -19,6 +19,7 @@ export interface ApiTask {
   thumbnailUrl: string | null
   createdAt: number
   updatedAt: number
+  commentCount: number
 }
 
 export interface TaskCreateInput {

@@ -3,6 +3,12 @@ import { HTTPException } from "hono/http-exception"
 import type { AppEnv } from "../types"
 import { requireAuth } from "../auth-middleware"
 import { buildFileUrl, uuid } from "../utils"
+import {
+  COMMENT_SELECT,
+  serializeComment,
+  validateCommentBody,
+  type CommentRow,
+} from "./comments"
 
 const STATUSES = ["pending", "in-progress", "completed"] as const
 const PRIORITIES = ["low", "medium", "high"] as const
@@ -24,7 +30,13 @@ interface TaskRow {
   thumbnail_key: string | null
   created_at: number
   updated_at: number
+  comment_count: number | null
 }
+
+// SELECT base kèm subquery đếm comment — dùng cho mọi route đọc task
+const TASK_SELECT = `SELECT t.*,
+  (SELECT COUNT(*) FROM task_comments WHERE task_id = t.id) AS comment_count
+FROM tasks t`
 
 function parseTags(s: string | null): string[] {
   if (!s) return []
@@ -53,6 +65,7 @@ function serializeTask(row: TaskRow, fileUrl: string | null) {
     thumbnailUrl: fileUrl,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+    commentCount: row.comment_count ?? 0,
   }
 }
 
@@ -79,11 +92,24 @@ async function loadOwnedTask(
 ): Promise<TaskRow> {
   const user = c.get("user")
   const row = await c.env.DB.prepare(
-    `SELECT t.* FROM tasks t
+    `${TASK_SELECT}
      JOIN projects p ON p.id = t.project_id
      WHERE t.id = ? AND p.owner_id = ?`,
   )
     .bind(id, user.uid)
+    .first<TaskRow>()
+  if (!row) throw new HTTPException(404, { message: "Không tìm thấy task." })
+  return row
+}
+
+// Bất kỳ user đã đăng nhập nào cũng có thể xem task qua trang chi tiết (cho phép
+// bình luận khi biết link). Helper này chỉ check task tồn tại, KHÔNG check ownership.
+async function loadTaskById(
+  c: Context<AppEnv>,
+  id: string,
+): Promise<TaskRow> {
+  const row = await c.env.DB.prepare(`${TASK_SELECT} WHERE t.id = ?`)
+    .bind(id)
     .first<TaskRow>()
   if (!row) throw new HTTPException(404, { message: "Không tìm thấy task." })
   return row
@@ -98,7 +124,7 @@ tasks.get("/", async (c) => {
   await assertProjectOwner(c, projectId)
 
   const rs = await c.env.DB.prepare(
-    "SELECT * FROM tasks WHERE project_id = ? ORDER BY updated_at DESC",
+    `${TASK_SELECT} WHERE t.project_id = ? ORDER BY t.updated_at DESC`,
   )
     .bind(projectId)
     .all<TaskRow>()
@@ -232,17 +258,65 @@ tasks.post("/", async (c) => {
     throw e
   }
 
-  const row = await c.env.DB.prepare("SELECT * FROM tasks WHERE id = ?")
+  const row = await c.env.DB.prepare(`${TASK_SELECT} WHERE t.id = ?`)
     .bind(id)
     .first<TaskRow>()
   if (!row) throw new HTTPException(500, { message: "Tạo task thất bại." })
   return c.json(serializeTask(row, buildFileUrl(c.env, c.req.raw, row.thumbnail_key)), 201)
 })
 
-// GET /tasks/:id
+// GET /tasks/:id — bất kỳ user đăng nhập nào cũng xem được (cho chức năng comment)
 tasks.get("/:id", async (c) => {
-  const row = await loadOwnedTask(c, c.req.param("id"))
+  const row = await loadTaskById(c, c.req.param("id"))
   return c.json(serializeTask(row, buildFileUrl(c.env, c.req.raw, row.thumbnail_key)))
+})
+
+// GET /tasks/:id/comments — list bình luận của task
+tasks.get("/:id/comments", async (c) => {
+  const taskId = c.req.param("id")
+  await loadTaskById(c, taskId)
+  const rs = await c.env.DB.prepare(
+    `${COMMENT_SELECT} WHERE c.task_id = ? ORDER BY c.created_at ASC`,
+  )
+    .bind(taskId)
+    .all<CommentRow>()
+  const items = (rs.results ?? []).map((r) =>
+    serializeComment(r, buildFileUrl(c.env, c.req.raw, r.author_avatar_key)),
+  )
+  return c.json({ items })
+})
+
+// POST /tasks/:id/comments — tạo bình luận
+tasks.post("/:id/comments", async (c) => {
+  const taskId = c.req.param("id")
+  await loadTaskById(c, taskId)
+  const user = c.get("user")
+
+  let body: { body?: unknown }
+  try {
+    body = await c.req.json()
+  } catch {
+    throw new HTTPException(400, { message: "Body không phải JSON hợp lệ." })
+  }
+  const text = validateCommentBody(body.body)
+
+  const id = uuid()
+  const now = Date.now()
+  await c.env.DB.prepare(
+    `INSERT INTO task_comments (id, task_id, author_id, body, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?)`,
+  )
+    .bind(id, taskId, user.uid, text, now, now)
+    .run()
+
+  const row = await c.env.DB.prepare(`${COMMENT_SELECT} WHERE c.id = ?`)
+    .bind(id)
+    .first<CommentRow>()
+  if (!row) throw new HTTPException(500, { message: "Tạo bình luận thất bại." })
+  return c.json(
+    serializeComment(row, buildFileUrl(c.env, c.req.raw, row.author_avatar_key)),
+    201,
+  )
 })
 
 // PUT /tasks/:id
@@ -334,7 +408,7 @@ tasks.put("/:id", async (c) => {
     throw e
   }
 
-  const row = await c.env.DB.prepare("SELECT * FROM tasks WHERE id = ?")
+  const row = await c.env.DB.prepare(`${TASK_SELECT} WHERE t.id = ?`)
     .bind(existing.id)
     .first<TaskRow>()
   if (!row) throw new HTTPException(500, { message: "Update thất bại." })
