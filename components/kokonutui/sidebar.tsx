@@ -120,7 +120,8 @@ export default function Sidebar({ isCollapsed = false }: SidebarProps) {
         className={cn(
           "fixed inset-y-0 left-0 z-[70] w-64 bg-white dark:bg-[#0F0F12]",
           "transform transition-[transform,width] duration-300 ease-in-out",
-          "lg:translate-x-0 lg:static border-r border-gray-200 dark:border-[#1F1F23]",
+          "lg:translate-x-0",
+          "border-r border-gray-200 dark:border-[#1F1F23]",
           isCollapsed ? "lg:w-16" : "lg:w-64",
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full",
         )}

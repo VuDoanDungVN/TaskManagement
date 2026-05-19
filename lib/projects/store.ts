@@ -25,10 +25,18 @@ export function useProjects() {
 
 export function useProject(id: string | null | undefined) {
   const { user, verified, loading: authLoading } = useAuth()
+  const queryClient = useQueryClient()
   return useQuery({
     queryKey: PROJECT_QUERY_KEY(id ?? ""),
     queryFn: () => projectsApi.get(id!),
     enabled: !authLoading && !!user && verified && !!id,
+    // Render ngay từ list cache nếu có — refetch nền nếu stale.
+    placeholderData: () => {
+      if (!id) return undefined
+      const list = queryClient.getQueryData<ApiProject[]>(PROJECTS_QUERY_KEY)
+      return list?.find((p) => p.id === id)
+    },
+    staleTime: 5 * 60_000,
   })
 }
 

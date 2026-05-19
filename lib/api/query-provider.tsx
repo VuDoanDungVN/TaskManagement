@@ -9,7 +9,13 @@ export function QueryProvider({ children }: { children: ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 30_000,
+            // Mặc định 60s. Các hook detail/comment tự override staleTime cao hơn
+            // (5 phút) vì kết hợp optimistic update + invalidate có target,
+            // không cần refetch định kỳ.
+            staleTime: 60_000,
+            // Giữ cache 10 phút sau khi không còn observer → quay lại trang
+            // navigation gần đây không phải refetch.
+            gcTime: 10 * 60_000,
             refetchOnWindowFocus: false,
             retry: (failureCount, error) => {
               const status = (error as { status?: number })?.status

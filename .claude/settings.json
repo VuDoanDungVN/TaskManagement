@@ -56,7 +56,8 @@
       "Bash(curl -i -s -o NUL -w \"HTTP %{http_code} in %{time_total}s\\\\n\" http://127.0.0.1:8787/health)",
       "Bash(curl -6 -i -s -o NUL -w \"HTTP %{http_code} in %{time_total}s\\\\n\" \"http://[::1]:8787/health\")",
       "Bash(mkdir \"c:/Users/Dung/Desktop/All file/Project/task-dashboard/app/dashboard/[projectId]/[taskId]\")",
-      "Bash(echo \"EXIT $?\")"
+      "Bash(echo \"EXIT $?\")",
+      "Bash(Get-Content \"c:/Users/Dung/Desktop/All file/Project/task-dashboard/app/globals.css\" -TotalCount 50)"
     ],
     "additionalDirectories": [
       "c:\\Users\\Dung\\Desktop\\All file\\Project\\task-dashboard\\app\\dashboard\\[projectId]"

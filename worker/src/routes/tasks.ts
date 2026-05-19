@@ -9,6 +9,11 @@ import {
   validateCommentBody,
   type CommentRow,
 } from "./comments"
+import {
+  ATTACHMENT_MAX_PER_COMMENT,
+  sanitizeFileName,
+  validateAttachmentFile,
+} from "../attachments"
 
 const STATUSES = ["pending", "in-progress", "completed"] as const
 const PRIORITIES = ["low", "medium", "high"] as const
@@ -281,40 +286,143 @@ tasks.get("/:id/comments", async (c) => {
     .bind(taskId)
     .all<CommentRow>()
   const items = (rs.results ?? []).map((r) =>
-    serializeComment(r, buildFileUrl(c.env, c.req.raw, r.author_avatar_key)),
+    serializeComment(
+      r,
+      buildFileUrl(c.env, c.req.raw, r.author_avatar_key),
+      c.env,
+      c.req.raw,
+    ),
   )
   return c.json({ items })
 })
 
-// POST /tasks/:id/comments — tạo bình luận
+interface ParsedCommentInput {
+  body: string
+  parentIdRaw: string | null
+  files: File[]
+}
+
+async function parseCommentInput(c: Context<AppEnv>): Promise<ParsedCommentInput> {
+  const contentType = c.req.header("content-type") ?? ""
+  if (contentType.startsWith("multipart/form-data")) {
+    let form: FormData
+    try {
+      form = await c.req.raw.formData()
+    } catch {
+      throw new HTTPException(400, { message: "Form data không hợp lệ." })
+    }
+    const bodyRaw = form.get("body")
+    const parentIdRaw = form.get("parentId")
+    const files: File[] = []
+    for (const entry of form.getAll("file")) {
+      if (typeof entry !== "string") files.push(entry)
+    }
+    return {
+      body: validateCommentBody(bodyRaw),
+      parentIdRaw: typeof parentIdRaw === "string" && parentIdRaw ? parentIdRaw : null,
+      files,
+    }
+  }
+  // Fallback JSON (text-only)
+  let json: { body?: unknown; parentId?: unknown }
+  try {
+    json = await c.req.json()
+  } catch {
+    throw new HTTPException(400, { message: "Body không phải JSON hợp lệ." })
+  }
+  return {
+    body: validateCommentBody(json.body),
+    parentIdRaw:
+      typeof json.parentId === "string" && json.parentId ? json.parentId : null,
+    files: [],
+  }
+}
+
+// POST /tasks/:id/comments — tạo bình luận (hoặc reply, model 1 cấp), có thể đính kèm file
 tasks.post("/:id/comments", async (c) => {
   const taskId = c.req.param("id")
   await loadTaskById(c, taskId)
   const user = c.get("user")
 
-  let body: { body?: unknown }
-  try {
-    body = await c.req.json()
-  } catch {
-    throw new HTTPException(400, { message: "Body không phải JSON hợp lệ." })
+  const { body: text, parentIdRaw, files } = await parseCommentInput(c)
+
+  if (files.length > ATTACHMENT_MAX_PER_COMMENT) {
+    throw new HTTPException(400, {
+      message: `Tối đa ${ATTACHMENT_MAX_PER_COMMENT} file đính kèm mỗi bình luận.`,
+    })
   }
-  const text = validateCommentBody(body.body)
+  // Validate trước khi insert DB / upload R2 — fail-fast, không để lại rác
+  for (const f of files) validateAttachmentFile(f)
+
+  // Xử lý reply: client truyền parentId là id của comment đang được trả lời (root
+  // hoặc reply). Server flatten về root để giữ thread đúng 1 cấp; reply_to_id giữ
+  // nguyên id client gửi để UI hiện "↳ @tên".
+  let parentId: string | null = null
+  let replyToId: string | null = null
+  if (parentIdRaw) {
+    const target = await c.env.DB.prepare(
+      "SELECT id, task_id, parent_id FROM task_comments WHERE id = ?",
+    )
+      .bind(parentIdRaw)
+      .first<{ id: string; task_id: string; parent_id: string | null }>()
+    if (!target) {
+      throw new HTTPException(404, { message: "Bình luận cha không tồn tại." })
+    }
+    if (target.task_id !== taskId) {
+      throw new HTTPException(400, { message: "Bình luận cha không thuộc task này." })
+    }
+    parentId = target.parent_id ?? target.id
+    replyToId = target.id
+  }
 
   const id = uuid()
   const now = Date.now()
   await c.env.DB.prepare(
-    `INSERT INTO task_comments (id, task_id, author_id, body, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO task_comments
+       (id, task_id, author_id, body, parent_id, reply_to_id, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
   )
-    .bind(id, taskId, user.uid, text, now, now)
+    .bind(id, taskId, user.uid, text, parentId, replyToId, now, now)
     .run()
+
+  // Upload từng file lên R2 + insert attachment row.
+  // Lưu key của file đã upload để rollback nếu DB insert fail.
+  const uploadedKeys: string[] = []
+  try {
+    for (const f of files) {
+      const attId = uuid()
+      const safeName = sanitizeFileName(f.name)
+      const key = `comments/${id}/${attId}-${safeName}`
+      await c.env.FILES.put(key, f.stream(), {
+        httpMetadata: { contentType: f.type },
+      })
+      uploadedKeys.push(key)
+      await c.env.DB.prepare(
+        `INSERT INTO comment_attachments
+           (id, comment_id, file_key, file_name, file_size, mime_type, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      )
+        .bind(attId, id, key, f.name.slice(0, 200), f.size, f.type, now)
+        .run()
+    }
+  } catch (e) {
+    // Rollback: xoá file đã upload + comment vừa tạo
+    await Promise.all(uploadedKeys.map((k) => c.env.FILES.delete(k).catch(() => {})))
+    await c.env.DB.prepare("DELETE FROM task_comments WHERE id = ?").bind(id).run()
+    throw e
+  }
 
   const row = await c.env.DB.prepare(`${COMMENT_SELECT} WHERE c.id = ?`)
     .bind(id)
     .first<CommentRow>()
   if (!row) throw new HTTPException(500, { message: "Tạo bình luận thất bại." })
   return c.json(
-    serializeComment(row, buildFileUrl(c.env, c.req.raw, row.author_avatar_key)),
+    serializeComment(
+      row,
+      buildFileUrl(c.env, c.req.raw, row.author_avatar_key),
+      c.env,
+      c.req.raw,
+    ),
     201,
   )
 })

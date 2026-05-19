@@ -24,10 +24,23 @@ export function useTasks(projectId: string | null | undefined) {
 
 export function useTask(id: string | null | undefined) {
   const { user, verified, loading: authLoading } = useAuth()
+  const queryClient = useQueryClient()
   return useQuery({
     queryKey: TASK_QUERY_KEY(id ?? ""),
     queryFn: () => tasksApi.get(id!),
     enabled: !authLoading && !!user && verified && !!id,
+    // Khi click task từ trang list, task đã có trong cache ["tasks", projectId].
+    // Scan mọi list đang cache để render ngay, tránh loading spinner.
+    placeholderData: () => {
+      if (!id) return undefined
+      const lists = queryClient.getQueriesData<ApiTask[]>({ queryKey: ["tasks"] })
+      for (const [, list] of lists) {
+        const t = list?.find((x) => x.id === id)
+        if (t) return t
+      }
+      return undefined
+    },
+    staleTime: 5 * 60_000,
   })
 }
 

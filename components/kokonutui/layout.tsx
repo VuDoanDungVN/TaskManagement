@@ -6,6 +6,7 @@ import TopNav from "./top-nav"
 import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
 import type { BreadcrumbItem } from "@/lib/breadcrumbs"
+import { cn } from "@/lib/utils"
 
 interface LayoutProps {
   children: ReactNode
@@ -46,17 +47,25 @@ export default function Layout({ children, breadcrumbs }: LayoutProps) {
   }
 
   return (
-    <div className={`flex h-screen ${theme === "dark" ? "dark" : ""}`}>
+    <div className={`min-h-screen ${theme === "dark" ? "dark" : ""}`}>
       <Sidebar isCollapsed={collapsed} />
-      <div className="w-full flex flex-1 flex-col">
-        <header className="h-16">
+      <div
+        className={cn(
+          "min-h-screen flex flex-col",
+          "transition-[padding] duration-300 ease-in-out",
+          // Sidebar luôn position: fixed → cột phải cần padding-left bù theo
+          // độ rộng sidebar. Mobile (< lg) sidebar slide-out nên không cần padding.
+          collapsed ? "lg:pl-16" : "lg:pl-64",
+        )}
+      >
+        <header className="sticky top-0 z-40 h-16">
           <TopNav
             onToggleSidebar={toggleSidebar}
             isSidebarCollapsed={collapsed}
             breadcrumbs={breadcrumbs}
           />
         </header>
-        <main className="flex-1 overflow-auto p-6 bg-white dark:bg-[#0F0F12]">{children}</main>
+        <main className="flex-1 p-6 bg-white dark:bg-[#0F0F12]">{children}</main>
       </div>
     </div>
   )

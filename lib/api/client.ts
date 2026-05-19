@@ -1,6 +1,6 @@
 import { getFirebaseAuth, isFirebaseConfigured } from "@/lib/firebase/client"
 
-const API_URL =
+export const API_URL =
   process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") || "http://localhost:8787"
 
 export class ApiError extends Error {
