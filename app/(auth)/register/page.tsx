@@ -5,6 +5,7 @@ import Link from "next/link"
 import { Eye, EyeOff, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/lib/auth/context"
+import { useI18n } from "@/lib/i18n/context"
 import TaskLogo from "@/components/kokonutui/task-logo"
 
 const fieldClass = cn(
@@ -22,6 +23,7 @@ const labelClass = "text-xs font-medium text-zinc-700 dark:text-zinc-300"
 
 export default function RegisterPage() {
   const { signUp, configured } = useAuth()
+  const { t } = useI18n()
 
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
@@ -32,10 +34,10 @@ export default function RegisterPage() {
   const [formError, setFormError] = useState<string | null>(null)
 
   function validate(): string | null {
-    if (!name.trim()) return "Vui lòng nhập họ và tên."
-    if (!email.trim()) return "Vui lòng nhập email."
-    if (password.length < 6) return "Mật khẩu phải có ít nhất 6 ký tự."
-    if (password !== confirm) return "Mật khẩu xác nhận không khớp."
+    if (!name.trim()) return t("auth.register.errors.fullNameRequired")
+    if (!email.trim()) return t("auth.register.errors.emailRequired")
+    if (password.length < 6) return t("auth.register.errors.passwordMinLength")
+    if (password !== confirm) return t("auth.register.errors.confirmMismatch")
     return null
   }
 
@@ -48,7 +50,7 @@ export default function RegisterPage() {
       return
     }
     if (!configured) {
-      setFormError("Firebase chưa được cấu hình. Hãy tạo .env.local theo .env.local.example.")
+      setFormError(t("auth.register.errors.firebaseNotConfigured"))
       return
     }
     setSubmitting(true)
@@ -66,16 +68,18 @@ export default function RegisterPage() {
       <div className="bg-white dark:bg-[#0F0F12] border border-gray-200 dark:border-[#1F1F23] rounded-xl shadow-sm p-6 sm:p-8">
         <div className="flex flex-col items-center text-center mb-6">
           <TaskLogo className="h-10 w-10" />
-          <h1 className="mt-3 text-xl font-bold text-zinc-900 dark:text-zinc-100">Tạo tài khoản</h1>
+          <h1 className="mt-3 text-xl font-bold text-zinc-900 dark:text-zinc-100">
+            {t("auth.register.title")}
+          </h1>
           <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
-            Bắt đầu quản lý dự án và công việc của bạn
+            {t("auth.register.subtitle")}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="space-y-1">
             <label className={labelClass}>
-              Họ và tên <span className="text-red-500">*</span>
+              {t("auth.register.fullNameLabel")} <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -83,14 +87,14 @@ export default function RegisterPage() {
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="VD: Nguyễn Văn Dung"
+              placeholder={t("auth.register.fullNamePlaceholder")}
               className={fieldClass}
             />
           </div>
 
           <div className="space-y-1">
             <label className={labelClass}>
-              Email <span className="text-red-500">*</span>
+              {t("auth.register.emailLabel")} <span className="text-red-500">*</span>
             </label>
             <input
               type="email"
@@ -98,14 +102,14 @@ export default function RegisterPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="ban@taskmanagement.app"
+              placeholder={t("auth.register.emailPlaceholder")}
               className={fieldClass}
             />
           </div>
 
           <div className="space-y-1">
             <label className={labelClass}>
-              Mật khẩu <span className="text-red-500">*</span>
+              {t("auth.register.passwordLabel")} <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <input
@@ -114,13 +118,15 @@ export default function RegisterPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Tối thiểu 6 ký tự"
+                placeholder={t("auth.register.passwordPlaceholder")}
                 className={cn(fieldClass, "pr-10")}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((s) => !s)}
-                aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+                aria-label={
+                  showPassword ? t("auth.login.hidePassword") : t("auth.login.showPassword")
+                }
                 className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -130,7 +136,7 @@ export default function RegisterPage() {
 
           <div className="space-y-1">
             <label className={labelClass}>
-              Xác nhận mật khẩu <span className="text-red-500">*</span>
+              {t("auth.register.confirmLabel")} <span className="text-red-500">*</span>
             </label>
             <input
               type={showPassword ? "text" : "password"}
@@ -138,7 +144,7 @@ export default function RegisterPage() {
               required
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
-              placeholder="Nhập lại mật khẩu"
+              placeholder={t("auth.register.confirmPlaceholder")}
               className={cn(fieldClass, confirm && password !== confirm && fieldErrorClass)}
             />
           </div>
@@ -164,21 +170,21 @@ export default function RegisterPage() {
             )}
           >
             {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
-            <span>{submitting ? "Đang tạo tài khoản…" : "Đăng ký"}</span>
+            <span>{submitting ? t("auth.register.submitting") : t("auth.register.submit")}</span>
           </button>
         </form>
 
         <p className="mt-3 text-center text-[11px] text-zinc-500 dark:text-zinc-500">
-          Bằng việc tạo tài khoản, bạn đồng ý với Điều khoản và Chính sách của Task Management.
+          {t("auth.register.disclaimer")}
         </p>
 
         <div className="mt-5 text-center text-xs text-zinc-600 dark:text-zinc-400">
-          Đã có tài khoản?{" "}
+          {t("auth.register.haveAccount")}{" "}
           <Link
             href="/login"
             className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline"
           >
-            Đăng nhập
+            {t("auth.register.login")}
           </Link>
         </div>
       </div>

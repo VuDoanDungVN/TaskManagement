@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { ImagePlus } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useI18n } from "@/lib/i18n/context"
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"])
@@ -29,6 +30,7 @@ export default function FileInput({
   const inputRef = useRef<HTMLInputElement>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const { t } = useI18n()
 
   // Cleanup blob URL khi unmount hoặc đổi
   useEffect(() => {
@@ -49,12 +51,12 @@ export default function FileInput({
       return
     }
     if (!ALLOWED_MIME.has(file.type)) {
-      setError("Chỉ hỗ trợ JPG/PNG/WEBP/GIF.")
+      setError(t("fileInput.errorInvalidType"))
       e.target.value = ""
       return
     }
     if (file.size > MAX_FILE_SIZE) {
-      setError("File quá lớn (tối đa 5MB).")
+      setError(t("fileInput.errorTooLarge"))
       e.target.value = ""
       return
     }
@@ -77,7 +79,7 @@ export default function FileInput({
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
-        aria-label="Chọn ảnh"
+        aria-label={t("fileInput.pickImage")}
         className={cn(
           "relative overflow-hidden shrink-0",
           rounded ? "rounded-full" : "rounded-lg",
@@ -110,7 +112,7 @@ export default function FileInput({
               "transition-colors",
             )}
           >
-            {displayUrl ? "Đổi ảnh" : "Chọn ảnh"}
+            {displayUrl ? t("fileInput.changeImage") : t("fileInput.pickImage")}
           </button>
           {(previewUrl || currentUrl) && (
             <button
@@ -118,12 +120,12 @@ export default function FileInput({
               onClick={handleClear}
               className="px-2.5 py-1.5 rounded-md text-[11px] font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
             >
-              Bỏ chọn
+              {t("fileInput.clear")}
             </button>
           )}
         </div>
         <p className="text-[10px] text-zinc-500 dark:text-zinc-500">
-          JPG/PNG/WEBP/GIF, tối đa 5MB
+          {t("fileInput.helper")}
         </p>
         {error && <p className="text-[11px] text-red-600 dark:text-red-400">{error}</p>}
       </div>

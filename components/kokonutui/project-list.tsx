@@ -11,12 +11,14 @@ import type { ProjectDraft } from "@/lib/projects/types"
 import { uploadsApi } from "@/lib/api/uploads"
 import ProjectDialog from "./project-dialog"
 import { useAuth } from "@/lib/auth/context"
+import { useI18n } from "@/lib/i18n/context"
 
 export default function ProjectList() {
   const { user, verified, loading: authLoading } = useAuth()
   const { data: projects = [], isLoading: projectsLoading, error: projectsError } = useProjects()
   const createMutation = useCreateProject()
   const queryClient = useQueryClient()
+  const { t } = useI18n()
   const [dialogOpen, setDialogOpen] = useState(false)
 
   const isGuest = !authLoading && (!user || !verified)
@@ -49,10 +51,10 @@ export default function ProjectList() {
             <Info className="w-4 h-4 mt-0.5 text-amber-600 dark:text-amber-400 shrink-0" />
             <div className="min-w-0">
               <p className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">
-                Bạn đang xem ở chế độ khách
+                {t("projects.guestBannerTitle")}
               </p>
               <p className="text-[11px] text-zinc-600 dark:text-zinc-400 mt-0.5">
-                Đăng nhập để xem chi tiết task của từng dự án, tạo dự án mới và quản lý công việc.
+                {t("projects.guestBannerDesc")}
               </p>
             </div>
           </div>
@@ -63,11 +65,11 @@ export default function ProjectList() {
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <FolderKanban className="w-3.5 h-3.5 text-zinc-900 dark:text-zinc-50" />
-            Dự án
+            {t("projects.title")}
           </h2>
           <div className="flex items-center gap-3">
             <span className="text-xs text-zinc-600 dark:text-zinc-400">
-              {projects.length} dự án
+              {t("projects.countLabel", { count: projects.length })}
             </span>
             {!isGuest && (
               <button
@@ -85,7 +87,7 @@ export default function ProjectList() {
                 )}
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>Tạo dự án mới</span>
+                <span>{t("projects.createNew")}</span>
               </button>
             )}
           </div>
@@ -94,27 +96,27 @@ export default function ProjectList() {
         {isGuest ? (
           <div className="p-8 text-center">
             <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
-              Đăng nhập để xem dự án
+              {t("projects.signInToViewTitle")}
             </div>
             <div className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
-              Tạo tài khoản hoặc đăng nhập bằng banner phía trên.
+              {t("projects.signInToViewHelp")}
             </div>
           </div>
         ) : projectsLoading ? (
           <div className="p-6 text-xs text-zinc-600 dark:text-zinc-400 text-center">
-            Đang tải dữ liệu…
+            {t("projects.loading")}
           </div>
         ) : projectsError ? (
           <div className="p-6 text-xs text-red-600 dark:text-red-400 text-center">
-            Lỗi: {(projectsError as Error).message}
+            {t("projects.error", { message: (projectsError as Error).message })}
           </div>
         ) : projects.length === 0 ? (
           <div className="p-8 text-center">
             <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
-              Chưa có dự án nào
+              {t("projects.emptyTitle")}
             </div>
             <div className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
-              Tạo dự án đầu tiên để bắt đầu quản lý công việc.
+              {t("projects.emptyHelp")}
             </div>
           </div>
         ) : (
@@ -178,7 +180,7 @@ export default function ProjectList() {
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-[10px] font-medium text-zinc-700 dark:text-zinc-300">
                         <ListChecks className="w-3 h-3" />
-                        {stats.total} task
+                        {t("projects.card.tasksTotal", { count: stats.total })}
                       </span>
                       {stats.pending > 0 && (
                         <span
@@ -187,7 +189,7 @@ export default function ProjectList() {
                             STATUS_CONFIG.pending.pill,
                           )}
                         >
-                          {stats.pending} chưa
+                          {t("projects.card.pendingShort", { count: stats.pending })}
                         </span>
                       )}
                       {stats["in-progress"] > 0 && (
@@ -197,7 +199,7 @@ export default function ProjectList() {
                             STATUS_CONFIG["in-progress"].pill,
                           )}
                         >
-                          {stats["in-progress"]} đang
+                          {t("projects.card.inProgressShort", { count: stats["in-progress"] })}
                         </span>
                       )}
                       {stats.completed > 0 && (
@@ -207,7 +209,7 @@ export default function ProjectList() {
                             STATUS_CONFIG.completed.pill,
                           )}
                         >
-                          {stats.completed} xong
+                          {t("projects.card.doneShort", { count: stats.completed })}
                         </span>
                       )}
                     </div>
@@ -215,7 +217,9 @@ export default function ProjectList() {
                     {stats.total > 0 && (
                       <div className="space-y-1">
                         <div className="flex items-center justify-between text-[11px]">
-                          <span className="text-zinc-600 dark:text-zinc-400">Tiến độ</span>
+                          <span className="text-zinc-600 dark:text-zinc-400">
+                            {t("projects.card.progress")}
+                          </span>
                           <span className="text-zinc-900 dark:text-zinc-100 tabular-nums">
                             {progress}%
                           </span>
@@ -233,7 +237,7 @@ export default function ProjectList() {
                     )}
 
                     <div className="mt-auto pt-2 flex items-center justify-end text-[11px] text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">
-                      <span>Xem chi tiết</span>
+                      <span>{t("projects.card.viewDetail")}</span>
                       <ArrowRight className="w-3.5 h-3.5 ml-1 transition-transform group-hover:translate-x-0.5" />
                     </div>
                   </div>

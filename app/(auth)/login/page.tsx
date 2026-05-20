@@ -5,6 +5,7 @@ import Link from "next/link"
 import { Eye, EyeOff, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/lib/auth/context"
+import { useI18n } from "@/lib/i18n/context"
 import TaskLogo from "@/components/kokonutui/task-logo"
 
 const fieldClass = cn(
@@ -22,6 +23,7 @@ const labelClass = "text-xs font-medium text-zinc-700 dark:text-zinc-300"
 
 export default function LoginPage() {
   const { signIn, resetPassword, configured } = useAuth()
+  const { t } = useI18n()
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -35,7 +37,7 @@ export default function LoginPage() {
     setFormError(null)
     setInfo(null)
     if (!configured) {
-      setFormError("Firebase chưa được cấu hình. Hãy tạo .env.local theo .env.local.example.")
+      setFormError(t("auth.login.firebaseNotConfigured"))
       return
     }
     setSubmitting(true)
@@ -52,16 +54,16 @@ export default function LoginPage() {
     setFormError(null)
     setInfo(null)
     if (!email.trim()) {
-      setFormError("Nhập email phía trên rồi bấm 'Quên mật khẩu' để nhận link đặt lại.")
+      setFormError(t("auth.login.forgotEmailPrompt"))
       return
     }
     if (!configured) {
-      setFormError("Firebase chưa được cấu hình.")
+      setFormError(t("auth.login.firebaseNotConfigured"))
       return
     }
     try {
       await resetPassword(email.trim())
-      setInfo("Đã gửi email đặt lại mật khẩu. Vui lòng kiểm tra hộp thư.")
+      setInfo(t("auth.login.resetEmailSent"))
     } catch (e) {
       setFormError((e as Error).message)
     }
@@ -72,35 +74,37 @@ export default function LoginPage() {
       <div className="bg-white dark:bg-[#0F0F12] border border-gray-200 dark:border-[#1F1F23] rounded-xl shadow-sm p-6 sm:p-8">
         <div className="flex flex-col items-center text-center mb-6">
           <TaskLogo className="h-10 w-10" />
-          <h1 className="mt-3 text-xl font-bold text-zinc-900 dark:text-zinc-100">Đăng nhập</h1>
+          <h1 className="mt-3 text-xl font-bold text-zinc-900 dark:text-zinc-100">
+            {t("auth.login.title")}
+          </h1>
           <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
-            Chào mừng bạn quay lại Task Management
+            {t("auth.login.subtitle")}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="space-y-1">
-            <label className={labelClass}>Email</label>
+            <label className={labelClass}>{t("auth.login.emailLabel")}</label>
             <input
               type="email"
               autoComplete="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="ban@taskmanagement.app"
+              placeholder={t("auth.login.emailPlaceholder")}
               className={cn(fieldClass, formError && fieldErrorClass)}
             />
           </div>
 
           <div className="space-y-1">
             <div className="flex items-center justify-between">
-              <label className={labelClass}>Mật khẩu</label>
+              <label className={labelClass}>{t("auth.login.passwordLabel")}</label>
               <button
                 type="button"
                 onClick={handleForgotPassword}
                 className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
               >
-                Quên mật khẩu?
+                {t("auth.login.forgotPassword")}
               </button>
             </div>
             <div className="relative">
@@ -110,13 +114,15 @@ export default function LoginPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder={t("auth.login.passwordPlaceholder")}
                 className={cn(fieldClass, "pr-10", formError && fieldErrorClass)}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((s) => !s)}
-                aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+                aria-label={
+                  showPassword ? t("auth.login.hidePassword") : t("auth.login.showPassword")
+                }
                 className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -150,17 +156,17 @@ export default function LoginPage() {
             )}
           >
             {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
-            <span>{submitting ? "Đang đăng nhập…" : "Đăng nhập"}</span>
+            <span>{submitting ? t("auth.login.submitting") : t("auth.login.submit")}</span>
           </button>
         </form>
 
         <div className="mt-5 text-center text-xs text-zinc-600 dark:text-zinc-400">
-          Chưa có tài khoản?{" "}
+          {t("auth.login.noAccount")}{" "}
           <Link
             href="/register"
             className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline"
           >
-            Đăng ký
+            {t("auth.login.register")}
           </Link>
         </div>
       </div>

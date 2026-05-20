@@ -20,6 +20,7 @@ import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 import TaskLogo from "./task-logo"
+import { useI18n } from "@/lib/i18n/context"
 
 interface SidebarProps {
   isCollapsed?: boolean
@@ -28,6 +29,7 @@ interface SidebarProps {
 export default function Sidebar({ isCollapsed = false }: SidebarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const { t } = useI18n()
 
   function handleNavigation() {
     setIsMobileMenuOpen(false)
@@ -145,7 +147,7 @@ export default function Sidebar({ isCollapsed = false }: SidebarProps) {
                     : "opacity-100 max-w-[200px]",
                 )}
               >
-                Task Management
+                {t("nav.appName")}
               </span>
             </div>
           </Link>
@@ -159,52 +161,52 @@ export default function Sidebar({ isCollapsed = false }: SidebarProps) {
           >
             <div className="space-y-6">
               <div>
-                <SectionTitle>Overview</SectionTitle>
+                <SectionTitle>{t("nav.sectionOverview")}</SectionTitle>
                 <div className="space-y-1">
                   <NavItem href="/dashboard" icon={FolderKanban}>
-                    Dashboard
+                    {t("nav.dashboard")}
                   </NavItem>
                   <NavItem href="#" icon={BarChart2}>
-                    Analytics
+                    {t("nav.analytics")}
                   </NavItem>
                   <NavItem href="#" icon={Building2}>
-                    Organization
+                    {t("nav.organization")}
                   </NavItem>
-                  <NavItem href="#" icon={Folder}>
-                    Projects
+                  <NavItem href="/dashboard/projects" icon={Folder}>
+                    {t("nav.projects")}
                   </NavItem>
                 </div>
               </div>
 
               <div>
-                <SectionTitle>Finance</SectionTitle>
+                <SectionTitle>{t("nav.sectionFinance")}</SectionTitle>
                 <div className="space-y-1">
                   <NavItem href="#" icon={Wallet}>
-                    Transactions
+                    {t("nav.transactions")}
                   </NavItem>
                   <NavItem href="#" icon={Receipt}>
-                    Invoices
+                    {t("nav.invoices")}
                   </NavItem>
                   <NavItem href="#" icon={CreditCard}>
-                    Payments
+                    {t("nav.payments")}
                   </NavItem>
                 </div>
               </div>
 
               <div>
-                <SectionTitle>Team</SectionTitle>
+                <SectionTitle>{t("nav.sectionTeam")}</SectionTitle>
                 <div className="space-y-1">
                   <NavItem href="#" icon={Users2}>
-                    Members
+                    {t("nav.members")}
                   </NavItem>
                   <NavItem href="#" icon={Shield}>
-                    Permissions
+                    {t("nav.permissions")}
                   </NavItem>
                   <NavItem href="#" icon={MessagesSquare}>
-                    Chat
+                    {t("nav.chat")}
                   </NavItem>
                   <NavItem href="#" icon={Video}>
-                    Meetings
+                    {t("nav.meetings")}
                   </NavItem>
                 </div>
               </div>
@@ -218,11 +220,11 @@ export default function Sidebar({ isCollapsed = false }: SidebarProps) {
             )}
           >
             <div className="space-y-1">
-              <NavItem href="#" icon={Settings}>
-                Settings
+              <NavItem href="/dashboard/settings" icon={Settings}>
+                {t("nav.settings")}
               </NavItem>
               <NavItem href="#" icon={HelpCircle}>
-                Help
+                {t("nav.help")}
               </NavItem>
             </div>
           </div>

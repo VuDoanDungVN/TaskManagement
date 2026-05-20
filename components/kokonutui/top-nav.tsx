@@ -17,6 +17,8 @@ import type { BreadcrumbItem } from "@/lib/breadcrumbs"
 import UserAvatar from "./user-avatar"
 import { useAuth } from "@/lib/auth/context"
 import { useMe } from "@/lib/users/store"
+import { useI18n } from "@/lib/i18n/context"
+import LanguageToggle from "./language-toggle"
 
 interface TopNavProps {
   onToggleSidebar?: () => void
@@ -24,22 +26,21 @@ interface TopNavProps {
   breadcrumbs?: BreadcrumbItem[]
 }
 
-const DEFAULT_BREADCRUMBS: BreadcrumbItem[] = [
-  { label: "Dashboard", icon: FolderKanban },
-]
-
 export default function TopNav({
   onToggleSidebar,
   isSidebarCollapsed = false,
-  breadcrumbs = DEFAULT_BREADCRUMBS,
+  breadcrumbs,
 }: TopNavProps) {
   const { user, verified } = useAuth()
   const { data: me } = useMe()
+  const { t } = useI18n()
   const isLoggedIn = !!user && verified
   const displayName =
-    me?.displayName || user?.displayName || user?.email?.split("@")[0] || "Người dùng"
+    me?.displayName || user?.displayName || user?.email?.split("@")[0] || "User"
   const displayEmail = me?.email ?? user?.email ?? ""
   const avatarSrc = me?.avatarUrl ?? user?.photoURL ?? undefined
+  const crumbs: BreadcrumbItem[] =
+    breadcrumbs ?? [{ label: t("breadcrumbs.dashboard"), icon: FolderKanban }]
 
   return (
     <nav className="px-3 sm:px-6 flex items-center justify-between bg-white dark:bg-[#0F0F12] border-b border-gray-200 dark:border-[#1F1F23] h-full">
@@ -48,7 +49,11 @@ export default function TopNav({
           <button
             type="button"
             onClick={onToggleSidebar}
-            aria-label={isSidebarCollapsed ? "Mở sidebar" : "Đóng sidebar"}
+            aria-label={
+              isSidebarCollapsed
+                ? t("topnav.openSidebar")
+                : t("topnav.closeSidebar")
+            }
             className={cn(
               "hidden lg:inline-flex items-center justify-center",
               "p-1.5 rounded-md transition-colors",
@@ -73,10 +78,10 @@ export default function TopNav({
           </button>
         )}
 
-        <nav aria-label="Breadcrumb" className="hidden sm:block">
+        <nav aria-label={t("topnav.breadcrumb")} className="hidden sm:block">
           <ol className="flex items-center gap-0.5 text-sm">
-            {breadcrumbs.map((item, index) => {
-              const isLast = index === breadcrumbs.length - 1
+            {crumbs.map((item, index) => {
+              const isLast = index === crumbs.length - 1
               const Icon = item.icon
               return (
                 <li key={item.label} className="flex items-center gap-0.5">
@@ -134,12 +139,13 @@ export default function TopNav({
           </button>
         )}
 
+        <LanguageToggle />
         <ThemeToggle />
 
         {isLoggedIn ? (
           <DropdownMenu>
             <DropdownMenuTrigger
-              aria-label="Mở menu người dùng"
+              aria-label={t("topnav.openUserMenu")}
               className={cn(
                 "focus:outline-none rounded-full",
                 "ring-2 ring-gray-200 dark:ring-[#2B2B30]",
@@ -180,7 +186,7 @@ export default function TopNav({
             )}
           >
             <LogIn className="w-3.5 h-3.5" />
-            <span>Đăng nhập</span>
+            <span>{t("topnav.signIn")}</span>
           </Link>
         )}
       </div>

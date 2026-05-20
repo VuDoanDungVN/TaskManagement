@@ -42,6 +42,9 @@ export const tasksApi = {
   listByProject: (projectId: string) =>
     api.get<{ items: ApiTask[] }>(`/tasks?projectId=${encodeURIComponent(projectId)}`),
 
+  /** Tất cả task của các project user sở hữu — dùng cho Dashboard tổng quan. */
+  listAll: () => api.get<{ items: ApiTask[] }>("/tasks"),
+
   get: (id: string) => api.get<ApiTask>(`/tasks/${encodeURIComponent(id)}`),
 
   create: (input: TaskCreateInput) => api.post<ApiTask>("/tasks", input),

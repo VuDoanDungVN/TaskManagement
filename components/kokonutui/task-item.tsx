@@ -6,6 +6,7 @@ import React from "react"
 import { useRouter } from "next/navigation"
 import type { Task } from "@/lib/tasks/types"
 import { PRIORITY_CONFIG, STATUS_CONFIG, formatDate, isOverdue } from "@/lib/tasks/utils"
+import { useI18n } from "@/lib/i18n/context"
 
 interface TaskItemProps {
   task: Task
@@ -16,6 +17,7 @@ interface TaskItemProps {
 
 export default function TaskItem({ task, no, onEdit, onDelete }: TaskItemProps) {
   const router = useRouter()
+  const { t } = useI18n()
   const status = STATUS_CONFIG[task.status]
   const priority = PRIORITY_CONFIG[task.priority]
   const overdue = isOverdue(task)
@@ -72,7 +74,7 @@ export default function TaskItem({ task, no, onEdit, onDelete }: TaskItemProps) 
                   "text-[10px] font-semibold tabular-nums",
                   "text-zinc-600 dark:text-zinc-300",
                 )}
-                aria-label={`Task số ${no}`}
+                aria-label={t("taskItem.ariaNumber", { value: no })}
               >
                 #{String(no).padStart(2, "0")}
               </span>
@@ -93,10 +95,10 @@ export default function TaskItem({ task, no, onEdit, onDelete }: TaskItemProps) 
               )}
             >
               {React.createElement(status.icon, { className: "w-3 h-3" })}
-              {status.label}
+              {t(status.labelKey)}
             </span>
             <span className={cn("px-2 py-1 rounded-full text-[11px] font-medium", priority.pill)}>
-              {priority.label}
+              {t(priority.labelKey)}
             </span>
           </div>
         </div>
@@ -131,8 +133,8 @@ export default function TaskItem({ task, no, onEdit, onDelete }: TaskItemProps) 
           )}
           <span
             className="inline-flex items-center gap-1 tabular-nums"
-            aria-label={`${task.commentCount} bình luận`}
-            title={`${task.commentCount} bình luận`}
+            aria-label={t("taskItem.ariaComments", { count: task.commentCount })}
+            title={t("taskItem.ariaComments", { count: task.commentCount })}
           >
             <MessageSquare className="w-3 h-3" />
             {task.commentCount}
@@ -154,7 +156,7 @@ export default function TaskItem({ task, no, onEdit, onDelete }: TaskItemProps) 
             "hover:bg-zinc-200 dark:hover:bg-zinc-700/60",
             "transition-colors",
           )}
-          aria-label="Sửa task"
+          aria-label={t("taskItem.ariaEdit")}
         >
           <Pencil className="w-3.5 h-3.5" />
         </button>
@@ -171,7 +173,7 @@ export default function TaskItem({ task, no, onEdit, onDelete }: TaskItemProps) 
             "hover:bg-red-100 dark:hover:bg-red-900/30",
             "transition-colors",
           )}
-          aria-label="Xoá task"
+          aria-label={t("taskItem.ariaDelete")}
         >
           <Trash2 className="w-3.5 h-3.5" />
         </button>

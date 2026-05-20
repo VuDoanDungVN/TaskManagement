@@ -120,20 +120,35 @@ async function loadTaskById(
   return row
 }
 
-// GET /tasks?projectId=xxx — list task của 1 project
+// GET /tasks?projectId=xxx → list task của 1 project
+// GET /tasks                  → toàn bộ task của các dự án user sở hữu (cho Dashboard)
 tasks.get("/", async (c) => {
   const projectId = c.req.query("projectId")
-  if (!projectId) {
-    throw new HTTPException(400, { message: "Thiếu query param projectId." })
+
+  if (projectId) {
+    await assertProjectOwner(c, projectId)
+    const rs = await c.env.DB.prepare(
+      `${TASK_SELECT} WHERE t.project_id = ? ORDER BY t.updated_at DESC`,
+    )
+      .bind(projectId)
+      .all<TaskRow>()
+    const items = (rs.results ?? []).map((r) =>
+      serializeTask(r, buildFileUrl(c.env, c.req.raw, r.thumbnail_key)),
+    )
+    return c.json({ items })
   }
-  await assertProjectOwner(c, projectId)
 
+  // Tất cả task của owner — giới hạn 500 để bảo vệ payload Dashboard.
+  const user = c.get("user")
   const rs = await c.env.DB.prepare(
-    `${TASK_SELECT} WHERE t.project_id = ? ORDER BY t.updated_at DESC`,
+    `${TASK_SELECT}
+     JOIN projects p ON p.id = t.project_id
+     WHERE p.owner_id = ?
+     ORDER BY t.updated_at DESC
+     LIMIT 500`,
   )
-    .bind(projectId)
+    .bind(user.uid)
     .all<TaskRow>()
-
   const items = (rs.results ?? []).map((r) =>
     serializeTask(r, buildFileUrl(c.env, c.req.raw, r.thumbnail_key)),
   )

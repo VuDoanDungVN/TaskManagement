@@ -14,6 +14,7 @@ import {
 import type { Task, TaskDraft, TaskStatus } from "@/lib/tasks/types"
 import { STATUS_CONFIG } from "@/lib/tasks/utils"
 import { uploadsApi } from "@/lib/api/uploads"
+import { useI18n } from "@/lib/i18n/context"
 import TaskItem from "./task-item"
 import TaskDialog from "./task-dialog"
 
@@ -29,6 +30,7 @@ export default function TaskManager({ projectId }: TaskManagerProps) {
   const updateMutation = useUpdateTask(projectId)
   const deleteMutation = useDeleteTask(projectId)
   const queryClient = useQueryClient()
+  const { t } = useI18n()
 
   const [filter, setFilter] = useState<FilterValue>("all")
   const [search, setSearch] = useState("")
@@ -92,15 +94,15 @@ export default function TaskManager({ projectId }: TaskManagerProps) {
   }
 
   function handleDelete(id: string) {
-    if (typeof window !== "undefined" && !window.confirm("Xoá task này?")) return
+    if (typeof window !== "undefined" && !window.confirm(t("taskDetail.deleteConfirm"))) return
     deleteMutation.mutate(id)
   }
 
   const filters: { value: FilterValue; label: string }[] = [
-    { value: "all", label: "Tất cả" },
-    { value: "pending", label: STATUS_CONFIG.pending.label },
-    { value: "in-progress", label: STATUS_CONFIG["in-progress"].label },
-    { value: "completed", label: STATUS_CONFIG.completed.label },
+    { value: "all", label: t("tasks.filterAll") },
+    { value: "pending", label: t(STATUS_CONFIG.pending.labelKey) },
+    { value: "in-progress", label: t(STATUS_CONFIG["in-progress"].labelKey) },
+    { value: "completed", label: t(STATUS_CONFIG.completed.labelKey) },
   ]
 
   return (
@@ -109,7 +111,7 @@ export default function TaskManager({ projectId }: TaskManagerProps) {
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <ListChecks className="w-3.5 h-3.5 text-zinc-900 dark:text-zinc-50" />
-            Quản lý Task
+            {t("tasks.title")}
           </h2>
           <button
             type="button"
@@ -126,7 +128,7 @@ export default function TaskManager({ projectId }: TaskManagerProps) {
             )}
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>Tạo task mới</span>
+            <span>{t("tasks.createNew")}</span>
           </button>
         </div>
 
@@ -169,7 +171,7 @@ export default function TaskManager({ projectId }: TaskManagerProps) {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Tìm task theo tên, tag, người phụ trách…"
+              placeholder={t("tasks.searchPlaceholder")}
               className={cn(
                 "w-full pl-8 pr-3 py-2 rounded-lg text-xs",
                 "bg-white dark:bg-zinc-900/70",
@@ -192,21 +194,19 @@ export default function TaskManager({ projectId }: TaskManagerProps) {
         >
           {isLoading ? (
             <div className="p-6 text-xs text-zinc-600 dark:text-zinc-400 text-center">
-              Đang tải dữ liệu…
+              {t("tasks.loading")}
             </div>
           ) : error ? (
             <div className="p-6 text-xs text-red-600 dark:text-red-400 text-center">
-              Lỗi: {(error as Error).message}
+              {t("tasks.errorPrefix", { message: (error as Error).message })}
             </div>
           ) : filtered.length === 0 ? (
             <div className="p-8 text-center">
               <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
-                Không có task nào
+                {t("tasks.emptyTitle")}
               </div>
               <div className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
-                {search
-                  ? "Thử từ khoá khác hoặc xoá bộ lọc."
-                  : "Tạo task đầu tiên để bắt đầu quản lý công việc."}
+                {search ? t("tasks.emptyHelpSearch") : t("tasks.emptyHelp")}
               </div>
             </div>
           ) : (

@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import type { Task, TaskDraft, TaskPriority, TaskStatus } from "@/lib/tasks/types"
+import { useI18n } from "@/lib/i18n/context"
 import FileInput from "./file-input"
 
 interface TaskDialogProps {
@@ -63,6 +64,7 @@ export default function TaskDialog({
   onClose,
   onSubmit,
 }: TaskDialogProps) {
+  const { t } = useI18n()
   const suggestedNo = useMemo(() => suggestNextNo(existingNos), [existingNos])
   const [draft, setDraft] = useState<TaskDraft>(() => emptyDraft(suggestedNo))
   const [noText, setNoText] = useState<string>(String(suggestedNo))
@@ -97,21 +99,21 @@ export default function TaskDialog({
 
   const noError = useMemo(() => {
     const trimmed = noText.trim()
-    if (!trimmed) return "Số No là bắt buộc."
-    if (!/^\d+$/.test(trimmed)) return "Số No phải là số nguyên dương."
+    if (!trimmed) return t("taskDialog.noRequired")
+    if (!/^\d+$/.test(trimmed)) return t("taskDialog.noInvalid")
     const value = Number.parseInt(trimmed, 10)
-    if (value < 1) return "Số No phải lớn hơn 0."
+    if (value < 1) return t("taskDialog.noMustGtZero")
     const collides = existingNos.some(
       (n) => n === value && n !== initialTask?.no,
     )
-    if (collides) return `Số No #${value} đã tồn tại trong dự án.`
+    if (collides) return t("taskDialog.noDuplicate", { value })
     return null
-  }, [noText, existingNos, initialTask])
+  }, [noText, existingNos, initialTask, t])
 
   const titleError = useMemo(() => {
-    if (!draft.title.trim()) return "Tiêu đề là bắt buộc."
+    if (!draft.title.trim()) return t("taskDialog.titleRequired")
     return null
-  }, [draft.title])
+  }, [draft.title, t])
 
   const canSubmit = !noError && !titleError
 
@@ -146,10 +148,10 @@ export default function TaskDialog({
       >
         <DialogHeader>
           <DialogTitle className="text-zinc-900 dark:text-zinc-100">
-            {initialTask ? "Sửa Task" : "Tạo Task mới"}
+            {initialTask ? t("taskDialog.editTitle") : t("taskDialog.createTitle")}
           </DialogTitle>
           <DialogDescription className="text-zinc-600 dark:text-zinc-400">
-            Nhập thông tin chi tiết của Task.
+            {t("taskDialog.description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -157,7 +159,7 @@ export default function TaskDialog({
           <div className="grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-3">
             <div className="space-y-1">
               <label className={labelClass}>
-                Số No <span className="text-red-500">*</span>
+                {t("taskDialog.noLabel")} <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
@@ -166,7 +168,7 @@ export default function TaskDialog({
                 required
                 value={noText}
                 onChange={(e) => setNoText(e.target.value)}
-                placeholder="VD: 6"
+                placeholder={t("taskDialog.noPlaceholder")}
                 className={cn(fieldClass, "tabular-nums", noError && fieldErrorClass)}
                 aria-invalid={!!noError}
                 aria-describedby="no-help"
@@ -180,18 +182,18 @@ export default function TaskDialog({
                     : "text-zinc-500 dark:text-zinc-400",
                 )}
               >
-                {noError ?? `Gợi ý: #${suggestedNo}`}
+                {noError ?? t("taskDialog.noHint", { value: suggestedNo })}
               </p>
             </div>
             <div className="space-y-1">
               <label className={labelClass}>
-                Tiêu đề <span className="text-red-500">*</span>
+                {t("taskDialog.titleLabel")} <span className="text-red-500">*</span>
               </label>
               <input
                 required
                 value={draft.title}
                 onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))}
-                placeholder="VD: Hoàn thành báo cáo tuần"
+                placeholder={t("taskDialog.titlePlaceholder")}
                 className={cn(fieldClass, titleError && fieldErrorClass)}
                 aria-invalid={!!titleError}
               />
@@ -202,11 +204,11 @@ export default function TaskDialog({
           </div>
 
           <div className="space-y-1">
-            <label className={labelClass}>Mô tả</label>
+            <label className={labelClass}>{t("taskDialog.descriptionLabel")}</label>
             <textarea
               value={draft.description ?? ""}
               onChange={(e) => setDraft((d) => ({ ...d, description: e.target.value }))}
-              placeholder="Chi tiết công việc, ghi chú…"
+              placeholder={t("taskDialog.descriptionPlaceholder")}
               rows={3}
               className={cn(fieldClass, "resize-y min-h-[72px]")}
             />
@@ -214,7 +216,7 @@ export default function TaskDialog({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className={labelClass}>Trạng thái</label>
+              <label className={labelClass}>{t("taskDialog.statusLabel")}</label>
               <select
                 value={draft.status}
                 onChange={(e) =>
@@ -222,13 +224,13 @@ export default function TaskDialog({
                 }
                 className={fieldClass}
               >
-                <option value="pending">Chưa thực hiện</option>
-                <option value="in-progress">Đang thực hiện</option>
-                <option value="completed">Đã hoàn thành</option>
+                <option value="pending">{t("tasks.status.pending")}</option>
+                <option value="in-progress">{t("tasks.status.inProgress")}</option>
+                <option value="completed">{t("tasks.status.completed")}</option>
               </select>
             </div>
             <div className="space-y-1">
-              <label className={labelClass}>Mức ưu tiên</label>
+              <label className={labelClass}>{t("taskDialog.priorityLabel")}</label>
               <select
                 value={draft.priority}
                 onChange={(e) =>
@@ -236,16 +238,16 @@ export default function TaskDialog({
                 }
                 className={fieldClass}
               >
-                <option value="low">Thấp</option>
-                <option value="medium">Trung bình</option>
-                <option value="high">Cao</option>
+                <option value="low">{t("tasks.priority.low")}</option>
+                <option value="medium">{t("tasks.priority.medium")}</option>
+                <option value="high">{t("tasks.priority.high")}</option>
               </select>
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className={labelClass}>Ngày bắt đầu</label>
+              <label className={labelClass}>{t("taskDialog.startDateLabel")}</label>
               <input
                 type="date"
                 value={draft.startDate ?? ""}
@@ -254,7 +256,7 @@ export default function TaskDialog({
               />
             </div>
             <div className="space-y-1">
-              <label className={labelClass}>Hạn chót</label>
+              <label className={labelClass}>{t("taskDialog.dueDateLabel")}</label>
               <input
                 type="date"
                 value={draft.dueDate ?? ""}
@@ -266,27 +268,27 @@ export default function TaskDialog({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className={labelClass}>Người phụ trách</label>
+              <label className={labelClass}>{t("taskDialog.assigneeLabel")}</label>
               <input
                 value={draft.assignee ?? ""}
                 onChange={(e) => setDraft((d) => ({ ...d, assignee: e.target.value }))}
-                placeholder="VD: Dung"
+                placeholder={t("taskDialog.assigneePlaceholder")}
                 className={fieldClass}
               />
             </div>
             <div className="space-y-1">
-              <label className={labelClass}>Tags (phân cách bằng dấu phẩy)</label>
+              <label className={labelClass}>{t("taskDialog.tagsLabel")}</label>
               <input
                 value={tagsText}
                 onChange={(e) => setTagsText(e.target.value)}
-                placeholder="backend, urgent"
+                placeholder={t("taskDialog.tagsPlaceholder")}
                 className={fieldClass}
               />
             </div>
           </div>
 
           <div className="space-y-1">
-            <label className={labelClass}>Thumbnail (tuỳ chọn)</label>
+            <label className={labelClass}>{t("taskDialog.thumbnailLabel")}</label>
             <FileInput
               size={80}
               currentUrl={initialTask?.thumbnailUrl ?? null}
@@ -306,7 +308,7 @@ export default function TaskDialog({
                 "transition-colors",
               )}
             >
-              Huỷ
+              {t("common.cancel")}
             </button>
             <button
               type="submit"
@@ -320,7 +322,7 @@ export default function TaskDialog({
                 "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-zinc-900 dark:disabled:hover:bg-zinc-50",
               )}
             >
-              {initialTask ? "Lưu thay đổi" : "Tạo task"}
+              {initialTask ? t("taskDialog.submitEdit") : t("taskDialog.submitCreate")}
             </button>
           </DialogFooter>
         </form>

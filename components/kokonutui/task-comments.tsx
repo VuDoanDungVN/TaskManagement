@@ -34,8 +34,12 @@ import {
   isPdfMime,
 } from "@/lib/comments/attachments"
 import { API_URL } from "@/lib/api/client"
+import { useI18n } from "@/lib/i18n/context"
+import type { TranslationKey } from "@/lib/i18n/types"
 import UserAvatar from "./user-avatar"
 import ImageLightbox from "./image-lightbox"
+
+type TFn = (key: TranslationKey, params?: Record<string, string | number>) => string
 
 interface TaskCommentsProps {
   taskId: string
@@ -52,20 +56,20 @@ function formatTimestamp(ms: number) {
   return `${dd}/${mm}/${yyyy} ${hh}:${mi}`
 }
 
-function authorDisplayName(c: TaskComment) {
+function authorDisplayName(c: TaskComment, t: TFn) {
   return (
     c.author.displayName?.trim() ||
     c.author.email?.split("@")[0] ||
-    "Người dùng"
+    t("comments.userFallback")
   )
 }
 
-function replyToDisplayName(c: TaskComment) {
+function replyToDisplayName(c: TaskComment, t: TFn) {
   if (!c.replyTo) return null
   return (
     c.replyTo.authorDisplayName?.trim() ||
     c.replyTo.authorEmail?.split("@")[0] ||
-    "Người dùng"
+    t("comments.userFallback")
   )
 }
 
@@ -101,9 +105,11 @@ interface LightboxImage {
 function AttachmentsView({
   items,
   onOpenImage,
+  t,
 }: {
   items: ApiCommentAttachment[]
   onOpenImage: (img: LightboxImage) => void
+  t: TFn
 }) {
   if (items.length === 0) return null
   const images = items.filter((a) => isImageMime(a.mimeType))
@@ -163,8 +169,11 @@ function AttachmentsView({
                 )}
                 title={
                   pdf
-                    ? "Mở PDF trong tab mới"
-                    : `Tải về: ${a.fileName} (${formatBytes(a.fileSize)})`
+                    ? t("comments.openPdfTitle")
+                    : t("comments.downloadTitle", {
+                        name: a.fileName,
+                        size: formatBytes(a.fileSize),
+                      })
                 }
               >
                 <FileText className="w-4 h-4 shrink-0 text-zinc-600 dark:text-zinc-300" />
@@ -193,9 +202,10 @@ interface PendingPickerProps {
   onChange: (files: File[]) => void
   onError: (msg: string | null) => void
   inputId: string
+  t: TFn
 }
 
-function AttachmentPicker({ files, onChange, onError, inputId }: PendingPickerProps) {
+function AttachmentPicker({ files, onChange, onError, inputId, t }: PendingPickerProps) {
   const inputRef = useRef<HTMLInputElement | null>(null)
 
   function handlePick(e: React.ChangeEvent<HTMLInputElement>) {
@@ -206,12 +216,12 @@ function AttachmentPicker({ files, onChange, onError, inputId }: PendingPickerPr
     const merged = [...files]
     for (const f of picked) {
       if (merged.length >= ATTACHMENT_MAX_PER_COMMENT) {
-        onError(`Tối đa ${ATTACHMENT_MAX_PER_COMMENT} file mỗi bình luận.`)
+        onError(t("comments.maxPerComment", { count: ATTACHMENT_MAX_PER_COMMENT }))
         break
       }
       const err = checkAttachmentFile(f)
       if (err) {
-        onError(err)
+        onError(t(`attachments.error${err.code}` as TranslationKey, err.params))
         continue
       }
       // Tránh thêm trùng (cùng tên + size)
@@ -251,7 +261,7 @@ function AttachmentPicker({ files, onChange, onError, inputId }: PendingPickerPr
         )}
       >
         <Paperclip className="w-3 h-3" />
-        Đính kèm
+        {t("comments.attach")}
       </button>
       {files.length > 0 && (
         <ul className="flex flex-wrap gap-1.5">
@@ -274,7 +284,7 @@ function AttachmentPicker({ files, onChange, onError, inputId }: PendingPickerPr
                 type="button"
                 onClick={() => removeAt(i)}
                 className="p-0.5 rounded hover:bg-zinc-200 dark:hover:bg-zinc-700 shrink-0"
-                aria-label={`Bỏ file ${f.name}`}
+                aria-label={t("comments.removeFile", { name: f.name })}
               >
                 <X className="w-3 h-3" />
               </button>
@@ -288,6 +298,7 @@ function AttachmentPicker({ files, onChange, onError, inputId }: PendingPickerPr
 
 export default function TaskComments({ taskId }: TaskCommentsProps) {
   const { user } = useAuth()
+  const { t } = useI18n()
   const commentsQuery = useTaskComments(taskId)
   const createMutation = useCreateComment(taskId)
   const updateMutation = useUpdateComment(taskId)
@@ -313,7 +324,7 @@ export default function TaskComments({ taskId }: TaskCommentsProps) {
     if (!text && draftFiles.length === 0) return
     try {
       await createMutation.mutateAsync({
-        body: text || "(file đính kèm)",
+        body: text || t("comments.attachOnlyFallback"),
         files: draftFiles,
       })
       setDraft("")
@@ -344,7 +355,7 @@ export default function TaskComments({ taskId }: TaskCommentsProps) {
     if (!text && replyFiles.length === 0) return
     try {
       await createMutation.mutateAsync({
-        body: text || "(file đính kèm)",
+        body: text || t("comments.attachOnlyFallback"),
         parentId: replyTarget.id,
         files: replyFiles,
       })
@@ -377,7 +388,7 @@ export default function TaskComments({ taskId }: TaskCommentsProps) {
   }
 
   async function handleDelete(id: string) {
-    if (typeof window !== "undefined" && !window.confirm("Xoá bình luận này?"))
+    if (typeof window !== "undefined" && !window.confirm(t("comments.deleteConfirm")))
       return
     try {
       await deleteMutation.mutateAsync(id)
@@ -388,10 +399,10 @@ export default function TaskComments({ taskId }: TaskCommentsProps) {
 
   function renderComment(c: TaskComment, opts: { isReply: boolean }) {
     const isMine = !!user && user.uid === c.author.id
-    const name = authorDisplayName(c)
+    const name = authorDisplayName(c, t)
     const edited = c.updatedAt > c.createdAt
     const isEditing = editingId === c.id
-    const replyToName = replyToDisplayName(c)
+    const replyToName = replyToDisplayName(c, t)
 
     return (
       <div className="flex gap-3 items-start">
@@ -413,7 +424,7 @@ export default function TaskComments({ taskId }: TaskCommentsProps) {
             )}
             <span className="text-[11px] text-zinc-500 dark:text-zinc-500">
               · {formatTimestamp(c.createdAt)}
-              {edited && " (đã sửa)"}
+              {edited && t("comments.edited")}
             </span>
           </div>
 
@@ -443,7 +454,7 @@ export default function TaskComments({ taskId }: TaskCommentsProps) {
                     "disabled:opacity-50",
                   )}
                 >
-                  {updateMutation.isPending ? "Đang lưu…" : "Lưu"}
+                  {updateMutation.isPending ? t("common.saving") : t("comments.save")}
                 </button>
                 <button
                   type="button"
@@ -455,7 +466,7 @@ export default function TaskComments({ taskId }: TaskCommentsProps) {
                     "hover:bg-zinc-100 dark:hover:bg-zinc-800/50",
                   )}
                 >
-                  Huỷ
+                  {t("comments.cancel")}
                 </button>
               </div>
             </div>
@@ -464,7 +475,11 @@ export default function TaskComments({ taskId }: TaskCommentsProps) {
               <p className="mt-0.5 text-sm text-zinc-800 dark:text-zinc-200 whitespace-pre-wrap break-words">
                 {c.body}
               </p>
-              <AttachmentsView items={c.attachments} onOpenImage={setLightboxImage} />
+              <AttachmentsView
+                items={c.attachments}
+                onOpenImage={setLightboxImage}
+                t={t}
+              />
             </>
           )}
 
@@ -480,7 +495,7 @@ export default function TaskComments({ taskId }: TaskCommentsProps) {
                 )}
               >
                 <Reply className="w-3 h-3" />
-                Trả lời
+                {t("comments.reply")}
               </button>
               {isMine && (
                 <>
@@ -494,7 +509,7 @@ export default function TaskComments({ taskId }: TaskCommentsProps) {
                     )}
                   >
                     <Pencil className="w-3 h-3" />
-                    Sửa
+                    {t("comments.edit")}
                   </button>
                   <button
                     type="button"
@@ -508,7 +523,7 @@ export default function TaskComments({ taskId }: TaskCommentsProps) {
                     )}
                   >
                     <Trash2 className="w-3 h-3" />
-                    Xoá
+                    {t("comments.delete")}
                   </button>
                 </>
               )}
@@ -520,7 +535,7 @@ export default function TaskComments({ taskId }: TaskCommentsProps) {
   }
 
   function renderReplyForm(target: TaskComment) {
-    const targetName = authorDisplayName(target)
+    const targetName = authorDisplayName(target, t)
     return (
       <form
         onSubmit={handleSubmitReply}
@@ -533,7 +548,7 @@ export default function TaskComments({ taskId }: TaskCommentsProps) {
         <div className="flex items-center justify-between gap-2 mb-1.5">
           <span className="inline-flex items-center gap-1 text-[11px] text-zinc-600 dark:text-zinc-400">
             <CornerDownRight className="w-3 h-3" />
-            Trả lời <span className="font-medium">@{targetName}</span>
+            {t("comments.replyingTo", { name: targetName })}
           </span>
           <button
             type="button"
@@ -545,7 +560,7 @@ export default function TaskComments({ taskId }: TaskCommentsProps) {
             )}
           >
             <X className="w-3 h-3" />
-            Huỷ
+            {t("comments.cancel")}
           </button>
         </div>
         <textarea
@@ -553,7 +568,7 @@ export default function TaskComments({ taskId }: TaskCommentsProps) {
           value={replyDraft}
           onChange={(e) => setReplyDraft(e.target.value)}
           rows={2}
-          placeholder={`Trả lời @${targetName}…`}
+          placeholder={t("comments.replyPlaceholder", { name: targetName })}
           className={cn(
             "w-full px-3 py-2 rounded-lg text-sm",
             "bg-white dark:bg-[#0F0F12]",
@@ -569,6 +584,7 @@ export default function TaskComments({ taskId }: TaskCommentsProps) {
             onChange={setReplyFiles}
             onError={setError}
             inputId={`reply-files-${target.id}`}
+            t={t}
           />
         </div>
         <div className="mt-2 flex items-center justify-end">
@@ -587,7 +603,7 @@ export default function TaskComments({ taskId }: TaskCommentsProps) {
             )}
           >
             <Send className="w-3.5 h-3.5" />
-            {createMutation.isPending ? "Đang gửi…" : "Gửi trả lời"}
+            {createMutation.isPending ? t("comments.sending") : t("comments.sendReply")}
           </button>
         </div>
       </form>
@@ -599,7 +615,7 @@ export default function TaskComments({ taskId }: TaskCommentsProps) {
       <div className="px-6 py-4 border-b border-zinc-100 dark:border-zinc-800 flex items-center gap-2">
         <MessageSquare className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
         <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-          Bình luận
+          {t("comments.title")}
         </h2>
         <span className="text-xs text-zinc-500 dark:text-zinc-400">
           ({items.length})
@@ -607,9 +623,65 @@ export default function TaskComments({ taskId }: TaskCommentsProps) {
       </div>
 
       <div className="p-6 space-y-4">
+        <form
+          onSubmit={handleSubmitRoot}
+          className="pb-4 border-b border-zinc-100 dark:border-zinc-800"
+        >
+          <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+            {t("comments.yourComment")}
+          </label>
+          <textarea
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            rows={3}
+            placeholder={t("comments.placeholder")}
+            className={cn(
+              "w-full px-3 py-2 rounded-lg text-sm",
+              "bg-white dark:bg-[#0F0F12]",
+              "border border-zinc-200 dark:border-zinc-700",
+              "text-zinc-900 dark:text-zinc-100",
+              "placeholder:text-zinc-400 dark:placeholder:text-zinc-500",
+              "focus:outline-none focus:ring-2 focus:ring-zinc-500 dark:focus:ring-zinc-400",
+            )}
+          />
+          <div className="mt-2">
+            <AttachmentPicker
+              files={draftFiles}
+              onChange={setDraftFiles}
+              onError={setError}
+              inputId="root-files"
+              t={t}
+            />
+          </div>
+          {error && (
+            <div className="mt-1.5 text-xs text-red-600 dark:text-red-400">
+              {error}
+            </div>
+          )}
+          <div className="mt-2 flex items-center justify-end">
+            <button
+              type="submit"
+              disabled={
+                createMutation.isPending ||
+                (!draft.trim() && draftFiles.length === 0)
+              }
+              className={cn(
+                "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg",
+                "text-xs font-medium",
+                "bg-zinc-900 dark:bg-zinc-50 text-zinc-50 dark:text-zinc-900",
+                "hover:bg-zinc-800 dark:hover:bg-zinc-200",
+                "disabled:opacity-50",
+              )}
+            >
+              <Send className="w-3.5 h-3.5" />
+              {createMutation.isPending ? t("comments.sending") : t("comments.send")}
+            </button>
+          </div>
+        </form>
+
         {commentsQuery.isLoading ? (
           <div className="text-xs text-zinc-600 dark:text-zinc-400 text-center py-4">
-            Đang tải bình luận…
+            {t("comments.loading")}
           </div>
         ) : commentsQuery.error ? (
           <div className="text-xs text-red-600 dark:text-red-400 text-center py-4">
@@ -617,7 +689,7 @@ export default function TaskComments({ taskId }: TaskCommentsProps) {
           </div>
         ) : threads.length === 0 ? (
           <div className="text-xs text-zinc-500 dark:text-zinc-400 text-center py-4 italic">
-            Chưa có bình luận nào. Hãy là người đầu tiên!
+            {t("comments.empty")}
           </div>
         ) : (
           <ul className="space-y-5">
@@ -644,61 +716,6 @@ export default function TaskComments({ taskId }: TaskCommentsProps) {
             ))}
           </ul>
         )}
-
-        <form
-          onSubmit={handleSubmitRoot}
-          className="pt-2 border-t border-zinc-100 dark:border-zinc-800"
-        >
-          <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1.5 mt-3">
-            Bình luận của bạn
-          </label>
-          <textarea
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            rows={3}
-            placeholder="Nhập bình luận…"
-            className={cn(
-              "w-full px-3 py-2 rounded-lg text-sm",
-              "bg-white dark:bg-[#0F0F12]",
-              "border border-zinc-200 dark:border-zinc-700",
-              "text-zinc-900 dark:text-zinc-100",
-              "placeholder:text-zinc-400 dark:placeholder:text-zinc-500",
-              "focus:outline-none focus:ring-2 focus:ring-zinc-500 dark:focus:ring-zinc-400",
-            )}
-          />
-          <div className="mt-2">
-            <AttachmentPicker
-              files={draftFiles}
-              onChange={setDraftFiles}
-              onError={setError}
-              inputId="root-files"
-            />
-          </div>
-          {error && (
-            <div className="mt-1.5 text-xs text-red-600 dark:text-red-400">
-              {error}
-            </div>
-          )}
-          <div className="mt-2 flex items-center justify-end">
-            <button
-              type="submit"
-              disabled={
-                createMutation.isPending ||
-                (!draft.trim() && draftFiles.length === 0)
-              }
-              className={cn(
-                "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg",
-                "text-xs font-medium",
-                "bg-zinc-900 dark:bg-zinc-50 text-zinc-50 dark:text-zinc-900",
-                "hover:bg-zinc-800 dark:hover:bg-zinc-200",
-                "disabled:opacity-50",
-              )}
-            >
-              <Send className="w-3.5 h-3.5" />
-              {createMutation.isPending ? "Đang gửi…" : "Gửi bình luận"}
-            </button>
-          </div>
-        </form>
       </div>
 
       <ImageLightbox

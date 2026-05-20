@@ -28,6 +28,7 @@ import {
   useUpdateTask,
 } from "@/lib/tasks/store"
 import { uploadsApi } from "@/lib/api/uploads"
+import { useI18n } from "@/lib/i18n/context"
 import TaskDialog from "./task-dialog"
 
 interface TaskDetailProps {
@@ -39,6 +40,7 @@ interface TaskDetailProps {
 export default function TaskDetail({ task, projectId, canManage }: TaskDetailProps) {
   const router = useRouter()
   const queryClient = useQueryClient()
+  const { t } = useI18n()
   const status = STATUS_CONFIG[task.status]
   const priority = PRIORITY_CONFIG[task.priority]
   const overdue = isOverdue(task)
@@ -66,7 +68,7 @@ export default function TaskDetail({ task, projectId, canManage }: TaskDetailPro
   }
 
   function handleDelete() {
-    if (typeof window !== "undefined" && !window.confirm("Xoá task này?")) return
+    if (typeof window !== "undefined" && !window.confirm(t("taskDetail.deleteConfirm"))) return
     deleteMutation.mutate(task.id, {
       onSuccess: () => router.push(`/dashboard/${projectId}`),
     })
@@ -88,7 +90,7 @@ export default function TaskDetail({ task, projectId, canManage }: TaskDetailPro
           )}
         >
           <ArrowLeft className="w-3.5 h-3.5" />
-          Quay lại
+          {t("taskDetail.back")}
         </button>
 
         {canManage && (
@@ -106,7 +108,7 @@ export default function TaskDetail({ task, projectId, canManage }: TaskDetailPro
               )}
             >
               <Pencil className="w-3.5 h-3.5" />
-              Sửa
+              {t("taskDetail.edit")}
             </button>
             <button
               type="button"
@@ -123,7 +125,7 @@ export default function TaskDetail({ task, projectId, canManage }: TaskDetailPro
               )}
             >
               <Trash2 className="w-3.5 h-3.5" />
-              {deleteMutation.isPending ? "Đang xoá…" : "Xoá"}
+              {deleteMutation.isPending ? t("common.deleting") : t("taskDetail.delete")}
             </button>
           </div>
         )}
@@ -170,7 +172,7 @@ export default function TaskDetail({ task, projectId, canManage }: TaskDetailPro
               )}
             >
               {React.createElement(status.icon, { className: "w-3 h-3" })}
-              {status.label}
+              {t(status.labelKey)}
             </span>
             <span
               className={cn(
@@ -178,11 +180,11 @@ export default function TaskDetail({ task, projectId, canManage }: TaskDetailPro
                 priority.pill,
               )}
             >
-              Ưu tiên: {priority.label}
+              {t("taskDetail.priorityWithLabel", { value: t(priority.labelKey) })}
             </span>
             {overdue && (
               <span className="px-2 py-1 rounded-full text-[11px] font-medium bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400">
-                Quá hạn
+                {t("taskDetail.overdue")}
               </span>
             )}
           </div>
@@ -195,21 +197,21 @@ export default function TaskDetail({ task, projectId, canManage }: TaskDetailPro
             <div className="flex items-center gap-2">
               <User2 className="w-3.5 h-3.5 shrink-0" />
               <span className="font-medium text-zinc-700 dark:text-zinc-300">
-                Người phụ trách:
+                {t("taskDetail.assignee")}
               </span>
               <span>{task.assignee?.trim() || "—"}</span>
             </div>
             <div className="flex items-center gap-2">
               <Calendar className="w-3.5 h-3.5 shrink-0" />
               <span className="font-medium text-zinc-700 dark:text-zinc-300">
-                Bắt đầu:
+                {t("taskDetail.startDate")}
               </span>
               <span>{start ?? "—"}</span>
             </div>
             <div className="flex items-center gap-2">
               <Calendar className="w-3.5 h-3.5 shrink-0" />
               <span className="font-medium text-zinc-700 dark:text-zinc-300">
-                Hạn:
+                {t("taskDetail.dueDate")}
               </span>
               <span className={cn(overdue && "text-red-600 dark:text-red-400")}>
                 {due ?? "—"}
@@ -218,7 +220,7 @@ export default function TaskDetail({ task, projectId, canManage }: TaskDetailPro
             <div className="flex items-start gap-2">
               <Tag className="w-3.5 h-3.5 shrink-0 mt-0.5" />
               <span className="font-medium text-zinc-700 dark:text-zinc-300 shrink-0">
-                Tags:
+                {t("taskDetail.tags")}
               </span>
               <div className="flex flex-wrap items-center gap-1">
                 {task.tags.length === 0 ? (
@@ -239,7 +241,7 @@ export default function TaskDetail({ task, projectId, canManage }: TaskDetailPro
 
           <div className="mt-2">
             <div className="text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
-              Mô tả
+              {t("taskDetail.descriptionHeading")}
             </div>
             {task.description ? (
               <p className="text-sm text-zinc-700 dark:text-zinc-200 whitespace-pre-wrap break-words">
@@ -247,7 +249,7 @@ export default function TaskDetail({ task, projectId, canManage }: TaskDetailPro
               </p>
             ) : (
               <p className="text-xs text-zinc-500 dark:text-zinc-500 italic">
-                Chưa có mô tả.
+                {t("taskDetail.noDescription")}
               </p>
             )}
           </div>

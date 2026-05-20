@@ -12,6 +12,7 @@ import { PROJECTS_QUERY_KEY } from "@/lib/projects/store"
 
 export const TASKS_QUERY_KEY = (projectId: string) => ["tasks", projectId] as const
 export const TASK_QUERY_KEY = (id: string) => ["task", id] as const
+export const ALL_TASKS_QUERY_KEY = ["tasks", "all"] as const
 
 export function useTasks(projectId: string | null | undefined) {
   const { user, verified, loading: authLoading } = useAuth()
@@ -19,6 +20,17 @@ export function useTasks(projectId: string | null | undefined) {
     queryKey: TASKS_QUERY_KEY(projectId ?? ""),
     queryFn: async () => (await tasksApi.listByProject(projectId!)).items,
     enabled: !authLoading && !!user && verified && !!projectId,
+  })
+}
+
+/** Lấy toàn bộ task của user (cho Dashboard) — staleTime 60s, cache 10 phút mặc định. */
+export function useAllTasks() {
+  const { user, verified, loading: authLoading } = useAuth()
+  return useQuery({
+    queryKey: ALL_TASKS_QUERY_KEY,
+    queryFn: async () => (await tasksApi.listAll()).items,
+    enabled: !authLoading && !!user && verified,
+    staleTime: 60_000,
   })
 }
 
@@ -46,6 +58,7 @@ export function useTask(id: string | null | undefined) {
 
 function invalidateAffected(queryClient: ReturnType<typeof useQueryClient>, projectId: string) {
   queryClient.invalidateQueries({ queryKey: TASKS_QUERY_KEY(projectId) })
+  queryClient.invalidateQueries({ queryKey: ALL_TASKS_QUERY_KEY }) // Dashboard
   queryClient.invalidateQueries({ queryKey: PROJECTS_QUERY_KEY }) // stats changed
 }
 

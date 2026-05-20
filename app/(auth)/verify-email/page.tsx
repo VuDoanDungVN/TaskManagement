@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Loader2, LogOut, MailCheck, RefreshCw } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/lib/auth/context"
+import { useI18n } from "@/lib/i18n/context"
 import TaskLogo from "@/components/kokonutui/task-logo"
 
 const RESEND_COOLDOWN = 30
@@ -12,6 +13,7 @@ const RESEND_COOLDOWN = 30
 export default function VerifyEmailPage() {
   const { user, sendVerification, reloadUser, signOut } = useAuth()
   const router = useRouter()
+  const { t } = useI18n()
 
   const [checking, setChecking] = useState(false)
   const [sending, setSending] = useState(false)
@@ -33,14 +35,11 @@ export default function VerifyEmailPage() {
     try {
       const verified = await reloadUser()
       if (verified) {
-        setInfo("Xác thực thành công! Đang chuyển hướng…")
+        setInfo(t("auth.verify.success"))
         router.replace("/dashboard")
         // Giữ checking=true cho đến khi unmount để spinner hiển thị liên tục
       } else {
-        setError(
-          "Email vẫn chưa được xác thực. Vui lòng đảm bảo đã nhấn link trong email rồi thử lại. " +
-            "Nếu link đã được mở từ thiết bị khác, hãy đăng xuất và đăng nhập lại để cập nhật.",
-        )
+        setError(t("auth.verify.stillNotVerified"))
         setChecking(false)
       }
     } catch (e) {
@@ -56,7 +55,7 @@ export default function VerifyEmailPage() {
     setInfo(null)
     try {
       await sendVerification()
-      setInfo("Đã gửi lại email xác thực. Hãy kiểm tra hộp thư (kể cả Spam).")
+      setInfo(t("auth.verify.resent"))
       setCooldown(RESEND_COOLDOWN)
     } catch (e) {
       setError((e as Error).message)
@@ -88,10 +87,10 @@ export default function VerifyEmailPage() {
             </span>
           </div>
           <h1 className="mt-3 text-xl font-bold text-zinc-900 dark:text-zinc-100">
-            Xác thực email
+            {t("auth.verify.title")}
           </h1>
           <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
-            Chúng tôi đã gửi link xác thực đến
+            {t("auth.verify.subtitle")}
           </p>
           <p className="mt-0.5 text-sm font-semibold text-zinc-900 dark:text-zinc-100 break-all">
             {user.email}
@@ -99,9 +98,7 @@ export default function VerifyEmailPage() {
         </div>
 
         <div className="text-[11px] text-zinc-600 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-100 dark:border-zinc-800 rounded-lg px-3 py-2 mb-4">
-          Mở email, nhấn vào link xác thực rồi quay lại đây và bấm{" "}
-          <span className="font-medium text-zinc-900 dark:text-zinc-100">Tôi đã xác thực</span>.
-          Đừng quên kiểm tra cả thư mục Spam.
+          {t("auth.verify.instruction")}
         </div>
 
         {error && (
@@ -132,7 +129,7 @@ export default function VerifyEmailPage() {
             )}
           >
             {checking && <Loader2 className="w-4 h-4 animate-spin" />}
-            <span>{checking ? "Đang kiểm tra…" : "Tôi đã xác thực"}</span>
+            <span>{checking ? t("auth.verify.checking") : t("auth.verify.iVerified")}</span>
           </button>
 
           <button
@@ -156,7 +153,9 @@ export default function VerifyEmailPage() {
               <RefreshCw className="w-4 h-4" />
             )}
             <span>
-              {cooldown > 0 ? `Gửi lại sau ${cooldown}s` : "Gửi lại email xác thực"}
+              {cooldown > 0
+                ? t("auth.verify.resendCountdown", { seconds: cooldown })
+                : t("auth.verify.resend")}
             </span>
           </button>
         </div>
@@ -179,7 +178,7 @@ export default function VerifyEmailPage() {
             ) : (
               <LogOut className="w-3.5 h-3.5" />
             )}
-            <span>Đăng xuất và dùng tài khoản khác</span>
+            <span>{t("auth.verify.signOutAndSwitch")}</span>
           </button>
         </div>
       </div>

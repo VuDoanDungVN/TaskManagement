@@ -57,7 +57,10 @@
       "Bash(curl -6 -i -s -o NUL -w \"HTTP %{http_code} in %{time_total}s\\\\n\" \"http://[::1]:8787/health\")",
       "Bash(mkdir \"c:/Users/Dung/Desktop/All file/Project/task-dashboard/app/dashboard/[projectId]/[taskId]\")",
       "Bash(echo \"EXIT $?\")",
-      "Bash(Get-Content \"c:/Users/Dung/Desktop/All file/Project/task-dashboard/app/globals.css\" -TotalCount 50)"
+      "Bash(Get-Content \"c:/Users/Dung/Desktop/All file/Project/task-dashboard/app/globals.css\" -TotalCount 50)",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\Dung\\\\Desktop\\\\All file\\\\Project\\\\task-dashboard\" -Directory)",
+      "Bash(Select-Object -First 20)",
+      "Bash(Format-Table Name)"
     ],
     "additionalDirectories": [
       "c:\\Users\\Dung\\Desktop\\All file\\Project\\task-dashboard\\app\\dashboard\\[projectId]"

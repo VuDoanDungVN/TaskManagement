@@ -21,6 +21,8 @@ import { cn } from "@/lib/utils"
 import { useAuth } from "@/lib/auth/context"
 import { ME_QUERY_KEY } from "@/lib/users/store"
 import { uploadsApi } from "@/lib/api/uploads"
+import { useI18n } from "@/lib/i18n/context"
+import type { TranslationKey } from "@/lib/i18n/types"
 import UserAvatar from "./user-avatar"
 
 type ProfileStatus = "online" | "away" | "offline"
@@ -32,21 +34,20 @@ interface Profile01Props {
   status?: ProfileStatus
 }
 
-const STATUS_CONFIG: Record<ProfileStatus, { dot: string; label: string }> = {
-  online: { dot: "bg-emerald-500", label: "Đang hoạt động" },
-  away: { dot: "bg-amber-500", label: "Vắng mặt" },
-  offline: { dot: "bg-zinc-400 dark:bg-zinc-500", label: "Ngoại tuyến" },
+const STATUS_DOTS: Record<ProfileStatus, string> = {
+  online: "bg-emerald-500",
+  away: "bg-amber-500",
+  offline: "bg-zinc-400 dark:bg-zinc-500",
 }
 
-const DEFAULTS = {
-  name: "Nguyễn Văn Dung",
-  email: "dung@taskmanagement.app",
-  avatar: undefined as string | undefined,
-  status: "online" as ProfileStatus,
+const STATUS_LABEL_KEYS: Record<ProfileStatus, TranslationKey> = {
+  online: "profile.statusActive",
+  away: "profile.statusAway",
+  offline: "profile.statusOffline",
 }
 
 interface MenuItemData {
-  label: string
+  labelKey: TranslationKey
   href: string
   icon: LucideIcon
   badge?: number | string
@@ -54,23 +55,27 @@ interface MenuItemData {
 }
 
 const ACCOUNT_ITEMS: MenuItemData[] = [
-  { label: "Hồ sơ cá nhân", href: "#", icon: User2 },
-  { label: "Cài đặt", href: "#", icon: Settings },
-  { label: "Thông báo", href: "#", icon: Bell, badge: 3 },
+  { labelKey: "profile.profile", href: "#", icon: User2 },
+  { labelKey: "profile.settings", href: "/dashboard/settings", icon: Settings },
+  { labelKey: "profile.notifications", href: "#", icon: Bell, badge: 3 },
 ]
 
 const SUPPORT_ITEMS: MenuItemData[] = [
-  { label: "Trợ giúp", href: "#", icon: HelpCircle },
-  { label: "Điều khoản & Chính sách", href: "#", icon: FileText, external: true },
+  { labelKey: "profile.help", href: "#", icon: HelpCircle },
+  { labelKey: "profile.terms", href: "#", icon: FileText, external: true },
 ]
 
 export default function Profile01({
-  name = DEFAULTS.name,
-  email = DEFAULTS.email,
+  name,
+  email,
   avatar,
-  status = DEFAULTS.status,
+  status = "online",
 }: Profile01Props = {}) {
-  const statusInfo = STATUS_CONFIG[status]
+  const { t } = useI18n()
+  const displayName = name ?? t("comments.userFallback")
+  const displayEmail = email ?? ""
+  const statusDot = STATUS_DOTS[status]
+  const statusLabel = t(STATUS_LABEL_KEYS[status])
   const { signOut } = useAuth()
   const router = useRouter()
   const queryClient = useQueryClient()
@@ -88,7 +93,7 @@ export default function Profile01({
       await uploadsApi.avatar(file)
       await queryClient.invalidateQueries({ queryKey: ME_QUERY_KEY })
     } catch (err) {
-      setUploadError((err as Error).message || "Upload thất bại.")
+      setUploadError((err as Error).message || t("profile.uploadFailed"))
     } finally {
       setUploadingAvatar(false)
       if (fileInputRef.current) fileInputRef.current.value = ""
@@ -115,7 +120,7 @@ export default function Profile01({
           <div className="flex items-start gap-3">
             <div className="relative shrink-0 group/avatar">
               <UserAvatar
-                name={name}
+                name={displayName}
                 src={avatar}
                 size={56}
                 className="ring-2 ring-white dark:ring-[#1F1F23]"
@@ -124,7 +129,7 @@ export default function Profile01({
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploadingAvatar}
-                aria-label="Đổi ảnh đại diện"
+                aria-label={t("profile.changeAvatar")}
                 className={cn(
                   "absolute inset-0 flex items-center justify-center",
                   "rounded-full bg-black/40 backdrop-blur-[1px]",
@@ -142,7 +147,7 @@ export default function Profile01({
               <span
                 className={cn(
                   "absolute bottom-0 right-0 w-3 h-3 rounded-full ring-2 ring-white dark:ring-[#0F0F12]",
-                  statusInfo.dot,
+                  statusDot,
                 )}
                 aria-hidden
               />
@@ -156,13 +161,15 @@ export default function Profile01({
             </div>
             <div className="flex-1 min-w-0 pt-0.5">
               <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate">
-                {name}
+                {displayName}
               </h2>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">{email}</p>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
+                {displayEmail}
+              </p>
               <div className="mt-1.5 inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800/60">
-                <span className={cn("w-1.5 h-1.5 rounded-full", statusInfo.dot)} />
+                <span className={cn("w-1.5 h-1.5 rounded-full", statusDot)} />
                 <span className="text-[10px] font-medium text-zinc-600 dark:text-zinc-400">
-                  {statusInfo.label}
+                  {statusLabel}
                 </span>
               </div>
             </div>
@@ -171,11 +178,11 @@ export default function Profile01({
 
         <div className="h-px bg-zinc-200 dark:bg-[#1F1F23]" />
 
-        <Section title="Tài khoản" items={ACCOUNT_ITEMS} />
+        <Section title={t("profile.sectionAccount")} items={ACCOUNT_ITEMS} t={t} />
 
         <div className="h-px bg-zinc-200 dark:bg-[#1F1F23]" />
 
-        <Section title="Hỗ trợ" items={SUPPORT_ITEMS} />
+        <Section title={t("profile.sectionSupport")} items={SUPPORT_ITEMS} t={t} />
 
         <div className="h-px bg-zinc-200 dark:bg-[#1F1F23]" />
 
@@ -200,7 +207,7 @@ export default function Profile01({
                 <LogOut className="w-4 h-4" />
               )}
               <span className="text-sm font-medium">
-                {signingOut ? "Đang đăng xuất…" : "Đăng xuất"}
+                {signingOut ? t("profile.signingOut") : t("profile.signOut")}
               </span>
             </div>
             <ChevronRight
@@ -217,7 +224,15 @@ export default function Profile01({
   )
 }
 
-function Section({ title, items }: { title: string; items: MenuItemData[] }) {
+function Section({
+  title,
+  items,
+  t,
+}: {
+  title: string
+  items: MenuItemData[]
+  t: (k: TranslationKey) => string
+}) {
   return (
     <div className="p-3">
       <div className="px-2 mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
@@ -225,14 +240,20 @@ function Section({ title, items }: { title: string; items: MenuItemData[] }) {
       </div>
       <div className="space-y-0.5">
         {items.map((item) => (
-          <MenuRow key={item.label} {...item} />
+          <MenuRow key={item.labelKey} {...item} label={t(item.labelKey)} />
         ))}
       </div>
     </div>
   )
 }
 
-function MenuRow({ label, href, icon: Icon, badge, external }: MenuItemData) {
+function MenuRow({
+  label,
+  href,
+  icon: Icon,
+  badge,
+  external,
+}: MenuItemData & { label: string }) {
   return (
     <Link
       href={href}

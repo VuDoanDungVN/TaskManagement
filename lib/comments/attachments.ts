@@ -54,18 +54,31 @@ function getExt(name: string): string {
   return name.slice(idx + 1).toLowerCase()
 }
 
-/** Trả về thông báo lỗi (string) nếu file không hợp lệ, hoặc null nếu OK. */
-export function checkAttachmentFile(f: File): string | null {
-  if (f.size <= 0) return `File "${f.name}" rỗng.`
+/**
+ * Kết quả validate file — `code` map vào i18n key `attachments.error<Code>`,
+ * `params` truyền vào hàm `t(key, params)` để render thông báo localized.
+ * Trả null nếu file hợp lệ.
+ */
+export type AttachmentCheckError =
+  | { code: "Empty"; params: { name: string } }
+  | { code: "TooLarge"; params: { name: string; limit: number } }
+  | { code: "Blocked"; params: { ext: string } }
+  | { code: "Unsupported"; params: { ext: string } }
+
+export function checkAttachmentFile(f: File): AttachmentCheckError | null {
+  if (f.size <= 0) return { code: "Empty", params: { name: f.name } }
   if (f.size > ATTACHMENT_MAX_SIZE) {
-    return `File "${f.name}" vượt giới hạn ${ATTACHMENT_MAX_SIZE / 1024 / 1024}MB.`
+    return {
+      code: "TooLarge",
+      params: { name: f.name, limit: ATTACHMENT_MAX_SIZE / 1024 / 1024 },
+    }
   }
   const ext = getExt(f.name)
   if (BLOCKED_EXT.has(ext)) {
-    return `Định dạng .${ext} không được phép.`
+    return { code: "Blocked", params: { ext } }
   }
   if (!ext || !ALLOWED_EXT.has(ext)) {
-    return `Định dạng .${ext || "?"} không được hỗ trợ.`
+    return { code: "Unsupported", params: { ext: ext || "?" } }
   }
   return null
 }

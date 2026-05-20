@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils"
 import { useEffect, useState } from "react"
 import { createPortal } from "react-dom"
 import { X } from "lucide-react"
+import { useI18n } from "@/lib/i18n/context"
 
 interface ImageLightboxProps {
   src: string
@@ -13,6 +14,7 @@ interface ImageLightboxProps {
 }
 
 export default function ImageLightbox({ src, alt, open, onClose }: ImageLightboxProps) {
+  const { t } = useI18n()
   // Tránh hydration mismatch — chỉ portal sau khi đã mount client.
   const [mounted, setMounted] = useState(false)
   useEffect(() => {
@@ -54,7 +56,7 @@ export default function ImageLightbox({ src, alt, open, onClose }: ImageLightbox
       <button
         type="button"
         onClick={onClose}
-        aria-label="Đóng"
+        aria-label={t("imageLightbox.close")}
         className={cn(
           "absolute top-3 right-3 z-10",
           "inline-flex items-center justify-center",

@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import type { ProjectDraft } from "@/lib/projects/types"
+import { useI18n } from "@/lib/i18n/context"
 import FileInput from "./file-input"
 
 interface ProjectDialogProps {
@@ -43,6 +44,7 @@ function emptyDraft(): ProjectDraft {
 }
 
 export default function ProjectDialog({ open, onClose, onSubmit }: ProjectDialogProps) {
+  const { t } = useI18n()
   const [draft, setDraft] = useState<ProjectDraft>(emptyDraft())
   const [file, setFile] = useState<File | null>(null)
 
@@ -54,9 +56,9 @@ export default function ProjectDialog({ open, onClose, onSubmit }: ProjectDialog
   }, [open])
 
   const nameError = useMemo(() => {
-    if (!draft.name.trim()) return "Tên dự án là bắt buộc."
+    if (!draft.name.trim()) return t("projectDialog.nameRequired")
     return null
-  }, [draft.name])
+  }, [draft.name, t])
 
   const canSubmit = !nameError
 
@@ -84,22 +86,24 @@ export default function ProjectDialog({ open, onClose, onSubmit }: ProjectDialog
         )}
       >
         <DialogHeader>
-          <DialogTitle className="text-zinc-900 dark:text-zinc-100">Tạo dự án mới</DialogTitle>
+          <DialogTitle className="text-zinc-900 dark:text-zinc-100">
+            {t("projectDialog.createTitle")}
+          </DialogTitle>
           <DialogDescription className="text-zinc-600 dark:text-zinc-400">
-            Nhập thông tin dự án để bắt đầu quản lý task.
+            {t("projectDialog.createDesc")}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="space-y-1">
             <label className={labelClass}>
-              Tên dự án <span className="text-red-500">*</span>
+              {t("projectDialog.nameLabel")} <span className="text-red-500">*</span>
             </label>
             <input
               required
               value={draft.name}
               onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))}
-              placeholder="VD: Website thương mại điện tử"
+              placeholder={t("projectDialog.namePlaceholder")}
               className={cn(fieldClass, nameError && fieldErrorClass)}
               aria-invalid={!!nameError}
             />
@@ -109,18 +113,18 @@ export default function ProjectDialog({ open, onClose, onSubmit }: ProjectDialog
           </div>
 
           <div className="space-y-1">
-            <label className={labelClass}>Mô tả</label>
+            <label className={labelClass}>{t("projectDialog.descriptionLabel")}</label>
             <textarea
               value={draft.description ?? ""}
               onChange={(e) => setDraft((d) => ({ ...d, description: e.target.value }))}
-              placeholder="Mục tiêu, phạm vi, deadline tổng…"
+              placeholder={t("projectDialog.descriptionPlaceholder")}
               rows={3}
               className={cn(fieldClass, "resize-y min-h-[72px]")}
             />
           </div>
 
           <div className="space-y-1">
-            <label className={labelClass}>Thumbnail (tuỳ chọn)</label>
+            <label className={labelClass}>{t("projectDialog.thumbnailLabel")}</label>
             <FileInput size={96} onFileChange={setFile} />
           </div>
 
@@ -136,7 +140,7 @@ export default function ProjectDialog({ open, onClose, onSubmit }: ProjectDialog
                 "transition-colors",
               )}
             >
-              Huỷ
+              {t("common.cancel")}
             </button>
             <button
               type="submit"
@@ -150,7 +154,7 @@ export default function ProjectDialog({ open, onClose, onSubmit }: ProjectDialog
                 "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-zinc-900 dark:disabled:hover:bg-zinc-50",
               )}
             >
-              Tạo dự án
+              {t("projectDialog.submit")}
             </button>
           </DialogFooter>
         </form>
