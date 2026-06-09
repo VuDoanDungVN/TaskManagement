@@ -10,6 +10,7 @@ interface ProjectRow {
   name: string
   description: string | null
   thumbnail_key: string | null
+  team_id: string | null
   created_at: number
   updated_at: number
 }
@@ -19,6 +20,7 @@ interface ProjectRowWithStats extends ProjectRow {
   task_pending: number | null
   task_in_progress: number | null
   task_completed: number | null
+  team_name: string | null
 }
 
 interface ProjectStats {
@@ -32,6 +34,7 @@ function serializeProject(
   row: ProjectRow,
   fileUrl: string | null,
   stats?: ProjectStats,
+  teamName?: string | null,
 ) {
   return {
     id: row.id,
@@ -40,10 +43,24 @@ function serializeProject(
     description: row.description,
     thumbnailKey: row.thumbnail_key,
     thumbnailUrl: fileUrl,
+    teamId: row.team_id,
+    teamName: teamName ?? null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     stats: stats ?? { total: 0, pending: 0, "in-progress": 0, completed: 0 },
   }
+}
+
+/** Lấy tên team của project (nếu có team_id). */
+async function fetchTeamName(
+  c: Context<AppEnv>,
+  teamId: string | null,
+): Promise<string | null> {
+  if (!teamId) return null
+  const row = await c.env.DB.prepare("SELECT name FROM teams WHERE id = ?")
+    .bind(teamId)
+    .first<{ name: string }>()
+  return row?.name ?? null
 }
 
 const projects = new Hono<AppEnv>()
@@ -58,8 +75,10 @@ projects.get("/", async (c) => {
        COALESCE(s.total, 0)        AS task_total,
        COALESCE(s.pending, 0)      AS task_pending,
        COALESCE(s.in_progress, 0)  AS task_in_progress,
-       COALESCE(s.completed, 0)    AS task_completed
+       COALESCE(s.completed, 0)    AS task_completed,
+       t.name                      AS team_name
      FROM projects p
+     LEFT JOIN teams t ON t.id = p.team_id
      LEFT JOIN (
        SELECT project_id,
          COUNT(*) AS total,
@@ -76,12 +95,17 @@ projects.get("/", async (c) => {
     .all<ProjectRowWithStats>()
 
   const items = (rs.results ?? []).map((row) =>
-    serializeProject(row, buildFileUrl(c.env, c.req.raw, row.thumbnail_key), {
-      total: row.task_total ?? 0,
-      pending: row.task_pending ?? 0,
-      "in-progress": row.task_in_progress ?? 0,
-      completed: row.task_completed ?? 0,
-    }),
+    serializeProject(
+      row,
+      buildFileUrl(c.env, c.req.raw, row.thumbnail_key),
+      {
+        total: row.task_total ?? 0,
+        pending: row.task_pending ?? 0,
+        "in-progress": row.task_in_progress ?? 0,
+        completed: row.task_completed ?? 0,
+      },
+      row.team_name,
+    ),
   )
   return c.json({ items })
 })
@@ -149,7 +173,10 @@ async function loadOwnedProject(
 // GET /projects/:id
 projects.get("/:id", async (c) => {
   const row = await loadOwnedProject(c, c.req.param("id"))
-  return c.json(serializeProject(row, buildFileUrl(c.env, c.req.raw, row.thumbnail_key)))
+  const teamName = await fetchTeamName(c, row.team_id)
+  return c.json(
+    serializeProject(row, buildFileUrl(c.env, c.req.raw, row.thumbnail_key), undefined, teamName),
+  )
 })
 
 // PUT /projects/:id
@@ -207,7 +234,10 @@ projects.put("/:id", async (c) => {
     .bind(existing.id)
     .first<ProjectRow>()
   if (!row) throw new HTTPException(500, { message: "Update thành công nhưng không đọc lại được." })
-  return c.json(serializeProject(row, buildFileUrl(c.env, c.req.raw, row.thumbnail_key)))
+  const teamName = await fetchTeamName(c, row.team_id)
+  return c.json(
+    serializeProject(row, buildFileUrl(c.env, c.req.raw, row.thumbnail_key), undefined, teamName),
+  )
 })
 
 // DELETE /projects/:id

@@ -309,15 +309,116 @@ export default function DashboardPage() {
       ]}
     >
       <div className="space-y-4">
-        {/* Active projects — full-width, ở vị trí cũ của header "Tổng quan" */}
-        <SectionCard
-          icon={FolderKanban}
-          title={t("dashboard.sectionActiveProjects")}
-          action={{
-            href: "/dashboard/projects",
-            label: t("dashboard.viewAll"),
-          }}
-        >
+        {/* Stats */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard
+            icon={FolderKanban}
+            label={t("dashboard.statTotalProjects")}
+            value={projects.length}
+          />
+          <StatCard
+            icon={ListChecks}
+            label={t("dashboard.statTotalTasks")}
+            value={stats.total}
+          />
+          <StatCard
+            icon={Clock}
+            label={t("dashboard.statInProgress")}
+            value={stats.inProgress}
+            tone="info"
+          />
+          <StatCard
+            icon={CheckCircle2}
+            label={t("dashboard.statCompleted")}
+            value={stats.completed}
+            hint={t("dashboard.statCompletionPct", { value: stats.pct })}
+            tone="success"
+          />
+        </div>
+
+        {isLoading ? (
+          <div className="bg-white dark:bg-[#0F0F12] rounded-xl border border-gray-200 dark:border-[#1F1F23] p-8 flex items-center justify-center gap-2 text-xs text-zinc-600 dark:text-zinc-400">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            {t("dashboard.loading")}
+          </div>
+        ) : error ? (
+          <div className="bg-white dark:bg-[#0F0F12] rounded-xl border border-red-200 dark:border-red-900/40 p-6 text-xs text-red-600 dark:text-red-400">
+            {t("dashboard.error", { message: (error as Error).message })}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {/* Charts row */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <StatusDonut tasks={tasks} />
+              <TopProjectsBar projects={projects} />
+            </div>
+
+            {/* 4 khối: Quá hạn, Sắp đến hạn, Dự án nổi bật, Hoạt động gần đây — 2 hàng × 2 cột */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Overdue — chỉ hiển thị khi có */}
+              {overdue.length > 0 && (
+                <SectionCard
+                  icon={AlertTriangle}
+                  title={t("dashboard.sectionOverdue")}
+                  subtitle={String(overdue.length)}
+                  variant="danger"
+                >
+                  {overdue.map((task) => (
+                    <TaskRow
+                      key={task.id}
+                      task={task}
+                      project={projectById.get(task.projectId)}
+                      t={t}
+                      rightSlot={
+                        <span className="inline-flex items-center gap-1 text-[11px] font-medium text-red-600 dark:text-red-400">
+                          <AlertTriangle className="w-3 h-3" />
+                          {formatDueRelative(task.dueDate!, today, t)}
+                        </span>
+                      }
+                    />
+                  ))}
+                </SectionCard>
+              )}
+
+              {/* Upcoming */}
+              <SectionCard
+                icon={Calendar}
+                title={t("dashboard.sectionUpcoming")}
+                subtitle={t("dashboard.upcomingWindow", { days: UPCOMING_DAYS })}
+              >
+                {upcoming.length === 0 ? (
+                  <EmptyState message={t("dashboard.emptyUpcoming")} />
+                ) : (
+                  upcoming.map((task) => (
+                    <TaskRow
+                      key={task.id}
+                      task={task}
+                      project={projectById.get(task.projectId)}
+                      t={t}
+                      rightSlot={
+                        <div className="flex flex-col items-end">
+                          <span className="text-[11px] font-medium text-zinc-700 dark:text-zinc-300 tabular-nums">
+                            {formatDateShort(task.dueDate!)}
+                          </span>
+                          <span className="text-[10px] text-zinc-500 dark:text-zinc-400">
+                            {formatDueRelative(task.dueDate!, today, t)}
+                          </span>
+                        </div>
+                      }
+                    />
+                  ))
+                )}
+              </SectionCard>
+
+              {/* Active projects */}
+              <SectionCard
+                icon={FolderKanban}
+                title={t("dashboard.sectionActiveProjects")}
+                action={{
+                  href: "/dashboard/projects",
+                  label: t("dashboard.viewAll"),
+                }}
+              >
           {projectsQuery.isLoading ? (
             <div className="px-3 py-8 flex items-center justify-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -346,7 +447,7 @@ export default function DashboardPage() {
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 p-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-1">
               {activeProjects.map((p) => {
                 const total = p.stats.total
                 const done = p.stats.completed
@@ -411,137 +512,39 @@ export default function DashboardPage() {
                 )
               })}
             </div>
-          )}
-        </SectionCard>
-
-        {/* Recent activity — ngay dưới Dự án nổi bật, full-width */}
-        <SectionCard icon={Timer} title={t("dashboard.sectionRecent")}>
-          {allTasksQuery.isLoading ? (
-            <div className="px-3 py-8 flex items-center justify-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
-              <Loader2 className="w-4 h-4 animate-spin" />
-              {t("dashboard.loading")}
-            </div>
-          ) : allTasksQuery.error ? (
-            <div className="px-3 py-6 text-center text-xs text-red-600 dark:text-red-400">
-              {t("dashboard.error", { message: (allTasksQuery.error as Error).message })}
-            </div>
-          ) : recent.length === 0 ? (
-            <EmptyState message={t("dashboard.emptyRecent")} />
-          ) : (
-            recent.map((task) => (
-              <TaskRow
-                key={task.id}
-                task={task}
-                project={projectById.get(task.projectId)}
-                t={t}
-                rightSlot={
-                  <span className="text-[11px] text-zinc-500 dark:text-zinc-400 tabular-nums">
-                    {formatRelativeTime(task.updatedAt, t)}
-                  </span>
-                }
-              />
-            ))
-          )}
-        </SectionCard>
-
-        {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard
-            icon={FolderKanban}
-            label={t("dashboard.statTotalProjects")}
-            value={projects.length}
-          />
-          <StatCard
-            icon={ListChecks}
-            label={t("dashboard.statTotalTasks")}
-            value={stats.total}
-          />
-          <StatCard
-            icon={Clock}
-            label={t("dashboard.statInProgress")}
-            value={stats.inProgress}
-            tone="info"
-          />
-          <StatCard
-            icon={CheckCircle2}
-            label={t("dashboard.statCompleted")}
-            value={stats.completed}
-            hint={t("dashboard.statCompletionPct", { value: stats.pct })}
-            tone="success"
-          />
-        </div>
-
-        {isLoading ? (
-          <div className="bg-white dark:bg-[#0F0F12] rounded-xl border border-gray-200 dark:border-[#1F1F23] p-8 flex items-center justify-center gap-2 text-xs text-zinc-600 dark:text-zinc-400">
-            <Loader2 className="w-4 h-4 animate-spin" />
-            {t("dashboard.loading")}
-          </div>
-        ) : error ? (
-          <div className="bg-white dark:bg-[#0F0F12] rounded-xl border border-red-200 dark:border-red-900/40 p-6 text-xs text-red-600 dark:text-red-400">
-            {t("dashboard.error", { message: (error as Error).message })}
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {/* Charts row */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <StatusDonut tasks={tasks} />
-              <TopProjectsBar projects={projects} />
-            </div>
-
-            {/* Overdue — chỉ hiển thị khi có */}
-            {overdue.length > 0 && (
-              <SectionCard
-                icon={AlertTriangle}
-                title={t("dashboard.sectionOverdue")}
-                subtitle={String(overdue.length)}
-                variant="danger"
-              >
-                {overdue.map((task) => (
-                  <TaskRow
-                    key={task.id}
-                    task={task}
-                    project={projectById.get(task.projectId)}
-                    t={t}
-                    rightSlot={
-                      <span className="inline-flex items-center gap-1 text-[11px] font-medium text-red-600 dark:text-red-400">
-                        <AlertTriangle className="w-3 h-3" />
-                        {formatDueRelative(task.dueDate!, today, t)}
-                      </span>
-                    }
-                  />
-                ))}
-              </SectionCard>
-            )}
-
-            {/* Upcoming */}
-            <SectionCard
-              icon={Calendar}
-              title={t("dashboard.sectionUpcoming")}
-              subtitle={t("dashboard.upcomingWindow", { days: UPCOMING_DAYS })}
-            >
-              {upcoming.length === 0 ? (
-                <EmptyState message={t("dashboard.emptyUpcoming")} />
-              ) : (
-                upcoming.map((task) => (
-                  <TaskRow
-                    key={task.id}
-                    task={task}
-                    project={projectById.get(task.projectId)}
-                    t={t}
-                    rightSlot={
-                      <div className="flex flex-col items-end">
-                        <span className="text-[11px] font-medium text-zinc-700 dark:text-zinc-300 tabular-nums">
-                          {formatDateShort(task.dueDate!)}
-                        </span>
-                        <span className="text-[10px] text-zinc-500 dark:text-zinc-400">
-                          {formatDueRelative(task.dueDate!, today, t)}
-                        </span>
-                      </div>
-                    }
-                  />
-                ))
               )}
-            </SectionCard>
+              </SectionCard>
+
+              {/* Recent activity */}
+              <SectionCard icon={Timer} title={t("dashboard.sectionRecent")}>
+                {allTasksQuery.isLoading ? (
+                  <div className="px-3 py-8 flex items-center justify-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    {t("dashboard.loading")}
+                  </div>
+                ) : allTasksQuery.error ? (
+                  <div className="px-3 py-6 text-center text-xs text-red-600 dark:text-red-400">
+                    {t("dashboard.error", { message: (allTasksQuery.error as Error).message })}
+                  </div>
+                ) : recent.length === 0 ? (
+                  <EmptyState message={t("dashboard.emptyRecent")} />
+                ) : (
+                  recent.map((task) => (
+                    <TaskRow
+                      key={task.id}
+                      task={task}
+                      project={projectById.get(task.projectId)}
+                      t={t}
+                      rightSlot={
+                        <span className="text-[11px] text-zinc-500 dark:text-zinc-400 tabular-nums">
+                          {formatRelativeTime(task.updatedAt, t)}
+                        </span>
+                      }
+                    />
+                  ))
+                )}
+              </SectionCard>
+            </div>
           </div>
         )}
       </div>

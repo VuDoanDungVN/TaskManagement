@@ -14,6 +14,8 @@ export interface ApiProject {
   description: string | null
   thumbnailKey: string | null
   thumbnailUrl: string | null
+  teamId: string | null
+  teamName: string | null
   stats: ApiProjectStats
   createdAt: number
   updatedAt: number

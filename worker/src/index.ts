@@ -4,6 +4,7 @@ import { HTTPException } from "hono/http-exception"
 import type { AppEnv } from "./types"
 import users from "./routes/users"
 import projects from "./routes/projects"
+import teams from "./routes/teams"
 import tasks from "./routes/tasks"
 import comments from "./routes/comments"
 import uploads from "./routes/uploads"
@@ -36,6 +37,7 @@ app.get("/health", (c) =>
 
 app.route("/users", users)
 app.route("/projects", projects)
+app.route("/teams", teams)
 app.route("/tasks", tasks)
 app.route("/comments", comments)
 app.route("/uploads", uploads)

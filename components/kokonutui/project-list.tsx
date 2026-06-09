@@ -2,7 +2,8 @@
 
 import { cn } from "@/lib/utils"
 import Link from "next/link"
-import { ArrowRight, FolderKanban, ImageIcon, Info, ListChecks, Plus } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { ArrowRight, FolderKanban, ImageIcon, Info, ListChecks, Plus, UsersRound } from "lucide-react"
 import { useState } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import { PROJECTS_QUERY_KEY, useCreateProject, useProjects } from "@/lib/projects/store"
@@ -18,6 +19,7 @@ export default function ProjectList() {
   const { data: projects = [], isLoading: projectsLoading, error: projectsError } = useProjects()
   const createMutation = useCreateProject()
   const queryClient = useQueryClient()
+  const router = useRouter()
   const { t } = useI18n()
   const [dialogOpen, setDialogOpen] = useState(false)
 
@@ -174,6 +176,33 @@ export default function ProjectList() {
                         <p className="text-[11px] text-zinc-600 dark:text-zinc-400 line-clamp-2 mt-1">
                           {p.description}
                         </p>
+                      )}
+                      {p.teamId && p.teamName && (
+                        <span
+                          role="link"
+                          tabIndex={0}
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            router.push(`/dashboard/teams/${p.teamId}`)
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault()
+                              e.stopPropagation()
+                              router.push(`/dashboard/teams/${p.teamId}`)
+                            }
+                          }}
+                          className={cn(
+                            "inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-md cursor-pointer",
+                            "bg-zinc-100 dark:bg-zinc-800 text-[10px] font-medium",
+                            "text-zinc-700 dark:text-zinc-300",
+                            "hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors",
+                          )}
+                        >
+                          <UsersRound className="w-3 h-3" />
+                          {p.teamName}
+                        </span>
                       )}
                     </div>
 

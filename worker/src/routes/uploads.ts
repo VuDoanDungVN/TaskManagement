@@ -117,6 +117,48 @@ uploads.post("/projects/:projectId/thumbnail", async (c) => {
 })
 
 /**
+ * POST /uploads/teams/:teamId/avatar
+ * Chỉ owner/admin của nhóm mới được upload avatar.
+ */
+uploads.post("/teams/:teamId/avatar", async (c) => {
+  const user = c.get("user")
+  const teamId = c.req.param("teamId")
+
+  const existing = await c.env.DB.prepare(
+    `SELECT t.avatar_key, tm.role
+     FROM teams t
+     LEFT JOIN team_members tm ON tm.team_id = t.id AND tm.user_id = ?
+     WHERE t.id = ?`,
+  )
+    .bind(user.uid, teamId)
+    .first<{ avatar_key: string | null; role: string | null }>()
+  if (!existing) throw new HTTPException(404, { message: "Không tìm thấy nhóm." })
+  if (existing.role !== "owner" && existing.role !== "admin") {
+    throw new HTTPException(403, { message: "Cần quyền quản trị nhóm để đổi avatar." })
+  }
+
+  const file = await extractFile(c.req.raw)
+  const ext = mimeToExt(file.type)
+  const key = `teams/${teamId}/avatar.${ext}`
+
+  if (existing.avatar_key && existing.avatar_key !== key) {
+    await c.env.FILES.delete(existing.avatar_key).catch(() => {})
+  }
+  await c.env.FILES.put(key, file.stream(), {
+    httpMetadata: { contentType: file.type },
+  })
+
+  const now = Date.now()
+  await c.env.DB.prepare(
+    "UPDATE teams SET avatar_key = ?, updated_at = ? WHERE id = ?",
+  )
+    .bind(key, now, teamId)
+    .run()
+
+  return c.json({ avatarKey: key, avatarUrl: buildFileUrl(c.env, c.req.raw, key) })
+})
+
+/**
  * POST /uploads/tasks/:taskId/thumbnail
  */
 uploads.post("/tasks/:taskId/thumbnail", async (c) => {

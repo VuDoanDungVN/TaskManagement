@@ -30,4 +30,10 @@ export const uploadsApi = {
       `/uploads/tasks/${encodeURIComponent(taskId)}/thumbnail`,
       buildFormData(file),
     ),
+
+  teamAvatar: (teamId: string, file: File) =>
+    api.upload<UploadAvatarResult>(
+      `/uploads/teams/${encodeURIComponent(teamId)}/avatar`,
+      buildFormData(file),
+    ),
 }

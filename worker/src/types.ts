@@ -4,6 +4,10 @@ export type Bindings = {
   FIREBASE_PROJECT_ID: string
   ALLOWED_ORIGIN: string
   PUBLIC_FILES_BASE_URL: string
+  // Email (Resend)
+  RESEND_API_KEY: string // secret — set bằng `wrangler secret put` hoặc .dev.vars
+  MAIL_FROM: string // địa chỉ gửi đi, vd "Task App <onboarding@resend.dev>"
+  APP_BASE_URL: string // base URL frontend để dựng link chấp nhận lời mời
 }
 
 // Authenticated user attached to context by auth middleware

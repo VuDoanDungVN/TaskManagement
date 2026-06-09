@@ -15,12 +15,20 @@ import {
   HelpCircle,
   Menu,
   FolderKanban,
+  Plus,
+  UsersRound,
 } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
+import { useQueryClient } from "@tanstack/react-query"
 import { cn } from "@/lib/utils"
 import TaskLogo from "./task-logo"
 import { useI18n } from "@/lib/i18n/context"
+import { useAuth } from "@/lib/auth/context"
+import { TEAMS_QUERY_KEY, useCreateTeam } from "@/lib/teams/store"
+import { teamsApi } from "@/lib/api/teams"
+import { uploadsApi } from "@/lib/api/uploads"
+import TeamDialog, { type TeamDialogDraft } from "./team-dialog"
 
 interface SidebarProps {
   isCollapsed?: boolean
@@ -28,11 +36,41 @@ interface SidebarProps {
 
 export default function Sidebar({ isCollapsed = false }: SidebarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [teamDialogOpen, setTeamDialogOpen] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
   const { t } = useI18n()
+  const { user, verified, loading: authLoading } = useAuth()
+  const queryClient = useQueryClient()
+  const createTeam = useCreateTeam()
+
+  const canCreateTeam = !authLoading && !!user && verified
 
   function handleNavigation() {
     setIsMobileMenuOpen(false)
+  }
+
+  async function handleCreateTeam(
+    draft: TeamDialogDraft,
+    file: File | null,
+    emails: string[],
+  ) {
+    const team = await createTeam.mutateAsync(draft)
+    // Avatar + lời mời không chặn luồng: lỗi chỉ log, nhóm vẫn được tạo
+    if (file) {
+      try {
+        await uploadsApi.teamAvatar(team.id, file)
+      } catch (e) {
+        console.error("Upload avatar nhóm thất bại:", e)
+      }
+    }
+    if (emails.length > 0) {
+      try {
+        await teamsApi.invite(team.id, { emails })
+      } catch (e) {
+        console.error("Gửi lời mời thất bại:", e)
+      }
+    }
+    queryClient.invalidateQueries({ queryKey: TEAMS_QUERY_KEY })
   }
 
   useEffect(() => {
@@ -93,18 +131,25 @@ export default function Sidebar({ isCollapsed = false }: SidebarProps) {
     )
   }
 
-  function SectionTitle({ children }: { children: React.ReactNode }) {
+  function SectionTitle({
+    children,
+    action,
+  }: {
+    children: React.ReactNode
+    action?: React.ReactNode
+  }) {
     return (
       <div
         className={cn(
-          "px-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400",
+          "px-3 flex items-center justify-between gap-2 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400",
           "overflow-hidden transition-[opacity,max-height,margin] duration-300 ease-in-out",
           isCollapsed
             ? "lg:opacity-0 lg:max-h-0 lg:mb-0 opacity-100 max-h-8 mb-2"
             : "opacity-100 max-h-8 mb-2",
         )}
       >
-        {children}
+        <span>{children}</span>
+        {action}
       </div>
     )
   }
@@ -178,6 +223,7 @@ export default function Sidebar({ isCollapsed = false }: SidebarProps) {
                 </div>
               </div>
 
+              {/* Ẩn phần Tài chính - chỉ ẩn, không xóa code
               <div>
                 <SectionTitle>{t("nav.sectionFinance")}</SectionTitle>
                 <div className="space-y-1">
@@ -192,10 +238,36 @@ export default function Sidebar({ isCollapsed = false }: SidebarProps) {
                   </NavItem>
                 </div>
               </div>
+              */}
 
               <div>
-                <SectionTitle>{t("nav.sectionTeam")}</SectionTitle>
+                <SectionTitle
+                  action={
+                    canCreateTeam ? (
+                      <button
+                        type="button"
+                        onClick={() => setTeamDialogOpen(true)}
+                        title={t("nav.createTeam")}
+                        aria-label={t("nav.createTeam")}
+                        className={cn(
+                          "flex items-center justify-center w-5 h-5 rounded-md",
+                          "text-gray-500 dark:text-gray-400",
+                          "hover:text-gray-900 dark:hover:text-white",
+                          "hover:bg-gray-100 dark:hover:bg-[#1F1F23]",
+                          "transition-colors",
+                        )}
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                      </button>
+                    ) : undefined
+                  }
+                >
+                  {t("nav.sectionTeam")}
+                </SectionTitle>
                 <div className="space-y-1">
+                  <NavItem href="/dashboard/teams" icon={UsersRound}>
+                    {t("nav.teamList")}
+                  </NavItem>
                   <NavItem href="#" icon={Users2}>
                     {t("nav.members")}
                   </NavItem>
@@ -237,6 +309,12 @@ export default function Sidebar({ isCollapsed = false }: SidebarProps) {
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
+
+      <TeamDialog
+        open={teamDialogOpen}
+        onClose={() => setTeamDialogOpen(false)}
+        onSubmit={handleCreateTeam}
+      />
     </>
   )
 }

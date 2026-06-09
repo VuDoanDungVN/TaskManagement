@@ -8,6 +8,11 @@ compatibility_flags = ["nodejs_compat"]
 FIREBASE_PROJECT_ID = "task-management-pro-2026"
 ALLOWED_ORIGIN = "http://localhost:3000,http://localhost:3001,http://localhost:3002"
 PUBLIC_FILES_BASE_URL = ""
+# Email (Resend). RESEND_API_KEY là SECRET — KHÔNG đặt ở đây.
+# Local: tạo file worker/.dev.vars với dòng RESEND_API_KEY=...
+# Production: chạy `wrangler secret put RESEND_API_KEY`
+MAIL_FROM = "vunhatjp@gmail.com"
+APP_BASE_URL = "http://localhost:3000"
 
 # D1 database — bound as `DB` in code (c.env.DB)
 [[d1_databases]]

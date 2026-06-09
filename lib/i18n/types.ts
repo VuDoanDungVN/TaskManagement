@@ -34,6 +34,8 @@ export interface Dictionary {
     invoices: string
     payments: string
     sectionTeam: string
+    createTeam: string
+    teamList: string
     members: string
     permissions: string
     chat: string
@@ -156,6 +158,111 @@ export interface Dictionary {
     descriptionPlaceholder: string
     thumbnailLabel: string
     submit: string
+  }
+  teamDialog: {
+    createTitle: string
+    createDesc: string
+    nameLabel: string
+    namePlaceholder: string
+    nameRequired: string
+    descriptionLabel: string
+    descriptionPlaceholder: string
+    avatarLabel: string
+    visibilityLabel: string
+    visibilityPrivate: string
+    visibilityPrivateHint: string
+    visibilityPublic: string
+    visibilityPublicHint: string
+    inviteLabel: string
+    invitePlaceholder: string
+    inviteHint: string
+    inviteInvalid: string
+    submit: string
+    creating: string
+    createError: string
+  }
+  teamsList: {
+    title: string
+    countLabel: string
+    loading: string
+    error: string
+    emptyTitle: string
+    emptyHelp: string
+    loadMore: string
+    loadingMore: string
+    endOfList: string
+    card: {
+      membersCount: string
+      visibilityPrivate: string
+      visibilityPublic: string
+      roleOwner: string
+      roleAdmin: string
+      roleMember: string
+    }
+    deleteAria: string
+    deleteTitle: string
+    deleteMessage: string
+    deleteConfirmWord: string
+    deleteConfirmPrompt: string
+    deletePlaceholder: string
+    deleteSubmit: string
+    deleting: string
+    deleteError: string
+  }
+  teamDetail: {
+    loading: string
+    error: string
+    notFound: string
+    visibilityPrivate: string
+    visibilityPublic: string
+    membersTitle: string
+    membersCount: string
+    roleOwner: string
+    roleAdmin: string
+    roleMember: string
+    you: string
+    makeAdmin: string
+    makeMember: string
+    removeMember: string
+    removeConfirm: string
+    leaveTeam: string
+    leaveConfirm: string
+    inviteTitle: string
+    invitePlaceholder: string
+    inviteHint: string
+    inviteSubmit: string
+    inviteSending: string
+    inviteInvalid: string
+    inviteError: string
+    pendingTitle: string
+    pendingEmpty: string
+    statusPending: string
+    cancelInvite: string
+    projectsTitle: string
+    projectsEmpty: string
+    addProject: string
+    removeProject: string
+    removeProjectConfirm: string
+    addProjectTitle: string
+    addProjectDesc: string
+    addProjectEmpty: string
+    addProjectSubmit: string
+    addingProject: string
+    addProjectError: string
+  }
+  invitePage: {
+    title: string
+    description: string
+    missingToken: string
+    signInRequired: string
+    signInButton: string
+    accept: string
+    accepting: string
+    successTitle: string
+    successDesc: string
+    goToTeam: string
+    errorTitle: string
+    backToTeams: string
   }
   tasks: {
     title: string
