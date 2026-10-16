@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils"
 import TaskLogo from "./task-logo"
 import { useI18n } from "@/lib/i18n/context"
 import { useAuth } from "@/lib/auth/context"
+import { useIsAdmin } from "@/lib/users/store"
 import { TEAMS_QUERY_KEY, useCreateTeam } from "@/lib/teams/store"
 import { teamsApi } from "@/lib/api/teams"
 import { uploadsApi } from "@/lib/api/uploads"
@@ -42,8 +43,10 @@ export default function Sidebar({ isCollapsed = false }: SidebarProps) {
   const { user, verified, loading: authLoading } = useAuth()
   const queryClient = useQueryClient()
   const createTeam = useCreateTeam()
+  const isAdmin = useIsAdmin()
 
-  const canCreateTeam = !authLoading && !!user && verified
+  // Nhóm và quản lý người dùng chỉ dành cho admin hệ thống
+  const canCreateTeam = !authLoading && !!user && verified && isAdmin
 
   function handleNavigation() {
     setIsMobileMenuOpen(false)
@@ -211,12 +214,14 @@ export default function Sidebar({ isCollapsed = false }: SidebarProps) {
                   <NavItem href="/dashboard" icon={FolderKanban}>
                     {t("nav.dashboard")}
                   </NavItem>
+                  {/* Chưa triển khai - chỉ ẩn, không xóa code
                   <NavItem href="#" icon={BarChart2}>
                     {t("nav.analytics")}
                   </NavItem>
                   <NavItem href="#" icon={Building2}>
                     {t("nav.organization")}
                   </NavItem>
+                  */}
                   <NavItem href="/dashboard/projects" icon={Folder}>
                     {t("nav.projects")}
                   </NavItem>
@@ -240,6 +245,7 @@ export default function Sidebar({ isCollapsed = false }: SidebarProps) {
               </div>
               */}
 
+              {isAdmin && (
               <div>
                 <SectionTitle
                   action={
@@ -268,9 +274,10 @@ export default function Sidebar({ isCollapsed = false }: SidebarProps) {
                   <NavItem href="/dashboard/teams" icon={UsersRound}>
                     {t("nav.teamList")}
                   </NavItem>
-                  <NavItem href="#" icon={Users2}>
+                  <NavItem href="/dashboard/members" icon={Users2}>
                     {t("nav.members")}
                   </NavItem>
+                  {/* Chưa triển khai - chỉ ẩn, không xóa code
                   <NavItem href="#" icon={Shield}>
                     {t("nav.permissions")}
                   </NavItem>
@@ -280,8 +287,10 @@ export default function Sidebar({ isCollapsed = false }: SidebarProps) {
                   <NavItem href="#" icon={Video}>
                     {t("nav.meetings")}
                   </NavItem>
+                  */}
                 </div>
               </div>
+              )}
             </div>
           </div>
 
@@ -295,9 +304,11 @@ export default function Sidebar({ isCollapsed = false }: SidebarProps) {
               <NavItem href="/dashboard/settings" icon={Settings}>
                 {t("nav.settings")}
               </NavItem>
+              {/* Chưa triển khai - chỉ ẩn, không xóa code
               <NavItem href="#" icon={HelpCircle}>
                 {t("nav.help")}
               </NavItem>
+              */}
             </div>
           </div>
         </div>
@@ -311,7 +322,7 @@ export default function Sidebar({ isCollapsed = false }: SidebarProps) {
       )}
 
       <TeamDialog
-        open={teamDialogOpen}
+        open={teamDialogOpen && isAdmin}
         onClose={() => setTeamDialogOpen(false)}
         onSubmit={handleCreateTeam}
       />

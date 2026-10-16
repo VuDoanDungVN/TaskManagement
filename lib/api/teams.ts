@@ -84,6 +84,14 @@ export const teamsApi = {
     return api.get<TeamListPage>(`/teams${qs ? `?${qs}` : ""}`)
   },
 
+  /** Admin: danh sách tất cả nhóm (cho dialog thêm user vào nhóm). */
+  allList: (search?: string) => {
+    const q = new URLSearchParams()
+    if (search) q.set("search", search)
+    const qs = q.toString()
+    return api.get<{ items: ApiTeam[] }>(`/teams/all${qs ? `?${qs}` : ""}`)
+  },
+
   get: (id: string) => api.get<ApiTeam>(`/teams/${encodeURIComponent(id)}`),
 
   create: (input: TeamCreateInput) => api.post<ApiTeam>("/teams", input),

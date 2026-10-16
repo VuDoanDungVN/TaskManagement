@@ -1,7 +1,7 @@
 import { Hono, type Context } from "hono"
 import { HTTPException } from "hono/http-exception"
 import type { AppEnv } from "../types"
-import { requireAuth } from "../auth-middleware"
+import { adminOnly, requireAuth, requireSystemAdmin } from "../auth-middleware"
 import { buildFileUrl, uuid } from "../utils"
 import { sendInviteEmail } from "../mailer"
 
@@ -143,6 +143,8 @@ async function requireManager(c: Context<AppEnv>, teamId: string) {
 // ============================================================================
 const teams = new Hono<AppEnv>()
 teams.use("*", requireAuth())
+// Nhóm là công cụ nội bộ — chỉ admin hệ thống dùng (customer phân quyền theo project_members)
+teams.use("*", adminOnly)
 
 // GET /teams — list các nhóm mà user là thành viên (keyset pagination)
 // Query: ?limit=20&cursor=<updatedAt_id>
@@ -196,6 +198,35 @@ teams.get("/", async (c) => {
     }),
   )
   return c.json({ items, nextCursor })
+})
+
+// GET /teams/all — danh sách TẤT CẢ nhóm (chỉ admin), dùng cho dialog "thêm vào nhóm".
+// Đặt TRƯỚC GET /:id để route tĩnh "all" được ưu tiên.
+// Query: ?search=<text> (giới hạn 50 kết quả).
+teams.get("/all", async (c) => {
+  requireSystemAdmin(c)
+  const binds: unknown[] = []
+  let where = ""
+  const search = (c.req.query("search") ?? "").trim()
+  if (search) {
+    const safe = search.replace(/[%_\\]/g, (m) => `\\${m}`)
+    where = " WHERE t.name LIKE ? ESCAPE '\\'"
+    binds.push(`%${safe}%`)
+  }
+  binds.push(50)
+  const rs = await c.env.DB.prepare(
+    `SELECT t.*,
+       (SELECT COUNT(*) FROM team_members tm WHERE tm.team_id = t.id) AS member_count
+     FROM teams t${where}
+     ORDER BY t.name ASC
+     LIMIT ?`,
+  )
+    .bind(...binds)
+    .all<TeamRowWithMeta>()
+  const items = (rs.results ?? []).map((row) =>
+    serializeTeam(c, row, { memberCount: row.member_count ?? 1, myRole: null }),
+  )
+  return c.json({ items })
 })
 
 // POST /teams — tạo nhóm mới (người tạo = owner)
@@ -614,7 +645,7 @@ teams.get("/:id/projects", async (c) => {
 // POST /teams/:id/projects — gán 1 project vào nhóm.
 // Yêu cầu: là owner/admin của nhóm VÀ là chủ của project.
 teams.post("/:id/projects", async (c) => {
-  const { team, user } = await requireManager(c, c.req.param("id"))
+  const { team } = await requireManager(c, c.req.param("id"))
   let body: { projectId?: unknown }
   try {
     body = await c.req.json()
@@ -624,15 +655,11 @@ teams.post("/:id/projects", async (c) => {
   const projectId = typeof body.projectId === "string" ? body.projectId : ""
   if (!projectId) throw new HTTPException(400, { message: "Thiếu projectId." })
 
-  const proj = await c.env.DB.prepare(
-    "SELECT owner_id FROM projects WHERE id = ?",
-  )
+  // Route đã giới hạn admin hệ thống (adminOnly) → admin gán được mọi project
+  const proj = await c.env.DB.prepare("SELECT 1 FROM projects WHERE id = ?")
     .bind(projectId)
-    .first<{ owner_id: string }>()
+    .first()
   if (!proj) throw new HTTPException(404, { message: "Không tìm thấy dự án." })
-  if (proj.owner_id !== user.uid) {
-    throw new HTTPException(403, { message: "Chỉ chủ dự án mới được gán dự án vào nhóm." })
-  }
 
   await c.env.DB.prepare("UPDATE projects SET team_id = ?, updated_at = ? WHERE id = ?")
     .bind(team.id, Date.now(), projectId)

@@ -1,7 +1,8 @@
 import { Hono, type Context } from "hono"
 import { HTTPException } from "hono/http-exception"
-import type { AppEnv } from "../types"
-import { requireAuth } from "../auth-middleware"
+import type { AppEnv, SystemRole, UserStatus } from "../types"
+import { requireAuth, requireSystemAdmin } from "../auth-middleware"
+import { PROJECT_ACCESS_SQL, projectAccessBinds, requireProjectAccess } from "../access"
 import { buildFileUrl, uuid } from "../utils"
 
 interface ProjectRow {
@@ -67,9 +68,8 @@ const projects = new Hono<AppEnv>()
 
 projects.use("*", requireAuth())
 
-// GET /projects — list projects của user hiện tại (kèm task stats)
+// GET /projects — admin: mọi project; customer: project được gán (kèm task stats)
 projects.get("/", async (c) => {
-  const user = c.get("user")
   const rs = await c.env.DB.prepare(
     `SELECT p.*,
        COALESCE(s.total, 0)        AS task_total,
@@ -88,10 +88,10 @@ projects.get("/", async (c) => {
        FROM tasks
        GROUP BY project_id
      ) s ON s.project_id = p.id
-     WHERE p.owner_id = ?
+     WHERE ${PROJECT_ACCESS_SQL}
      ORDER BY p.updated_at DESC`,
   )
-    .bind(user.uid)
+    .bind(...projectAccessBinds(c))
     .all<ProjectRowWithStats>()
 
   const items = (rs.results ?? []).map((row) =>
@@ -110,9 +110,9 @@ projects.get("/", async (c) => {
   return c.json({ items })
 })
 
-// POST /projects — tạo mới
+// POST /projects — tạo mới (chỉ admin)
 projects.post("/", async (c) => {
-  const user = c.get("user")
+  const user = requireSystemAdmin(c)
   let body: { name?: unknown; description?: unknown; thumbnailKey?: unknown }
   try {
     body = await c.req.json()
@@ -154,34 +154,32 @@ projects.post("/", async (c) => {
   )
 })
 
-// Helper: load project & check ownership
-async function loadOwnedProject(
+// Helper: load project sau khi đã kiểm tra quyền xem (admin hoặc thành viên)
+async function loadAccessibleProject(
   c: Context<AppEnv>,
   id: string,
 ): Promise<ProjectRow> {
-  const user = c.get("user")
+  await requireProjectAccess(c, id)
   const row = await c.env.DB.prepare("SELECT * FROM projects WHERE id = ?")
     .bind(id)
     .first<ProjectRow>()
   if (!row) throw new HTTPException(404, { message: "Không tìm thấy dự án." })
-  if (row.owner_id !== user.uid) {
-    throw new HTTPException(403, { message: "Bạn không có quyền truy cập dự án này." })
-  }
   return row
 }
 
 // GET /projects/:id
 projects.get("/:id", async (c) => {
-  const row = await loadOwnedProject(c, c.req.param("id"))
+  const row = await loadAccessibleProject(c, c.req.param("id"))
   const teamName = await fetchTeamName(c, row.team_id)
   return c.json(
     serializeProject(row, buildFileUrl(c.env, c.req.raw, row.thumbnail_key), undefined, teamName),
   )
 })
 
-// PUT /projects/:id
+// PUT /projects/:id — sửa thông tin dự án (chỉ admin)
 projects.put("/:id", async (c) => {
-  const existing = await loadOwnedProject(c, c.req.param("id"))
+  requireSystemAdmin(c)
+  const existing = await loadAccessibleProject(c, c.req.param("id"))
   let body: {
     name?: unknown
     description?: unknown
@@ -240,10 +238,89 @@ projects.put("/:id", async (c) => {
   )
 })
 
-// DELETE /projects/:id
+// DELETE /projects/:id — chỉ admin
 projects.delete("/:id", async (c) => {
-  const existing = await loadOwnedProject(c, c.req.param("id"))
+  requireSystemAdmin(c)
+  const existing = await loadAccessibleProject(c, c.req.param("id"))
   await c.env.DB.prepare("DELETE FROM projects WHERE id = ?").bind(existing.id).run()
+  return c.json({ ok: true })
+})
+
+// ----------------------------------------------------------------------------
+// Thành viên dự án
+// ----------------------------------------------------------------------------
+
+interface ProjectMemberRow {
+  id: string
+  email: string
+  display_name: string | null
+  avatar_key: string | null
+  role: SystemRole
+  status: UserStatus
+  added_at: number
+}
+
+// GET /projects/:id/members — người được gán vào dự án.
+// Customer chỉ xem được thành viên của dự án mình thuộc về (dùng để giao task).
+projects.get("/:id/members", async (c) => {
+  const id = c.req.param("id")
+  await requireProjectAccess(c, id)
+  const rs = await c.env.DB.prepare(
+    `SELECT u.id, u.email, u.display_name, u.avatar_key, u.role, u.status, pm.added_at
+     FROM project_members pm JOIN users u ON u.id = pm.user_id
+     WHERE pm.project_id = ?
+     ORDER BY COALESCE(u.display_name, u.email) COLLATE NOCASE ASC`,
+  )
+    .bind(id)
+    .all<ProjectMemberRow>()
+  const items = (rs.results ?? []).map((r) => ({
+    id: r.id,
+    email: r.email,
+    displayName: r.display_name,
+    avatarUrl: buildFileUrl(c.env, c.req.raw, r.avatar_key),
+    role: r.role,
+    status: r.status,
+    addedAt: r.added_at,
+  }))
+  return c.json({ items })
+})
+
+// POST /projects/:id/members — gán user vào dự án (chỉ admin). Body: { userId }
+projects.post("/:id/members", async (c) => {
+  const admin = requireSystemAdmin(c)
+  const id = c.req.param("id")
+  await loadAccessibleProject(c, id)
+  let body: { userId?: unknown }
+  try {
+    body = await c.req.json()
+  } catch {
+    throw new HTTPException(400, { message: "Body không phải JSON hợp lệ." })
+  }
+  const userId = typeof body.userId === "string" ? body.userId : ""
+  if (!userId) throw new HTTPException(400, { message: "Thiếu userId." })
+  const exists = await c.env.DB.prepare("SELECT 1 FROM users WHERE id = ?").bind(userId).first()
+  if (!exists) throw new HTTPException(404, { message: "Không tìm thấy user." })
+
+  await c.env.DB.prepare(
+    `INSERT OR IGNORE INTO project_members (project_id, user_id, added_by, added_at)
+     VALUES (?, ?, ?, ?)`,
+  )
+    .bind(id, userId, admin.uid, Date.now())
+    .run()
+  return c.json({ ok: true }, 201)
+})
+
+// DELETE /projects/:id/members/:userId — gỡ user khỏi dự án (chỉ admin)
+projects.delete("/:id/members/:userId", async (c) => {
+  requireSystemAdmin(c)
+  const res = await c.env.DB.prepare(
+    "DELETE FROM project_members WHERE project_id = ? AND user_id = ?",
+  )
+    .bind(c.req.param("id"), c.req.param("userId"))
+    .run()
+  if (!res.meta.changes) {
+    throw new HTTPException(404, { message: "User không thuộc dự án này." })
+  }
   return c.json({ ok: true })
 })
 

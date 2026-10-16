@@ -3,11 +3,20 @@
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { useEffect, useMemo, useRef, useState } from "react"
-import { Globe, ImageIcon, Lock, Trash2, UsersRound } from "lucide-react"
-import { useDeleteTeam, useInfiniteTeams } from "@/lib/teams/store"
-import type { ApiTeam, TeamRole } from "@/lib/api/teams"
+import { useQueryClient } from "@tanstack/react-query"
+import { Globe, ImageIcon, Lock, Plus, Trash2, UsersRound } from "lucide-react"
+import {
+  TEAMS_QUERY_KEY,
+  useCreateTeam,
+  useDeleteTeam,
+  useInfiniteTeams,
+} from "@/lib/teams/store"
+import { teamsApi, type ApiTeam, type TeamRole } from "@/lib/api/teams"
+import { uploadsApi } from "@/lib/api/uploads"
+import { useAuth } from "@/lib/auth/context"
 import { useI18n } from "@/lib/i18n/context"
 import TeamDeleteDialog from "./team-delete-dialog"
+import TeamDialog, { type TeamDialogDraft } from "./team-dialog"
 
 const PAGE_SIZE = 20
 
@@ -29,6 +38,37 @@ export default function TeamList() {
 
   const deleteMutation = useDeleteTeam()
   const [deleteTarget, setDeleteTarget] = useState<ApiTeam | null>(null)
+
+  // Tạo nhóm ngay từ trang danh sách (dùng lại luồng giống nút + trên sidebar)
+  const queryClient = useQueryClient()
+  const createTeam = useCreateTeam()
+  const { user, verified, loading: authLoading } = useAuth()
+  const canCreateTeam = !authLoading && !!user && verified
+  const [createDialogOpen, setCreateDialogOpen] = useState(false)
+
+  async function handleCreateTeam(
+    draft: TeamDialogDraft,
+    file: File | null,
+    emails: string[],
+  ) {
+    const team = await createTeam.mutateAsync(draft)
+    // Avatar + lời mời không chặn luồng: lỗi chỉ log, nhóm vẫn được tạo
+    if (file) {
+      try {
+        await uploadsApi.teamAvatar(team.id, file)
+      } catch (e) {
+        console.error("Upload avatar nhóm thất bại:", e)
+      }
+    }
+    if (emails.length > 0) {
+      try {
+        await teamsApi.invite(team.id, { emails })
+      } catch (e) {
+        console.error("Gửi lời mời thất bại:", e)
+      }
+    }
+    queryClient.invalidateQueries({ queryKey: TEAMS_QUERY_KEY })
+  }
 
   // IntersectionObserver: tự fetch trang sau khi sentinel lọt vào khung nhìn
   const sentinelRef = useRef<HTMLDivElement>(null)
@@ -88,6 +128,22 @@ export default function TeamList() {
           <div className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
             {t("teamsList.emptyHelp")}
           </div>
+          {canCreateTeam && (
+            <button
+              type="button"
+              onClick={() => setCreateDialogOpen(true)}
+              className={cn(
+                "inline-flex items-center gap-1.5 mt-4 px-4 py-2 rounded-lg",
+                "text-xs font-medium",
+                "bg-zinc-900 dark:bg-zinc-50 text-zinc-50 dark:text-zinc-900",
+                "hover:bg-zinc-800 dark:hover:bg-zinc-200",
+                "transition-colors",
+              )}
+            >
+              <Plus className="w-3.5 h-3.5" />
+              {t("nav.createTeam")}
+            </button>
+          )}
         </div>
       ) : (
         <>
@@ -222,6 +278,12 @@ export default function TeamList() {
         onConfirm={async () => {
           if (deleteTarget) await deleteMutation.mutateAsync(deleteTarget.id)
         }}
+      />
+
+      <TeamDialog
+        open={createDialogOpen}
+        onClose={() => setCreateDialogOpen(false)}
+        onSubmit={handleCreateTeam}
       />
     </div>
   )

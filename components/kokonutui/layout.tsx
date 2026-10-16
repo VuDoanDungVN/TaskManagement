@@ -3,6 +3,7 @@
 import type { ReactNode } from "react"
 import Sidebar from "./sidebar"
 import TopNav from "./top-nav"
+import { AccessGate } from "./access-gate"
 import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
 import type { BreadcrumbItem } from "@/lib/breadcrumbs"
@@ -48,6 +49,7 @@ export default function Layout({ children, breadcrumbs }: LayoutProps) {
 
   return (
     <div className={`min-h-screen ${theme === "dark" ? "dark" : ""}`}>
+      <AccessGate />
       <Sidebar isCollapsed={collapsed} />
       <div
         className={cn(
@@ -65,7 +67,7 @@ export default function Layout({ children, breadcrumbs }: LayoutProps) {
             breadcrumbs={breadcrumbs}
           />
         </header>
-        <main className="flex-1 p-6 bg-white dark:bg-[#0F0F12]">{children}</main>
+        <main className="flex-1 min-w-0 p-4 sm:p-6 bg-white dark:bg-[#0F0F12]">{children}</main>
       </div>
     </div>
   )

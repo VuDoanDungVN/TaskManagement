@@ -4,6 +4,12 @@ import type { AppEnv } from "../types"
 import { requireAuth } from "../auth-middleware"
 import { buildFileUrl, uuid } from "../utils"
 import {
+  PROJECT_ACCESS_SQL,
+  projectAccessBinds,
+  requireProjectAccess,
+  requireTaskAccess,
+} from "../access"
+import {
   COMMENT_SELECT,
   serializeComment,
   validateCommentBody,
@@ -77,42 +83,12 @@ function serializeTask(row: TaskRow, fileUrl: string | null) {
 const tasks = new Hono<AppEnv>()
 tasks.use("*", requireAuth())
 
-async function assertProjectOwner(
-  c: Context<AppEnv>,
-  projectId: string,
-): Promise<void> {
-  const user = c.get("user")
-  const owner = await c.env.DB.prepare("SELECT owner_id FROM projects WHERE id = ?")
-    .bind(projectId)
-    .first<{ owner_id: string }>()
-  if (!owner) throw new HTTPException(404, { message: "Không tìm thấy dự án." })
-  if (owner.owner_id !== user.uid) {
-    throw new HTTPException(403, { message: "Bạn không có quyền truy cập dự án này." })
-  }
-}
-
-async function loadOwnedTask(
+// Load task sau khi kiểm tra quyền truy cập project chứa nó (admin hoặc thành viên)
+async function loadAccessibleTask(
   c: Context<AppEnv>,
   id: string,
 ): Promise<TaskRow> {
-  const user = c.get("user")
-  const row = await c.env.DB.prepare(
-    `${TASK_SELECT}
-     JOIN projects p ON p.id = t.project_id
-     WHERE t.id = ? AND p.owner_id = ?`,
-  )
-    .bind(id, user.uid)
-    .first<TaskRow>()
-  if (!row) throw new HTTPException(404, { message: "Không tìm thấy task." })
-  return row
-}
-
-// Bất kỳ user đã đăng nhập nào cũng có thể xem task qua trang chi tiết (cho phép
-// bình luận khi biết link). Helper này chỉ check task tồn tại, KHÔNG check ownership.
-async function loadTaskById(
-  c: Context<AppEnv>,
-  id: string,
-): Promise<TaskRow> {
+  await requireTaskAccess(c, id)
   const row = await c.env.DB.prepare(`${TASK_SELECT} WHERE t.id = ?`)
     .bind(id)
     .first<TaskRow>()
@@ -121,12 +97,12 @@ async function loadTaskById(
 }
 
 // GET /tasks?projectId=xxx → list task của 1 project
-// GET /tasks                  → toàn bộ task của các dự án user sở hữu (cho Dashboard)
+// GET /tasks                  → toàn bộ task của các dự án user truy cập được (cho Dashboard)
 tasks.get("/", async (c) => {
   const projectId = c.req.query("projectId")
 
   if (projectId) {
-    await assertProjectOwner(c, projectId)
+    await requireProjectAccess(c, projectId)
     const rs = await c.env.DB.prepare(
       `${TASK_SELECT} WHERE t.project_id = ? ORDER BY t.updated_at DESC`,
     )
@@ -138,16 +114,15 @@ tasks.get("/", async (c) => {
     return c.json({ items })
   }
 
-  // Tất cả task của owner — giới hạn 500 để bảo vệ payload Dashboard.
-  const user = c.get("user")
+  // Tất cả task user truy cập được — giới hạn 500 để bảo vệ payload Dashboard.
   const rs = await c.env.DB.prepare(
     `${TASK_SELECT}
      JOIN projects p ON p.id = t.project_id
-     WHERE p.owner_id = ?
+     WHERE ${PROJECT_ACCESS_SQL}
      ORDER BY t.updated_at DESC
      LIMIT 500`,
   )
-    .bind(user.uid)
+    .bind(...projectAccessBinds(c))
     .all<TaskRow>()
   const items = (rs.results ?? []).map((r) =>
     serializeTask(r, buildFileUrl(c.env, c.req.raw, r.thumbnail_key)),
@@ -218,7 +193,7 @@ tasks.post("/", async (c) => {
   if (!projectId) {
     throw new HTTPException(400, { message: "Thiếu projectId." })
   }
-  await assertProjectOwner(c, projectId)
+  await requireProjectAccess(c, projectId)
 
   const no = validateNo(body.no)
   const title =
@@ -285,16 +260,16 @@ tasks.post("/", async (c) => {
   return c.json(serializeTask(row, buildFileUrl(c.env, c.req.raw, row.thumbnail_key)), 201)
 })
 
-// GET /tasks/:id — bất kỳ user đăng nhập nào cũng xem được (cho chức năng comment)
+// GET /tasks/:id
 tasks.get("/:id", async (c) => {
-  const row = await loadTaskById(c, c.req.param("id"))
+  const row = await loadAccessibleTask(c, c.req.param("id"))
   return c.json(serializeTask(row, buildFileUrl(c.env, c.req.raw, row.thumbnail_key)))
 })
 
 // GET /tasks/:id/comments — list bình luận của task
 tasks.get("/:id/comments", async (c) => {
   const taskId = c.req.param("id")
-  await loadTaskById(c, taskId)
+  await requireTaskAccess(c, taskId)
   const rs = await c.env.DB.prepare(
     `${COMMENT_SELECT} WHERE c.task_id = ? ORDER BY c.created_at ASC`,
   )
@@ -356,7 +331,7 @@ async function parseCommentInput(c: Context<AppEnv>): Promise<ParsedCommentInput
 // POST /tasks/:id/comments — tạo bình luận (hoặc reply, model 1 cấp), có thể đính kèm file
 tasks.post("/:id/comments", async (c) => {
   const taskId = c.req.param("id")
-  await loadTaskById(c, taskId)
+  await requireTaskAccess(c, taskId)
   const user = c.get("user")
 
   const { body: text, parentIdRaw, files } = await parseCommentInput(c)
@@ -444,7 +419,7 @@ tasks.post("/:id/comments", async (c) => {
 
 // PUT /tasks/:id
 tasks.put("/:id", async (c) => {
-  const existing = await loadOwnedTask(c, c.req.param("id"))
+  const existing = await loadAccessibleTask(c, c.req.param("id"))
   let body: TaskInput
   try {
     body = await c.req.json()
@@ -540,7 +515,7 @@ tasks.put("/:id", async (c) => {
 
 // DELETE /tasks/:id
 tasks.delete("/:id", async (c) => {
-  const existing = await loadOwnedTask(c, c.req.param("id"))
+  const existing = await loadAccessibleTask(c, c.req.param("id"))
   await c.env.DB.prepare("DELETE FROM tasks WHERE id = ?").bind(existing.id).run()
   return c.json({ ok: true })
 })

@@ -18,6 +18,8 @@ interface TaskDialogProps {
   open: boolean
   initialTask?: Task | null
   existingNos: number[]
+  /** Tên thành viên dự án để chọn người phụ trách; không truyền → ô nhập tự do. */
+  assigneeOptions?: string[]
   onClose: () => void
   onSubmit: (draft: TaskDraft, file: File | null) => void
 }
@@ -61,6 +63,7 @@ export default function TaskDialog({
   open,
   initialTask,
   existingNos,
+  assigneeOptions,
   onClose,
   onSubmit,
 }: TaskDialogProps) {
@@ -269,12 +272,31 @@ export default function TaskDialog({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1">
               <label className={labelClass}>{t("taskDialog.assigneeLabel")}</label>
-              <input
-                value={draft.assignee ?? ""}
-                onChange={(e) => setDraft((d) => ({ ...d, assignee: e.target.value }))}
-                placeholder={t("taskDialog.assigneePlaceholder")}
-                className={fieldClass}
-              />
+              {assigneeOptions ? (
+                <select
+                  value={draft.assignee ?? ""}
+                  onChange={(e) => setDraft((d) => ({ ...d, assignee: e.target.value }))}
+                  className={fieldClass}
+                >
+                  <option value="">{t("access.assigneeNone")}</option>
+                  {/* Giữ giá trị cũ (nhập tự do trước đây) nếu không còn trong danh sách */}
+                  {draft.assignee && !assigneeOptions.includes(draft.assignee) && (
+                    <option value={draft.assignee}>{draft.assignee}</option>
+                  )}
+                  {assigneeOptions.map((name) => (
+                    <option key={name} value={name}>
+                      {name}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  value={draft.assignee ?? ""}
+                  onChange={(e) => setDraft((d) => ({ ...d, assignee: e.target.value }))}
+                  placeholder={t("taskDialog.assigneePlaceholder")}
+                  className={fieldClass}
+                />
+              )}
             </div>
             <div className="space-y-1">
               <label className={labelClass}>{t("taskDialog.tagsLabel")}</label>

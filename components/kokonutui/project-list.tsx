@@ -13,6 +13,7 @@ import { uploadsApi } from "@/lib/api/uploads"
 import ProjectDialog from "./project-dialog"
 import { useAuth } from "@/lib/auth/context"
 import { useI18n } from "@/lib/i18n/context"
+import { useIsAdmin } from "@/lib/users/store"
 
 export default function ProjectList() {
   const { user, verified, loading: authLoading } = useAuth()
@@ -24,6 +25,8 @@ export default function ProjectList() {
   const [dialogOpen, setDialogOpen] = useState(false)
 
   const isGuest = !authLoading && (!user || !verified)
+  // Chỉ admin được tạo dự án; customer chỉ thấy dự án được gán
+  const isAdmin = useIsAdmin()
 
   async function handleCreate(draft: ProjectDraft, file: File | null) {
     const project = await createMutation.mutateAsync(draft)
@@ -73,7 +76,7 @@ export default function ProjectList() {
             <span className="text-xs text-zinc-600 dark:text-zinc-400">
               {t("projects.countLabel", { count: projects.length })}
             </span>
-            {!isGuest && (
+            {!isGuest && isAdmin && (
               <button
                 type="button"
                 onClick={() => setDialogOpen(true)}
@@ -118,7 +121,7 @@ export default function ProjectList() {
               {t("projects.emptyTitle")}
             </div>
             <div className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
-              {t("projects.emptyHelp")}
+              {isAdmin ? t("projects.emptyHelp") : t("access.contactAdmin")}
             </div>
           </div>
         ) : (
@@ -278,7 +281,7 @@ export default function ProjectList() {
       </div>
 
       <ProjectDialog
-        open={dialogOpen}
+        open={dialogOpen && isAdmin}
         onClose={() => setDialogOpen(false)}
         onSubmit={handleCreate}
       />

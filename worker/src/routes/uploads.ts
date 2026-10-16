@@ -1,7 +1,8 @@
 import { Hono } from "hono"
 import { HTTPException } from "hono/http-exception"
 import type { AppEnv } from "../types"
-import { requireAuth } from "../auth-middleware"
+import { requireAuth, requireSystemAdmin } from "../auth-middleware"
+import { requireTaskAccess } from "../access"
 import { buildFileUrl } from "../utils"
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
@@ -82,18 +83,16 @@ uploads.post("/avatar", async (c) => {
  * POST /uploads/projects/:projectId/thumbnail
  */
 uploads.post("/projects/:projectId/thumbnail", async (c) => {
-  const user = c.get("user")
+  // Ảnh dự án thuộc thông tin dự án → chỉ admin
+  requireSystemAdmin(c)
   const projectId = c.req.param("projectId")
 
   const existing = await c.env.DB.prepare(
-    "SELECT owner_id, thumbnail_key FROM projects WHERE id = ?",
+    "SELECT thumbnail_key FROM projects WHERE id = ?",
   )
     .bind(projectId)
-    .first<{ owner_id: string; thumbnail_key: string | null }>()
+    .first<{ thumbnail_key: string | null }>()
   if (!existing) throw new HTTPException(404, { message: "Không tìm thấy dự án." })
-  if (existing.owner_id !== user.uid) {
-    throw new HTTPException(403, { message: "Bạn không có quyền truy cập dự án này." })
-  }
 
   const file = await extractFile(c.req.raw)
   const ext = mimeToExt(file.type)
@@ -121,7 +120,7 @@ uploads.post("/projects/:projectId/thumbnail", async (c) => {
  * Chỉ owner/admin của nhóm mới được upload avatar.
  */
 uploads.post("/teams/:teamId/avatar", async (c) => {
-  const user = c.get("user")
+  const user = requireSystemAdmin(c) // nhóm chỉ dành cho admin
   const teamId = c.req.param("teamId")
 
   const existing = await c.env.DB.prepare(
@@ -162,20 +161,13 @@ uploads.post("/teams/:teamId/avatar", async (c) => {
  * POST /uploads/tasks/:taskId/thumbnail
  */
 uploads.post("/tasks/:taskId/thumbnail", async (c) => {
-  const user = c.get("user")
   const taskId = c.req.param("taskId")
+  await requireTaskAccess(c, taskId)
 
-  const existing = await c.env.DB.prepare(
-    `SELECT t.thumbnail_key, p.owner_id
-     FROM tasks t JOIN projects p ON p.id = t.project_id
-     WHERE t.id = ?`,
-  )
+  const existing = await c.env.DB.prepare("SELECT thumbnail_key FROM tasks WHERE id = ?")
     .bind(taskId)
-    .first<{ thumbnail_key: string | null; owner_id: string }>()
+    .first<{ thumbnail_key: string | null }>()
   if (!existing) throw new HTTPException(404, { message: "Không tìm thấy task." })
-  if (existing.owner_id !== user.uid) {
-    throw new HTTPException(403, { message: "Bạn không có quyền truy cập task này." })
-  }
 
   const file = await extractFile(c.req.raw)
   const ext = mimeToExt(file.type)

@@ -73,4 +73,42 @@ export function useDeleteProject() {
   })
 }
 
-export type { ApiProject as Project } from "@/lib/api/projects"
+export const PROJECT_MEMBERS_QUERY_KEY = (id: string) => ["projects", id, "members"] as const
+
+/** Thành viên của dự án (admin + customer cùng dự án đều xem được). */
+export function useProjectMembers(id: string | null | undefined) {
+  const { user, verified, loading: authLoading } = useAuth()
+  return useQuery({
+    queryKey: PROJECT_MEMBERS_QUERY_KEY(id ?? ""),
+    queryFn: async () => (await projectsApi.members(id!)).items,
+    enabled: !authLoading && !!user && verified && !!id,
+    staleTime: 60_000,
+  })
+}
+
+function invalidateMembership(queryClient: ReturnType<typeof useQueryClient>, projectId: string) {
+  queryClient.invalidateQueries({ queryKey: PROJECT_MEMBERS_QUERY_KEY(projectId) })
+  queryClient.invalidateQueries({ queryKey: ["users"] })
+}
+
+/** Admin: gán user vào dự án. */
+export function useAddProjectMember() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ projectId, userId }: { projectId: string; userId: string }) =>
+      projectsApi.addMember(projectId, userId),
+    onSuccess: (_d, vars) => invalidateMembership(queryClient, vars.projectId),
+  })
+}
+
+/** Admin: gỡ user khỏi dự án. */
+export function useRemoveProjectMember() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ projectId, userId }: { projectId: string; userId: string }) =>
+      projectsApi.removeMember(projectId, userId),
+    onSuccess: (_d, vars) => invalidateMembership(queryClient, vars.projectId),
+  })
+}
+
+export type { ApiProject as Project, ApiProjectMember as ProjectMember } from "@/lib/api/projects"

@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  keepPreviousData,
   useInfiniteQuery,
   useMutation,
   useQuery,
@@ -50,6 +51,24 @@ export function useInfiniteTeams(pageSize = 20) {
     initialPageParam: null as string | null,
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
     enabled,
+  })
+}
+
+/**
+ * Admin: danh sách tất cả nhóm cho dialog "thêm vào nhóm".
+ * Chỉ fetch khi dialog mở (`enabled`) và có debounce search ở component → không gọi thừa.
+ */
+export const ALL_TEAMS_QUERY_KEY = (search: string) =>
+  ["teams", "all", search] as const
+
+export function useAllTeams(search = "", enabled = true) {
+  const { user, verified, loading: authLoading } = useAuth()
+  return useQuery({
+    queryKey: ALL_TEAMS_QUERY_KEY(search),
+    queryFn: async () => (await teamsApi.allList(search || undefined)).items,
+    enabled: !authLoading && !!user && verified && enabled,
+    placeholderData: keepPreviousData,
+    staleTime: 30_000,
   })
 }
 

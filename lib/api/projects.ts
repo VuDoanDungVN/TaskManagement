@@ -29,6 +29,16 @@ export interface ProjectCreateInput {
 
 export type ProjectUpdateInput = Partial<ProjectCreateInput>
 
+export interface ApiProjectMember {
+  id: string
+  email: string
+  displayName: string | null
+  avatarUrl: string | null
+  role: "admin" | "user"
+  status: "active" | "disabled"
+  addedAt: number
+}
+
 export const projectsApi = {
   list: () => api.get<{ items: ApiProject[] }>("/projects"),
 
@@ -40,4 +50,15 @@ export const projectsApi = {
     api.put<ApiProject>(`/projects/${encodeURIComponent(id)}`, patch),
 
   remove: (id: string) => api.del<{ ok: true }>(`/projects/${encodeURIComponent(id)}`),
+
+  members: (id: string) =>
+    api.get<{ items: ApiProjectMember[] }>(`/projects/${encodeURIComponent(id)}/members`),
+
+  addMember: (id: string, userId: string) =>
+    api.post<{ ok: true }>(`/projects/${encodeURIComponent(id)}/members`, { userId }),
+
+  removeMember: (id: string, userId: string) =>
+    api.del<{ ok: true }>(
+      `/projects/${encodeURIComponent(id)}/members/${encodeURIComponent(userId)}`,
+    ),
 }

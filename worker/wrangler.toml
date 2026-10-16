@@ -13,6 +13,9 @@ PUBLIC_FILES_BASE_URL = ""
 # Production: chạy `wrangler secret put RESEND_API_KEY`
 MAIL_FROM = "vunhatjp@gmail.com"
 APP_BASE_URL = "http://localhost:3000"
+# Danh sách email được tự cấp quyền admin hệ thống (phân tách bằng dấu phẩy).
+# Khi các email này đăng nhập, role trong bảng users sẽ tự được set 'admin'.
+ADMIN_EMAILS = "ai.global.occ@gmail.com"
 
 # D1 database — bound as `DB` in code (c.env.DB)
 [[d1_databases]]

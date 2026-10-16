@@ -209,6 +209,62 @@ export interface Dictionary {
     deleting: string
     deleteError: string
   }
+  membersList: {
+    title: string
+    subtitle: string
+    countLabel: string
+    searchPlaceholder: string
+    loading: string
+    error: string
+    emptyTitle: string
+    emptyHelp: string
+    emptyHelpSearch: string
+    loadMore: string
+    loadingMore: string
+    endOfList: string
+    roleAdmin: string
+    roleUser: string
+    teamCountLabel: string
+    verified: string
+    unverified: string
+    you: string
+    actionEdit: string
+    actionManageTeams: string
+    edit: {
+      title: string
+      desc: string
+      nameLabel: string
+      namePlaceholder: string
+      roleLabel: string
+      roleAdmin: string
+      roleUser: string
+      submit: string
+      error: string
+    }
+    teams: {
+      title: string
+      desc: string
+      loading: string
+      empty: string
+      ownerBadge: string
+      roleAdmin: string
+      roleMember: string
+      remove: string
+      removeError: string
+      removing: string
+      addTitle: string
+      selectTeamLabel: string
+      selectTeamPlaceholder: string
+      searchPlaceholder: string
+      noTeams: string
+      addRoleLabel: string
+      addRoleMember: string
+      addRoleAdmin: string
+      addSubmit: string
+      adding: string
+      addError: string
+    }
+  }
   teamDetail: {
     loading: string
     error: string
@@ -407,6 +463,66 @@ export interface Dictionary {
       loading: string
       errorFallback: string
     }
+  }
+  access: {
+    roleAdmin: string
+    roleCustomer: string
+    noPermissionTitle: string
+    noPermissionDesc: string
+    backToDashboard: string
+    deniedLogin: string
+    contactAdmin: string
+    createAccount: string
+    createTitle: string
+    createDesc: string
+    emailLabel: string
+    emailPlaceholder: string
+    nameLabel: string
+    namePlaceholder: string
+    roleLabel: string
+    roleCustomerHint: string
+    roleAdminHint: string
+    projectsLabel: string
+    projectsHint: string
+    noProjectsAvailable: string
+    creating: string
+    createSubmit: string
+    createError: string
+    createdTitle: string
+    createdEmailSent: string
+    createdEmailFailed: string
+    setPasswordLink: string
+    copy: string
+    copied: string
+    done: string
+    actionProjects: string
+    actionLock: string
+    actionUnlock: string
+    actionResendLink: string
+    lockConfirm: string
+    unlockConfirm: string
+    statusDisabled: string
+    projectCountLabel: string
+    resendTitle: string
+    resendError: string
+    userProjectsTitle: string
+    userProjectsDesc: string
+    searchProjects: string
+    saveProjects: string
+    saveError: string
+    selectedCount: string
+    projectMembers: string
+    projectMembersCount: string
+    manageMembers: string
+    membersDialogTitle: string
+    membersDialogDesc: string
+    addMemberTitle: string
+    searchUsers: string
+    noMembers: string
+    noCandidates: string
+    removeMember: string
+    memberError: string
+    assigneeNone: string
   }
   dashboard: {
     title: string

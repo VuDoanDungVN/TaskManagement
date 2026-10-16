@@ -3,6 +3,7 @@ import { HTTPException } from "hono/http-exception"
 import type { AppEnv, Bindings } from "../types"
 import { requireAuth } from "../auth-middleware"
 import { buildFileUrl } from "../utils"
+import { requireTaskAccess } from "../access"
 
 export interface CommentRow {
   id: string
@@ -156,11 +157,13 @@ comments.put("/:id", async (c) => {
   const user = c.get("user")
   const id = c.req.param("id")
   const existing = await c.env.DB.prepare(
-    "SELECT author_id FROM task_comments WHERE id = ?",
+    "SELECT author_id, task_id FROM task_comments WHERE id = ?",
   )
     .bind(id)
-    .first<{ author_id: string }>()
+    .first<{ author_id: string; task_id: string }>()
   if (!existing) throw new HTTPException(404, { message: "Không tìm thấy bình luận." })
+  // Tác giả bị gỡ khỏi dự án thì không còn sửa/xoá được bình luận cũ
+  await requireTaskAccess(c, existing.task_id)
   if (existing.author_id !== user.uid) {
     throw new HTTPException(403, { message: "Bạn không có quyền sửa bình luận này." })
   }
@@ -199,11 +202,13 @@ comments.delete("/:id", async (c) => {
   const user = c.get("user")
   const id = c.req.param("id")
   const existing = await c.env.DB.prepare(
-    "SELECT author_id FROM task_comments WHERE id = ?",
+    "SELECT author_id, task_id FROM task_comments WHERE id = ?",
   )
     .bind(id)
-    .first<{ author_id: string }>()
+    .first<{ author_id: string; task_id: string }>()
   if (!existing) throw new HTTPException(404, { message: "Không tìm thấy bình luận." })
+  // Tác giả bị gỡ khỏi dự án thì không còn sửa/xoá được bình luận cũ
+  await requireTaskAccess(c, existing.task_id)
   if (existing.author_id !== user.uid) {
     throw new HTTPException(403, { message: "Bạn không có quyền xoá bình luận này." })
   }

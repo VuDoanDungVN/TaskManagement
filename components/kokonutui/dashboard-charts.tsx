@@ -152,7 +152,7 @@ export function StatusDonut({ tasks }: { tasks: ApiTask[] }) {
       {total === 0 ? (
         <ChartEmpty message={t("dashboard.chartNoData")} />
       ) : (
-        <div className="grid grid-cols-[180px_1fr] gap-4 items-center">
+        <div className="grid grid-cols-1 sm:grid-cols-[180px_minmax(0,1fr)] gap-4 items-center">
           <div className="relative h-[180px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>

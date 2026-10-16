@@ -68,11 +68,14 @@
       "Bash(echo \"exit:$?\")",
       "Bash(python -c \"import pptx; print\\('OK', pptx.__version__\\)\")",
       "Bash(python build_pptx.py)",
-      "Bash(python -c \"from pptx import Presentation; p=Presentation\\('製品紹介_TaskManagement_JP.pptx'\\); print\\('Slides:', len\\(p.slides._sldIdLst\\)\\)\")"
+      "Bash(python -c \"from pptx import Presentation; p=Presentation\\('製品紹介_TaskManagement_JP.pptx'\\); print\\('Slides:', len\\(p.slides._sldIdLst\\)\\)\")",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\Dung\\\\Desktop\\\\All file\\\\Project\\\\task-dashboard\\\\worker\" -Recurse -Depth 2)",
+      "Bash(Select-Object FullName)"
     ],
     "additionalDirectories": [
       "c:\\Users\\Dung\\Desktop\\All file\\Project\\task-dashboard\\app\\dashboard\\[projectId]",
-      "C:\\Users\\Dung\\Downloads"
+      "C:\\Users\\Dung\\Downloads",
+      "c:\\Users\\Dung\\.claude\\projects\\c--Users-Dung-Desktop-All-file-Project-task-dashboard\\memory"
     ]
   }
 }

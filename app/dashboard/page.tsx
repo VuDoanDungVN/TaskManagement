@@ -19,6 +19,7 @@ import Layout from "@/components/kokonutui/layout"
 import { StatusDonut, TopProjectsBar } from "@/components/kokonutui/dashboard-charts"
 import { useProjects } from "@/lib/projects/store"
 import { useAllTasks } from "@/lib/tasks/store"
+import { useIsAdmin } from "@/lib/users/store"
 import type { ApiProject } from "@/lib/api/projects"
 import type { ApiTask } from "@/lib/api/tasks"
 import { PRIORITY_CONFIG, STATUS_CONFIG } from "@/lib/tasks/utils"
@@ -243,6 +244,7 @@ const UPCOMING_DAYS = 7
 
 export default function DashboardPage() {
   const { t } = useI18n()
+  const isAdmin = useIsAdmin()
   const projectsQuery = useProjects()
   const allTasksQuery = useAllTasks()
 
@@ -295,7 +297,7 @@ export default function DashboardPage() {
   )
 
   const activeProjects = useMemo(
-    () => [...projects].sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 6),
+    () => [...projects].sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 10),
     [projects],
   )
 
@@ -347,14 +349,121 @@ export default function DashboardPage() {
           </div>
         ) : (
           <div className="space-y-4">
+              {/* Dự án nổi bật — full width, tối đa 5 thẻ/hàng, tự xuống dòng */}
+              <SectionCard
+                icon={FolderKanban}
+                title={t("dashboard.sectionActiveProjects")}
+                action={{
+                  href: "/dashboard/projects",
+                  label: t("dashboard.viewAll"),
+                }}
+              >
+          {projectsQuery.isLoading ? (
+            <div className="px-3 py-8 flex items-center justify-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              {t("dashboard.loading")}
+            </div>
+          ) : projectsQuery.error ? (
+            <div className="px-3 py-6 text-center text-xs text-red-600 dark:text-red-400">
+              {t("dashboard.error", { message: (projectsQuery.error as Error).message })}
+            </div>
+          ) : activeProjects.length === 0 ? (
+            <div className="px-3 py-8 flex flex-col items-center text-center gap-2">
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                {isAdmin ? t("dashboard.emptyProjects") : t("access.contactAdmin")}
+              </p>
+              {isAdmin && (
+              <Link
+                href="/dashboard/projects"
+                className={cn(
+                  "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg",
+                  "text-xs font-medium",
+                  "bg-zinc-900 dark:bg-zinc-50 text-zinc-50 dark:text-zinc-900",
+                  "hover:bg-zinc-800 dark:hover:bg-zinc-200",
+                )}
+              >
+                <Plus className="w-3.5 h-3.5" />
+                {t("dashboard.emptyProjectsCta")}
+              </Link>
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 min-[480px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2 p-1">
+              {activeProjects.map((p) => {
+                const total = p.stats.total
+                const done = p.stats.completed
+                const pct = total === 0 ? 0 : Math.round((done / total) * 100)
+                const barColor =
+                  pct >= 70
+                    ? "bg-emerald-500 dark:bg-emerald-400"
+                    : pct >= 30
+                      ? "bg-amber-500 dark:bg-amber-400"
+                      : "bg-red-500 dark:bg-red-400"
+                return (
+                  <Link
+                    key={p.id}
+                    href={`/dashboard/${p.id}`}
+                    className={cn(
+                      "group min-w-0 flex flex-col gap-2 p-3 rounded-lg",
+                      "border border-zinc-100 dark:border-zinc-800",
+                      "hover:border-zinc-200 dark:hover:border-zinc-700",
+                      "hover:bg-zinc-50 dark:hover:bg-zinc-800/40",
+                      "transition-colors",
+                    )}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-10 h-10 shrink-0 rounded-lg overflow-hidden bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+                        {p.thumbnailUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={p.thumbnailUrl}
+                            alt={p.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <ImageIcon className="w-4 h-4 text-zinc-400" />
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">
+                          {p.name}
+                        </p>
+                        <p className="text-[10px] text-zinc-500 dark:text-zinc-400">
+                          {t("projects.card.tasksTotal", { count: total })}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between text-[10px] tabular-nums">
+                        <span className="text-zinc-500 dark:text-zinc-400">
+                          {t("projects.card.progress")}
+                        </span>
+                        <span className="text-zinc-700 dark:text-zinc-300 font-medium">
+                          {pct}%
+                        </span>
+                      </div>
+                      <div className="h-1 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                        <div
+                          className={cn("h-full rounded-full transition-all", barColor)}
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+              )}
+              </SectionCard>
+
             {/* Charts row */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 [&>*]:min-w-0">
               <StatusDonut tasks={tasks} />
               <TopProjectsBar projects={projects} />
             </div>
 
-            {/* 4 khối: Quá hạn, Sắp đến hạn, Dự án nổi bật, Hoạt động gần đây — 2 hàng × 2 cột */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Quá hạn, Sắp đến hạn, Hoạt động gần đây */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 [&>*]:min-w-0">
               {/* Overdue — chỉ hiển thị khi có */}
               {overdue.length > 0 && (
                 <SectionCard
@@ -408,111 +517,6 @@ export default function DashboardPage() {
                     />
                   ))
                 )}
-              </SectionCard>
-
-              {/* Active projects */}
-              <SectionCard
-                icon={FolderKanban}
-                title={t("dashboard.sectionActiveProjects")}
-                action={{
-                  href: "/dashboard/projects",
-                  label: t("dashboard.viewAll"),
-                }}
-              >
-          {projectsQuery.isLoading ? (
-            <div className="px-3 py-8 flex items-center justify-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
-              <Loader2 className="w-4 h-4 animate-spin" />
-              {t("dashboard.loading")}
-            </div>
-          ) : projectsQuery.error ? (
-            <div className="px-3 py-6 text-center text-xs text-red-600 dark:text-red-400">
-              {t("dashboard.error", { message: (projectsQuery.error as Error).message })}
-            </div>
-          ) : activeProjects.length === 0 ? (
-            <div className="px-3 py-8 flex flex-col items-center text-center gap-2">
-              <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                {t("dashboard.emptyProjects")}
-              </p>
-              <Link
-                href="/dashboard/projects"
-                className={cn(
-                  "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg",
-                  "text-xs font-medium",
-                  "bg-zinc-900 dark:bg-zinc-50 text-zinc-50 dark:text-zinc-900",
-                  "hover:bg-zinc-800 dark:hover:bg-zinc-200",
-                )}
-              >
-                <Plus className="w-3.5 h-3.5" />
-                {t("dashboard.emptyProjectsCta")}
-              </Link>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-1">
-              {activeProjects.map((p) => {
-                const total = p.stats.total
-                const done = p.stats.completed
-                const pct = total === 0 ? 0 : Math.round((done / total) * 100)
-                const barColor =
-                  pct >= 70
-                    ? "bg-emerald-500 dark:bg-emerald-400"
-                    : pct >= 30
-                      ? "bg-amber-500 dark:bg-amber-400"
-                      : "bg-red-500 dark:bg-red-400"
-                return (
-                  <Link
-                    key={p.id}
-                    href={`/dashboard/${p.id}`}
-                    className={cn(
-                      "group flex flex-col gap-2 p-3 rounded-lg",
-                      "border border-zinc-100 dark:border-zinc-800",
-                      "hover:border-zinc-200 dark:hover:border-zinc-700",
-                      "hover:bg-zinc-50 dark:hover:bg-zinc-800/40",
-                      "transition-colors",
-                    )}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-10 h-10 shrink-0 rounded-lg overflow-hidden bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
-                        {p.thumbnailUrl ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={p.thumbnailUrl}
-                            alt={p.name}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <ImageIcon className="w-4 h-4 text-zinc-400" />
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">
-                          {p.name}
-                        </p>
-                        <p className="text-[10px] text-zinc-500 dark:text-zinc-400">
-                          {t("projects.card.tasksTotal", { count: total })}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="space-y-1">
-                      <div className="flex items-center justify-between text-[10px] tabular-nums">
-                        <span className="text-zinc-500 dark:text-zinc-400">
-                          {t("projects.card.progress")}
-                        </span>
-                        <span className="text-zinc-700 dark:text-zinc-300 font-medium">
-                          {pct}%
-                        </span>
-                      </div>
-                      <div className="h-1 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-                        <div
-                          className={cn("h-full rounded-full transition-all", barColor)}
-                          style={{ width: `${pct}%` }}
-                        />
-                      </div>
-                    </div>
-                  </Link>
-                )
-              })}
-            </div>
-              )}
               </SectionCard>
 
               {/* Recent activity */}

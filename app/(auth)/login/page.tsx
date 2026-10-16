@@ -1,8 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import Link from "next/link"
-import { Eye, EyeOff, Loader2 } from "lucide-react"
+import { useEffect, useState } from "react"
+import { Eye, EyeOff, Loader2, ShieldAlert } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/lib/auth/context"
 import { useI18n } from "@/lib/i18n/context"
@@ -31,6 +30,12 @@ export default function LoginPage() {
   const [submitting, setSubmitting] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
   const [info, setInfo] = useState<string | null>(null)
+  // ?denied=1 do AccessGate gắn khi Worker từ chối tài khoản (chưa được cấp / đã khoá).
+  // Đọc trực tiếp window.location để khỏi cần <Suspense> cho useSearchParams.
+  const [denied, setDenied] = useState(false)
+  useEffect(() => {
+    setDenied(new URLSearchParams(window.location.search).get("denied") === "1")
+  }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -81,6 +86,15 @@ export default function LoginPage() {
             {t("auth.login.subtitle")}
           </p>
         </div>
+
+        {denied && (
+          <div className="mb-4 flex items-start gap-2 rounded-lg px-3 py-2.5 text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300">
+            <ShieldAlert className="w-4 h-4 shrink-0 mt-px" />
+            <span>
+              {t("access.deniedLogin")} {t("access.contactAdmin")}
+            </span>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="space-y-1">
@@ -160,15 +174,10 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="mt-5 text-center text-xs text-zinc-600 dark:text-zinc-400">
-          {t("auth.login.noAccount")}{" "}
-          <Link
-            href="/register"
-            className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline"
-          >
-            {t("auth.login.register")}
-          </Link>
-        </div>
+        {/* Hệ thống đóng: tài khoản do admin cấp, không có đăng ký công khai */}
+        <p className="mt-5 text-center text-[11px] text-zinc-500 dark:text-zinc-400">
+          {t("access.contactAdmin")}
+        </p>
       </div>
     </div>
   )

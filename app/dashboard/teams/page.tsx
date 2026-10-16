@@ -2,6 +2,7 @@
 
 import { FolderKanban, UsersRound } from "lucide-react"
 import Layout from "@/components/kokonutui/layout"
+import { AdminOnly } from "@/components/kokonutui/access-gate"
 import TeamList from "@/components/kokonutui/team-list"
 import { useI18n } from "@/lib/i18n/context"
 
@@ -14,7 +15,9 @@ export default function TeamsPage() {
         { label: t("teamsList.title"), icon: UsersRound },
       ]}
     >
-      <TeamList />
+      <AdminOnly>
+        <TeamList />
+      </AdminOnly>
     </Layout>
   )
 }

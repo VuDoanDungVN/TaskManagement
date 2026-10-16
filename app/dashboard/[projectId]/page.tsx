@@ -4,6 +4,7 @@ import { useParams } from "next/navigation"
 import { FolderKanban, ListChecks } from "lucide-react"
 import Layout from "@/components/kokonutui/layout"
 import TaskManager from "@/components/kokonutui/task-manager"
+import ProjectMembers from "@/components/kokonutui/project-members"
 import { useProject } from "@/lib/projects/store"
 import { useI18n } from "@/lib/i18n/context"
 
@@ -20,7 +21,10 @@ export default function ProjectTasksPage() {
         { label: project?.name ?? t("breadcrumbs.projectFallback"), icon: ListChecks },
       ]}
     >
-      <TaskManager projectId={projectId} />
+      <div className="space-y-4">
+        <ProjectMembers projectId={projectId} />
+        <TaskManager projectId={projectId} />
+      </div>
     </Layout>
   )
 }

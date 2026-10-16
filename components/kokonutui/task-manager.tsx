@@ -15,8 +15,10 @@ import type { Task, TaskDraft, TaskStatus } from "@/lib/tasks/types"
 import { STATUS_CONFIG } from "@/lib/tasks/utils"
 import { uploadsApi } from "@/lib/api/uploads"
 import { useI18n } from "@/lib/i18n/context"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import TaskItem from "./task-item"
 import TaskDialog from "./task-dialog"
+import { useProjectMembers } from "@/lib/projects/store"
 
 type FilterValue = "all" | TaskStatus
 
@@ -44,6 +46,11 @@ export default function TaskManager({ projectId }: TaskManagerProps) {
   }, [tasks])
 
   const existingNos = useMemo(() => tasks.map((t) => t.no), [tasks])
+  const { data: members = [] } = useProjectMembers(projectId)
+  const assigneeOptions = useMemo(
+    () => [...new Set(members.map((m) => m.displayName || m.email))],
+    [members],
+  )
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -133,7 +140,32 @@ export default function TaskManager({ projectId }: TaskManagerProps) {
         </div>
 
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
-          <div className="flex flex-wrap items-center gap-1.5">
+          {/* Mobile: dropdown full width (bằng ô search) */}
+          <Select value={filter} onValueChange={(v) => setFilter(v as FilterValue)}>
+            <SelectTrigger
+              className={cn(
+                "md:hidden w-full h-auto py-2 px-3 rounded-lg text-xs font-medium",
+                "bg-white dark:bg-zinc-900/70",
+                "border-zinc-200 dark:border-zinc-800",
+                "text-zinc-900 dark:text-zinc-100",
+                "focus:ring-2 focus:ring-zinc-500 dark:focus:ring-zinc-400 focus:ring-offset-0",
+              )}
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {filters.map((f) => (
+                <SelectItem key={f.value} value={f.value} className="text-xs">
+                  <span>{f.label}</span>
+                  <span className="ml-1.5 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[10px] bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                    {counts[f.value as keyof typeof counts]}
+                  </span>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <div className="hidden md:flex flex-wrap items-center gap-1.5">
             {filters.map((f) => {
               const active = filter === f.value
               const count = counts[f.value as keyof typeof counts]
@@ -229,6 +261,7 @@ export default function TaskManager({ projectId }: TaskManagerProps) {
         open={dialogOpen}
         initialTask={editing}
         existingNos={existingNos}
+        assigneeOptions={assigneeOptions}
         onClose={() => setDialogOpen(false)}
         onSubmit={handleSubmit}
       />

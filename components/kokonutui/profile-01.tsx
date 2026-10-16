@@ -10,6 +10,7 @@ import {
   LogOut,
   MoveUpRight,
   Settings,
+  ShieldCheck,
   User2,
   type LucideIcon,
 } from "lucide-react"
@@ -19,7 +20,7 @@ import { useRef, useState } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/lib/auth/context"
-import { ME_QUERY_KEY } from "@/lib/users/store"
+import { ME_QUERY_KEY, useMe } from "@/lib/users/store"
 import { uploadsApi } from "@/lib/api/uploads"
 import { useI18n } from "@/lib/i18n/context"
 import type { TranslationKey } from "@/lib/i18n/types"
@@ -65,6 +66,9 @@ const SUPPORT_ITEMS: MenuItemData[] = [
   { labelKey: "profile.terms", href: "#", icon: FileText, external: true },
 ]
 
+// Mục có href "#" là placeholder chưa triển khai → không hiển thị cho người dùng
+const isImplemented = (item: MenuItemData) => item.href !== "#"
+
 export default function Profile01({
   name,
   email,
@@ -77,6 +81,7 @@ export default function Profile01({
   const statusDot = STATUS_DOTS[status]
   const statusLabel = t(STATUS_LABEL_KEYS[status])
   const { signOut } = useAuth()
+  const { data: me } = useMe()
   const router = useRouter()
   const queryClient = useQueryClient()
   const [signingOut, setSigningOut] = useState(false)
@@ -166,11 +171,26 @@ export default function Profile01({
               <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
                 {displayEmail}
               </p>
-              <div className="mt-1.5 inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800/60">
-                <span className={cn("w-1.5 h-1.5 rounded-full", statusDot)} />
-                <span className="text-[10px] font-medium text-zinc-600 dark:text-zinc-400">
-                  {statusLabel}
-                </span>
+              <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                <div className="inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800/60">
+                  <span className={cn("w-1.5 h-1.5 rounded-full", statusDot)} />
+                  <span className="text-[10px] font-medium text-zinc-600 dark:text-zinc-400">
+                    {statusLabel}
+                  </span>
+                </div>
+                {me && (
+                  <span
+                    className={cn(
+                      "inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium",
+                      me.role === "admin"
+                        ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400"
+                        : "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400",
+                    )}
+                  >
+                    {me.role === "admin" && <ShieldCheck className="w-3 h-3" />}
+                    {me.role === "admin" ? t("access.roleAdmin") : t("access.roleCustomer")}
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -178,13 +198,17 @@ export default function Profile01({
 
         <div className="h-px bg-zinc-200 dark:bg-[#1F1F23]" />
 
-        <Section title={t("profile.sectionAccount")} items={ACCOUNT_ITEMS} t={t} />
+        <Section title={t("profile.sectionAccount")} items={ACCOUNT_ITEMS.filter(isImplemented)} t={t} />
 
         <div className="h-px bg-zinc-200 dark:bg-[#1F1F23]" />
 
-        <Section title={t("profile.sectionSupport")} items={SUPPORT_ITEMS} t={t} />
-
-        <div className="h-px bg-zinc-200 dark:bg-[#1F1F23]" />
+        {/* Mục Hỗ trợ chưa có trang thật (href "#") — ẩn tới khi triển khai */}
+        {SUPPORT_ITEMS.some(isImplemented) && (
+          <>
+            <Section title={t("profile.sectionSupport")} items={SUPPORT_ITEMS.filter(isImplemented)} t={t} />
+            <div className="h-px bg-zinc-200 dark:bg-[#1F1F23]" />
+          </>
+        )}
 
         <div className="p-3">
           <button

@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation"
 import { FolderKanban, UsersRound } from "lucide-react"
 import Layout from "@/components/kokonutui/layout"
+import { AdminOnly } from "@/components/kokonutui/access-gate"
 import TeamDetail from "@/components/kokonutui/team-detail"
 import { useTeam } from "@/lib/teams/store"
 import { useI18n } from "@/lib/i18n/context"
@@ -21,7 +22,9 @@ export default function TeamDetailPage() {
         { label: team?.name ?? "…" },
       ]}
     >
-      <TeamDetail teamId={teamId} />
+      <AdminOnly>
+        <TeamDetail teamId={teamId} />
+      </AdminOnly>
     </Layout>
   )
 }

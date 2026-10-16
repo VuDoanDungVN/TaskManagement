@@ -30,6 +30,7 @@ import {
 import { uploadsApi } from "@/lib/api/uploads"
 import { useI18n } from "@/lib/i18n/context"
 import TaskDialog from "./task-dialog"
+import { useProjectMembers } from "@/lib/projects/store"
 
 interface TaskDetailProps {
   task: Task
@@ -50,6 +51,11 @@ export default function TaskDetail({ task, projectId, canManage }: TaskDetailPro
   const [dialogOpen, setDialogOpen] = useState(false)
   const { data: siblingTasks = [] } = useTasks(canManage ? projectId : null)
   const existingNos = useMemo(() => siblingTasks.map((t) => t.no), [siblingTasks])
+  const { data: members = [] } = useProjectMembers(canManage ? projectId : null)
+  const assigneeOptions = useMemo(
+    () => [...new Set(members.map((m) => m.displayName || m.email))],
+    [members],
+  )
 
   const updateMutation = useUpdateTask(projectId)
   const deleteMutation = useDeleteTask(projectId)
@@ -261,6 +267,7 @@ export default function TaskDetail({ task, projectId, canManage }: TaskDetailPro
           open={dialogOpen}
           initialTask={task}
           existingNos={existingNos}
+          assigneeOptions={assigneeOptions}
           onClose={() => setDialogOpen(false)}
           onSubmit={handleEditSubmit}
         />
