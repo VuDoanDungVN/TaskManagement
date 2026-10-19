@@ -13,11 +13,11 @@ import {
 import type { Task, TaskDraft, TaskPriority, TaskStatus } from "@/lib/tasks/types"
 import { useI18n } from "@/lib/i18n/context"
 import FileInput from "./file-input"
+import { useMe } from "@/lib/users/store"
 
 interface TaskDialogProps {
   open: boolean
   initialTask?: Task | null
-  existingNos: number[]
   /** Tên thành viên dự án để chọn người phụ trách; không truyền → ô nhập tự do. */
   assigneeOptions?: string[]
   onClose: () => void
@@ -40,37 +40,40 @@ const fieldErrorClass = cn(
 
 const labelClass = "text-xs font-medium text-zinc-700 dark:text-zinc-300"
 
-function emptyDraft(no: number): TaskDraft {
+/** Ngày hôm nay theo giờ máy người dùng, dạng YYYY-MM-DD (giá trị của input type="date"). */
+function todayYMD(): string {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
+}
+
+// Số No không nằm trong form: server tự cấp khi tạo và giữ cố định về sau.
+// Task mới mặc định: bắt đầu hôm nay, người phụ trách là người đang đăng nhập (đều đổi được).
+function emptyDraft(assignee = ""): TaskDraft {
   return {
-    no,
     title: "",
     description: "",
     status: "pending",
     priority: "medium",
-    assignee: "",
+    assignee,
     tags: [],
-    startDate: "",
+    startDate: todayYMD(),
     dueDate: "",
   }
 }
 
-function suggestNextNo(nos: number[]) {
-  if (nos.length === 0) return 1
-  return Math.max(...nos) + 1
-}
 
 export default function TaskDialog({
   open,
   initialTask,
-  existingNos,
   assigneeOptions,
   onClose,
   onSubmit,
 }: TaskDialogProps) {
   const { t } = useI18n()
-  const suggestedNo = useMemo(() => suggestNextNo(existingNos), [existingNos])
-  const [draft, setDraft] = useState<TaskDraft>(() => emptyDraft(suggestedNo))
-  const [noText, setNoText] = useState<string>(String(suggestedNo))
+  const { data: me } = useMe()
+  // Cùng định dạng với assigneeOptions (displayName || email) để dropdown chọn đúng
+  const myName = me ? me.displayName || me.email : ""
+  const [draft, setDraft] = useState<TaskDraft>(() => emptyDraft())
   const [tagsText, setTagsText] = useState("")
   const [file, setFile] = useState<File | null>(null)
 
@@ -78,7 +81,6 @@ export default function TaskDialog({
     if (!open) return
     if (initialTask) {
       setDraft({
-        no: initialTask.no,
         title: initialTask.title,
         description: initialTask.description ?? "",
         status: initialTask.status,
@@ -88,37 +90,30 @@ export default function TaskDialog({
         startDate: initialTask.startDate ?? "",
         dueDate: initialTask.dueDate ?? "",
       })
-      setNoText(String(initialTask.no))
       setTagsText(initialTask.tags.join(", "))
       setFile(null)
     } else {
-      const nextNo = suggestNextNo(existingNos)
-      setDraft(emptyDraft(nextNo))
-      setNoText(String(nextNo))
+      setDraft(emptyDraft(myName))
       setTagsText("")
       setFile(null)
     }
-  }, [open, initialTask, existingNos])
+    // myName cố ý không nằm trong deps: chỉ reset form khi mở dialog, không reset khi /users/me refetch
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, initialTask])
 
-  const noError = useMemo(() => {
-    const trimmed = noText.trim()
-    if (!trimmed) return t("taskDialog.noRequired")
-    if (!/^\d+$/.test(trimmed)) return t("taskDialog.noInvalid")
-    const value = Number.parseInt(trimmed, 10)
-    if (value < 1) return t("taskDialog.noMustGtZero")
-    const collides = existingNos.some(
-      (n) => n === value && n !== initialTask?.no,
-    )
-    if (collides) return t("taskDialog.noDuplicate", { value })
-    return null
-  }, [noText, existingNos, initialTask, t])
+  // /users/me về muộn hơn lúc mở dialog → điền người phụ trách mặc định nếu ô vẫn trống
+  useEffect(() => {
+    if (open && !initialTask && myName) {
+      setDraft((d) => (d.assignee ? d : { ...d, assignee: myName }))
+    }
+  }, [open, initialTask, myName])
 
   const titleError = useMemo(() => {
     if (!draft.title.trim()) return t("taskDialog.titleRequired")
     return null
   }, [draft.title, t])
 
-  const canSubmit = !noError && !titleError
+  const canSubmit = !titleError
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -130,7 +125,6 @@ export default function TaskDialog({
     onSubmit(
       {
         ...draft,
-        no: Number.parseInt(noText.trim(), 10),
         title: draft.title.trim(),
         tags,
       },
@@ -150,8 +144,14 @@ export default function TaskDialog({
         )}
       >
         <DialogHeader>
-          <DialogTitle className="text-zinc-900 dark:text-zinc-100">
+          <DialogTitle className="text-zinc-900 dark:text-zinc-100 flex items-center gap-2 justify-center sm:justify-start">
             {initialTask ? t("taskDialog.editTitle") : t("taskDialog.createTitle")}
+            {/* Số No cố định → chỉ hiển thị khi sửa, không cho nhập */}
+            {initialTask && (
+              <span className="px-1.5 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 ring-1 ring-inset ring-zinc-200 dark:ring-zinc-700 text-xs font-semibold tabular-nums text-zinc-600 dark:text-zinc-300">
+                #{String(initialTask.no).padStart(2, "0")}
+              </span>
+            )}
           </DialogTitle>
           <DialogDescription className="text-zinc-600 dark:text-zinc-400">
             {t("taskDialog.description")}
@@ -159,35 +159,7 @@ export default function TaskDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-3">
-          <div className="grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-3">
-            <div className="space-y-1">
-              <label className={labelClass}>
-                {t("taskDialog.noLabel")} <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                min={1}
-                step={1}
-                required
-                value={noText}
-                onChange={(e) => setNoText(e.target.value)}
-                placeholder={t("taskDialog.noPlaceholder")}
-                className={cn(fieldClass, "tabular-nums", noError && fieldErrorClass)}
-                aria-invalid={!!noError}
-                aria-describedby="no-help"
-              />
-              <p
-                id="no-help"
-                className={cn(
-                  "text-[11px]",
-                  noError
-                    ? "text-red-600 dark:text-red-400"
-                    : "text-zinc-500 dark:text-zinc-400",
-                )}
-              >
-                {noError ?? t("taskDialog.noHint", { value: suggestedNo })}
-              </p>
-            </div>
+          <div>
             <div className="space-y-1">
               <label className={labelClass}>
                 {t("taskDialog.titleLabel")} <span className="text-red-500">*</span>
@@ -318,7 +290,15 @@ export default function TaskDialog({
             />
           </div>
 
-          <DialogFooter className="pt-2">
+          {/* Footer dính đáy vùng cuộn → nút Huỷ/Lưu luôn trong tầm tay khi form dài */}
+          <DialogFooter
+            className={cn(
+              "sticky bottom-0 z-10 flex-row justify-end",
+              "-mx-4 -mb-4 px-4 py-3 sm:-mx-6 sm:-mb-6 sm:px-6",
+              "bg-white dark:bg-[#0F0F12]",
+              "border-t border-zinc-100 dark:border-zinc-800",
+            )}
+          >
             <button
               type="button"
               onClick={onClose}

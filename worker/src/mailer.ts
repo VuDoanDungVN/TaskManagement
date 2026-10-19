@@ -1,3 +1,4 @@
+import { WorkerMailer } from "worker-mailer"
 import type { Bindings } from "./types"
 
 interface InviteEmailParams {
@@ -80,10 +81,68 @@ async function sendMail(
   html: string,
   text: string,
 ): Promise<boolean> {
+  // Ưu tiên Gmail SMTP (App Password); chưa cấu hình thì dùng Resend (cần domain đã xác minh)
+  if (env.GMAIL_USER && env.GMAIL_APP_PASSWORD) {
+    return sendViaGmail(env, to, subject, html, text)
+  }
   if (!env.RESEND_API_KEY) {
-    console.warn("RESEND_API_KEY chưa cấu hình — bỏ qua gửi email.")
+    console.warn("Chưa cấu hình GMAIL_APP_PASSWORD hoặc RESEND_API_KEY — bỏ qua gửi email.")
     return false
   }
+  return sendViaResend(env, to, subject, html, text)
+}
+
+/**
+ * Gửi qua SMTP của Gmail (smtp.gmail.com:465, TLS) bằng App Password.
+ * Yêu cầu: tài khoản GMAIL_USER bật xác minh 2 bước + tạo App Password tại
+ * https://myaccount.google.com/apppasswords. Giới hạn ~500 người nhận/ngày (Gmail cá nhân).
+ */
+async function sendViaGmail(
+  env: Bindings,
+  to: string,
+  subject: string,
+  html: string,
+  text: string,
+): Promise<boolean> {
+  const user = env.GMAIL_USER!.trim()
+  try {
+    await WorkerMailer.send(
+      {
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        authType: "plain",
+        credentials: {
+          username: user,
+          // Google hiển thị App Password dạng "abcd efgh ijkl mnop" → bỏ khoảng trắng
+          password: env.GMAIL_APP_PASSWORD!.replace(/\s+/g, ""),
+        },
+        socketTimeoutMs: 15_000,
+        responseTimeoutMs: 15_000,
+      },
+      {
+        // Gmail luôn gửi bằng địa chỉ của tài khoản đăng nhập SMTP
+        from: { name: env.MAIL_FROM_NAME || "Task Management", email: user },
+        to: { email: to },
+        subject,
+        html,
+        text,
+      },
+    )
+    return true
+  } catch (e) {
+    console.error("Gmail SMTP gửi thất bại:", e)
+    return false
+  }
+}
+
+async function sendViaResend(
+  env: Bindings,
+  to: string,
+  subject: string,
+  html: string,
+  text: string,
+): Promise<boolean> {
   const from = env.MAIL_FROM || "Task App <onboarding@resend.dev>"
   try {
     const res = await fetch("https://api.resend.com/emails", {

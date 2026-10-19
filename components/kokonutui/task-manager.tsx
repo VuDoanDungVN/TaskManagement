@@ -45,7 +45,6 @@ export default function TaskManager({ projectId }: TaskManagerProps) {
     return c
   }, [tasks])
 
-  const existingNos = useMemo(() => tasks.map((t) => t.no), [tasks])
   const { data: members = [] } = useProjectMembers(projectId)
   const assigneeOptions = useMemo(
     () => [...new Set(members.map((m) => m.displayName || m.email))],
@@ -114,7 +113,7 @@ export default function TaskManager({ projectId }: TaskManagerProps) {
 
   return (
     <div className="space-y-4">
-      <div className="bg-white dark:bg-[#0F0F12] rounded-xl p-6 flex flex-col border border-gray-200 dark:border-[#1F1F23]">
+      <div className="bg-white dark:bg-[#0F0F12] rounded-xl p-4 sm:p-6 flex flex-col border border-gray-200 dark:border-[#1F1F23]">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <ListChecks className="w-3.5 h-3.5 text-zinc-900 dark:text-zinc-50" />
@@ -216,12 +215,13 @@ export default function TaskManager({ projectId }: TaskManagerProps) {
           </div>
         </div>
 
+        {/* Mobile: bỏ khung lồng khung để danh sách tận dụng hết chiều ngang */}
         <div
           className={cn(
             "w-full",
-            "bg-white dark:bg-zinc-900/70",
-            "border border-zinc-100 dark:border-zinc-800",
-            "rounded-xl shadow-sm backdrop-blur-xl",
+            "sm:bg-white sm:dark:bg-zinc-900/70",
+            "sm:border sm:border-zinc-100 sm:dark:border-zinc-800",
+            "sm:rounded-xl sm:shadow-sm sm:backdrop-blur-xl",
           )}
         >
           {isLoading ? (
@@ -242,7 +242,7 @@ export default function TaskManager({ projectId }: TaskManagerProps) {
               </div>
             </div>
           ) : (
-            <div className="p-2 divide-y divide-zinc-100 dark:divide-zinc-800">
+            <div className="sm:p-2 divide-y divide-zinc-100 dark:divide-zinc-800 border-t border-zinc-100 dark:border-zinc-800 sm:border-t-0">
               {filtered.map((t) => (
                 <TaskItem
                   key={t.id}
@@ -260,7 +260,6 @@ export default function TaskManager({ projectId }: TaskManagerProps) {
       <TaskDialog
         open={dialogOpen}
         initialTask={editing}
-        existingNos={existingNos}
         assigneeOptions={assigneeOptions}
         onClose={() => setDialogOpen(false)}
         onSubmit={handleSubmit}

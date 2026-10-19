@@ -24,7 +24,6 @@ import {
 import {
   TASKS_QUERY_KEY,
   useDeleteTask,
-  useTasks,
   useUpdateTask,
 } from "@/lib/tasks/store"
 import { uploadsApi } from "@/lib/api/uploads"
@@ -49,8 +48,6 @@ export default function TaskDetail({ task, projectId, canManage }: TaskDetailPro
   const due = formatDate(task.dueDate)
 
   const [dialogOpen, setDialogOpen] = useState(false)
-  const { data: siblingTasks = [] } = useTasks(canManage ? projectId : null)
-  const existingNos = useMemo(() => siblingTasks.map((t) => t.no), [siblingTasks])
   const { data: members = [] } = useProjectMembers(canManage ? projectId : null)
   const assigneeOptions = useMemo(
     () => [...new Set(members.map((m) => m.displayName || m.email))],
@@ -266,7 +263,6 @@ export default function TaskDetail({ task, projectId, canManage }: TaskDetailPro
         <TaskDialog
           open={dialogOpen}
           initialTask={task}
-          existingNos={existingNos}
           assigneeOptions={assigneeOptions}
           onClose={() => setDialogOpen(false)}
           onSubmit={handleEditSubmit}

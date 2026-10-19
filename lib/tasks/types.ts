@@ -8,7 +8,6 @@ export type {
 
 // Local draft: dùng trong task-dialog, KHÔNG có projectId (TaskManager set khi submit)
 export interface TaskDraft {
-  no: number
   title: string
   description?: string | null
   status: import("@/lib/api/tasks").ApiTaskStatus

@@ -25,3 +25,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+# Firebase service account key — KHÔNG BAO GIỜ commit (đã lưu trong worker/.dev.vars / wrangler secret)
+*firebase-adminsdk*.json

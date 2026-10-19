@@ -4,17 +4,24 @@ import { cn } from "@/lib/utils"
 import { useEffect, useMemo, useRef, useState } from "react"
 import {
   FolderKanban,
-  ImageIcon,
   Loader2,
   Lock,
   LockOpen,
   Mail,
+  MoreHorizontal,
   Search,
   ShieldCheck,
   UserCog,
   UserPlus,
   UsersRound,
 } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { useI18n } from "@/lib/i18n/context"
 import {
   useInfiniteUsers,
@@ -25,6 +32,7 @@ import {
 } from "@/lib/users/store"
 import type { ApiUser, SetupLinkResult } from "@/lib/api/users"
 import MemberEditDialog from "./member-edit-dialog"
+import UserAvatar from "./user-avatar"
 import MemberTeamsDialog from "./member-teams-dialog"
 import {
   CreateAccountDialog,
@@ -32,14 +40,163 @@ import {
   SetupLinkDialog,
 } from "./member-account-dialogs"
 
-const actionBtn = cn(
-  "inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium",
-  "bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100",
-  "hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors",
-  "disabled:opacity-50 disabled:cursor-not-allowed",
-)
-
 const PAGE_SIZE = 20
+
+const badgeBase = "inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium whitespace-nowrap"
+
+/** Unix ms → DD/MM/YYYY */
+function formatCreated(ms: number) {
+  const d = new Date(ms)
+  return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`
+}
+
+function UserCell({ user, isMe, youLabel }: { user: ApiUser; isMe: boolean; youLabel: string }) {
+  const name = user.displayName || user.email
+  return (
+    <div className="flex items-center gap-3 min-w-0">
+      <UserAvatar name={name} src={user.avatarUrl ?? undefined} size={32} />
+      <div className="min-w-0">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">{name}</span>
+          {isMe && (
+            <span className="shrink-0 px-1.5 py-0.5 rounded-md bg-blue-100 dark:bg-blue-900/30 text-[10px] font-medium text-blue-600 dark:text-blue-400">
+              {youLabel}
+            </span>
+          )}
+        </div>
+        <div className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">{user.email}</div>
+      </div>
+    </div>
+  )
+}
+
+function RoleBadge({ user }: { user: ApiUser }) {
+  const { t } = useI18n()
+  return user.role === "admin" ? (
+    <span className={cn(badgeBase, "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400")}>
+      <ShieldCheck className="w-3 h-3" />
+      {t("access.roleAdmin")}
+    </span>
+  ) : (
+    <span className={cn(badgeBase, "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400")}>
+      {t("access.roleCustomer")}
+    </span>
+  )
+}
+
+function StatusBadge({ user }: { user: ApiUser }) {
+  const { t } = useI18n()
+  return user.status === "disabled" ? (
+    <span className={cn(badgeBase, "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400")}>
+      <Lock className="w-3 h-3" />
+      {t("access.statusDisabled")}
+    </span>
+  ) : (
+    <span className={cn(badgeBase, "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400")}>
+      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+      {t("access.statusActive")}
+    </span>
+  )
+}
+
+/** Customer: số dự án được gán; admin: số nhóm nội bộ */
+function AccessBadge({ user }: { user: ApiUser }) {
+  const { t } = useI18n()
+  return (
+    <span className={cn(badgeBase, "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300")}>
+      {user.role === "admin" ? (
+        <>
+          <UsersRound className="w-3 h-3" />
+          {t("membersList.teamCountLabel", { count: user.teamCount ?? 0 })}
+        </>
+      ) : (
+        <>
+          <FolderKanban className="w-3 h-3" />
+          {t("access.projectCountLabel", { count: user.projectCount ?? 0 })}
+        </>
+      )}
+    </span>
+  )
+}
+
+function RowActions({
+  user,
+  isMe,
+  busy,
+  onEdit,
+  onTeams,
+  onProjects,
+  onResend,
+  onToggleLock,
+}: {
+  user: ApiUser
+  isMe: boolean
+  busy: boolean
+  onEdit: (u: ApiUser) => void
+  onTeams: (u: ApiUser) => void
+  onProjects: (u: ApiUser) => void
+  onResend: (u: ApiUser) => void
+  onToggleLock: (u: ApiUser) => void
+}) {
+  const { t } = useI18n()
+  const locked = user.status === "disabled"
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          disabled={busy}
+          aria-label={t("access.moreActions")}
+          title={t("access.moreActions")}
+          className={cn(
+            "inline-flex items-center justify-center w-8 h-8 rounded-lg shrink-0",
+            "text-zinc-500 dark:text-zinc-400",
+            "hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100",
+            "transition-colors disabled:opacity-50",
+          )}
+        >
+          <MoreHorizontal className="w-4 h-4" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-48">
+        <DropdownMenuItem onSelect={() => onEdit(user)} className="text-xs gap-2">
+          <UserCog className="w-3.5 h-3.5" />
+          {t("membersList.actionEdit")}
+        </DropdownMenuItem>
+        {user.role === "admin" ? (
+          <DropdownMenuItem onSelect={() => onTeams(user)} className="text-xs gap-2">
+            <UsersRound className="w-3.5 h-3.5" />
+            {t("membersList.actionManageTeams")}
+          </DropdownMenuItem>
+        ) : (
+          <DropdownMenuItem onSelect={() => onProjects(user)} className="text-xs gap-2">
+            <FolderKanban className="w-3.5 h-3.5" />
+            {t("access.actionProjects")}
+          </DropdownMenuItem>
+        )}
+        <DropdownMenuItem onSelect={() => onResend(user)} className="text-xs gap-2">
+          <Mail className="w-3.5 h-3.5" />
+          {t("access.actionResendLink")}
+        </DropdownMenuItem>
+        {!isMe && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onSelect={() => onToggleLock(user)}
+              className={cn(
+                "text-xs gap-2",
+                !locked && "text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400",
+              )}
+            >
+              {locked ? <LockOpen className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
+              {locked ? t("access.actionUnlock") : t("access.actionLock")}
+            </DropdownMenuItem>
+          </>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
 
 export default function MemberList() {
   const { t } = useI18n()
@@ -120,7 +277,7 @@ export default function MemberList() {
   }
 
   return (
-    <div className="bg-white dark:bg-[#0F0F12] rounded-xl p-6 flex flex-col border border-gray-200 dark:border-[#1F1F23]">
+    <div className="bg-white dark:bg-[#0F0F12] rounded-xl p-4 sm:p-6 flex flex-col border border-gray-200 dark:border-[#1F1F23]">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <div>
           <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -190,144 +347,98 @@ export default function MemberList() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+          {/* Desktop/tablet: bảng */}
+          <div className="hidden md:block overflow-hidden rounded-xl border border-zinc-100 dark:border-zinc-800">
+            <table className="w-full table-fixed text-left">
+              <thead className="bg-zinc-50 dark:bg-zinc-900/70">
+                <tr className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                  <th className="px-4 py-2.5 w-[38%]">{t("access.colUser")}</th>
+                  <th className="px-3 py-2.5 w-[14%]">{t("access.colRole")}</th>
+                  <th className="px-3 py-2.5 w-[14%]">{t("access.colStatus")}</th>
+                  <th className="px-3 py-2.5 w-[14%]">{t("access.colAccess")}</th>
+                  <th className="px-3 py-2.5 w-[12%] hidden lg:table-cell">{t("access.colCreated")}</th>
+                  {isAdmin && (
+                    <th className="px-3 py-2.5 w-[8%] text-right">
+                      <span className="sr-only">{t("access.colActions")}</span>
+                    </th>
+                  )}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                {users.map((u) => {
+                  const isMe = !!myId && u.id === myId
+                  return (
+                    <tr
+                      key={u.id}
+                      className={cn(
+                        "hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors",
+                        u.status === "disabled" && "opacity-60",
+                      )}
+                    >
+                      <td className="px-4 py-2.5">
+                        <UserCell user={u} isMe={isMe} youLabel={t("membersList.you")} />
+                      </td>
+                      <td className="px-3 py-2.5">
+                        <RoleBadge user={u} />
+                      </td>
+                      <td className="px-3 py-2.5">
+                        <StatusBadge user={u} />
+                      </td>
+                      <td className="px-3 py-2.5">
+                        <AccessBadge user={u} />
+                      </td>
+                      <td className="px-3 py-2.5 hidden lg:table-cell text-xs text-zinc-600 dark:text-zinc-400 tabular-nums">
+                        {formatCreated(u.createdAt)}
+                      </td>
+                      {isAdmin && (
+                        <td className="px-3 py-2.5 text-right">
+                          <RowActions
+                            user={u}
+                            isMe={isMe}
+                            busy={updateUser.isPending || resendLink.isPending}
+                            onEdit={setEditTarget}
+                            onTeams={setTeamsTarget}
+                            onProjects={setProjectsTarget}
+                            onResend={handleResend}
+                            onToggleLock={handleToggleLock}
+                          />
+                        </td>
+                      )}
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile: danh sách gọn (bảng nhiều cột sẽ phải cuộn ngang) */}
+          <div className="md:hidden divide-y divide-zinc-100 dark:divide-zinc-800 border-y border-zinc-100 dark:border-zinc-800">
             {users.map((u) => {
-              const name = u.displayName || u.email
               const isMe = !!myId && u.id === myId
               return (
                 <div
                   key={u.id}
-                  className={cn(
-                    "relative flex flex-col gap-3",
-                    "bg-white dark:bg-zinc-900/70",
-                    "border border-zinc-100 dark:border-zinc-800",
-                    "rounded-xl shadow-sm p-4",
-                  )}
+                  className={cn("py-3 flex items-start gap-2", u.status === "disabled" && "opacity-60")}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 shrink-0 rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center border border-zinc-100 dark:border-zinc-800">
-                      {u.avatarUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={u.avatarUrl} alt={name} className="w-full h-full object-cover" />
-                      ) : (
-                        <ImageIcon className="w-4 h-4 text-zinc-400 dark:text-zinc-600" />
-                      )}
-                    </div>
-                    <div className="flex flex-col flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5 min-w-0">
-                        <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 line-clamp-1">
-                          {name}
-                        </h3>
-                        {isMe && (
-                          <span className="shrink-0 px-1.5 py-0.5 rounded-md bg-blue-100 dark:bg-blue-900/30 text-[10px] font-medium text-blue-600 dark:text-blue-400">
-                            {t("membersList.you")}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-[11px] text-zinc-500 dark:text-zinc-400 line-clamp-1">
-                        {u.email}
-                      </p>
+                  <div className="flex-1 min-w-0 space-y-1.5">
+                    <UserCell user={u} isMe={isMe} youLabel={t("membersList.you")} />
+                    <div className="flex flex-wrap items-center gap-1.5 pl-11">
+                      <RoleBadge user={u} />
+                      <StatusBadge user={u} />
+                      <AccessBadge user={u} />
                     </div>
                   </div>
-
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <span
-                      className={cn(
-                        "inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium",
-                        u.role === "admin"
-                          ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400"
-                          : "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300",
-                      )}
-                    >
-                      {u.role === "admin" && <ShieldCheck className="w-3 h-3" />}
-                      {u.role === "admin"
-                        ? t("membersList.roleAdmin")
-                        : t("membersList.roleUser")}
-                    </span>
-                    {u.status === "disabled" && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-red-100 dark:bg-red-900/30 text-[10px] font-medium text-red-700 dark:text-red-400">
-                        <Lock className="w-3 h-3" />
-                        {t("access.statusDisabled")}
-                      </span>
-                    )}
-                    {/* Customer: số dự án được gán; admin: số nhóm nội bộ */}
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-[10px] font-medium text-zinc-700 dark:text-zinc-300">
-                      {u.role === "admin" ? (
-                        <>
-                          <UsersRound className="w-3 h-3" />
-                          {t("membersList.teamCountLabel", { count: u.teamCount ?? 0 })}
-                        </>
-                      ) : (
-                        <>
-                          <FolderKanban className="w-3 h-3" />
-                          {t("access.projectCountLabel", { count: u.projectCount ?? 0 })}
-                        </>
-                      )}
-                    </span>
-                    <span
-                      className={cn(
-                        "px-2 py-0.5 rounded-md text-[10px] font-medium",
-                        u.emailVerified
-                          ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400"
-                          : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400",
-                      )}
-                    >
-                      {u.emailVerified
-                        ? t("membersList.verified")
-                        : t("membersList.unverified")}
-                    </span>
-                  </div>
-
                   {isAdmin && (
-                    <div className="flex items-center gap-2 flex-wrap pt-2 mt-auto border-t border-zinc-100 dark:border-zinc-800">
-                      <button type="button" onClick={() => setEditTarget(u)} className={actionBtn}>
-                        <UserCog className="w-3.5 h-3.5" />
-                        {t("membersList.actionEdit")}
-                      </button>
-                      {u.role === "admin" ? (
-                        <button type="button" onClick={() => setTeamsTarget(u)} className={actionBtn}>
-                          <UsersRound className="w-3.5 h-3.5" />
-                          {t("membersList.actionManageTeams")}
-                        </button>
-                      ) : (
-                        <button type="button" onClick={() => setProjectsTarget(u)} className={actionBtn}>
-                          <FolderKanban className="w-3.5 h-3.5" />
-                          {t("access.actionProjects")}
-                        </button>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => handleResend(u)}
-                        disabled={resendLink.isPending}
-                        className={actionBtn}
-                      >
-                        {resendLink.isPending && resendLink.variables === u.id ? (
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        ) : (
-                          <Mail className="w-3.5 h-3.5" />
-                        )}
-                        {t("access.actionResendLink")}
-                      </button>
-                      {!isMe && (
-                        <button
-                          type="button"
-                          onClick={() => handleToggleLock(u)}
-                          disabled={updateUser.isPending}
-                          className={cn(
-                            actionBtn,
-                            u.status !== "disabled" &&
-                              "hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400",
-                          )}
-                        >
-                          {u.status === "disabled" ? (
-                            <LockOpen className="w-3.5 h-3.5" />
-                          ) : (
-                            <Lock className="w-3.5 h-3.5" />
-                          )}
-                          {u.status === "disabled" ? t("access.actionUnlock") : t("access.actionLock")}
-                        </button>
-                      )}
-                    </div>
+                    <RowActions
+                      user={u}
+                      isMe={isMe}
+                      busy={updateUser.isPending || resendLink.isPending}
+                      onEdit={setEditTarget}
+                      onTeams={setTeamsTarget}
+                      onProjects={setProjectsTarget}
+                      onResend={handleResend}
+                      onToggleLock={handleToggleLock}
+                    />
                   )}
                 </div>
               )

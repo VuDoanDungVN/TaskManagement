@@ -132,7 +132,6 @@ tasks.get("/", async (c) => {
 
 interface TaskInput {
   projectId?: unknown
-  no?: unknown
   title?: unknown
   description?: unknown
   status?: unknown
@@ -142,13 +141,6 @@ interface TaskInput {
   startDate?: unknown
   dueDate?: unknown
   thumbnailKey?: unknown
-}
-
-function validateNo(v: unknown): number {
-  if (typeof v !== "number" || !Number.isInteger(v) || v < 1) {
-    throw new HTTPException(400, { message: "Số No phải là số nguyên dương." })
-  }
-  return v
 }
 
 function validateStatus(v: unknown): TaskStatus {
@@ -195,7 +187,7 @@ tasks.post("/", async (c) => {
   }
   await requireProjectAccess(c, projectId)
 
-  const no = validateNo(body.no)
+  // Số No do server tự cấp (body.no bị bỏ qua) — xem câu INSERT bên dưới
   const title =
     typeof body.title === "string" && body.title.trim() ? body.title.trim().slice(0, 300) : ""
   if (!title) throw new HTTPException(400, { message: "Tiêu đề bắt buộc." })
@@ -221,17 +213,20 @@ tasks.post("/", async (c) => {
   const id = uuid()
   const now = Date.now()
 
-  try {
-    await c.env.DB.prepare(
+  // No = MAX(no) + 1 trong project, tính ngay trong câu INSERT (1 statement → D1 thực thi
+  // tuần tự, không bị 2 request đọc cùng MAX). Vẫn retry phòng trường hợp hiếm đụng UNIQUE.
+  const insert = () =>
+    c.env.DB.prepare(
       `INSERT INTO tasks (
          id, project_id, no, title, description, status, priority,
          assignee, tags, start_date, due_date, thumbnail_key, created_at, updated_at
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       )
+       SELECT ?, ?, COALESCE(MAX(no), 0) + 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+       FROM tasks WHERE project_id = ?`,
     )
       .bind(
         id,
         projectId,
-        no,
         title,
         description,
         status,
@@ -243,14 +238,19 @@ tasks.post("/", async (c) => {
         thumbnailKey,
         now,
         now,
+        projectId,
       )
       .run()
-  } catch (e) {
-    const msg = String((e as Error)?.message ?? "")
-    if (msg.includes("UNIQUE") && msg.includes("project_id, no")) {
-      throw new HTTPException(409, { message: `Số No #${no} đã tồn tại trong dự án.` })
+
+  for (let attempt = 1; ; attempt++) {
+    try {
+      await insert()
+      break
+    } catch (e) {
+      const msg = String((e as Error)?.message ?? "")
+      const isNoConflict = msg.includes("UNIQUE") && msg.includes("project_id, no")
+      if (!isNoConflict || attempt >= 3) throw e
     }
-    throw e
   }
 
   const row = await c.env.DB.prepare(`${TASK_SELECT} WHERE t.id = ?`)
@@ -430,10 +430,7 @@ tasks.put("/:id", async (c) => {
   const sets: string[] = []
   const params: unknown[] = []
 
-  if (body.no !== undefined) {
-    sets.push("no = ?")
-    params.push(validateNo(body.no))
-  }
+  // Số No cố định từ lúc tạo — không cho sửa (body.no bị bỏ qua)
   if (body.title !== undefined) {
     if (typeof body.title !== "string" || !body.title.trim()) {
       throw new HTTPException(400, { message: "Tiêu đề không hợp lệ." })
@@ -494,17 +491,9 @@ tasks.put("/:id", async (c) => {
   params.push(now)
   params.push(existing.id)
 
-  try {
-    await c.env.DB.prepare(`UPDATE tasks SET ${sets.join(", ")} WHERE id = ?`)
-      .bind(...params)
-      .run()
-  } catch (e) {
-    const msg = String((e as Error)?.message ?? "")
-    if (msg.includes("UNIQUE") && msg.includes("project_id, no")) {
-      throw new HTTPException(409, { message: "Số No đã tồn tại trong dự án." })
-    }
-    throw e
-  }
+  await c.env.DB.prepare(`UPDATE tasks SET ${sets.join(", ")} WHERE id = ?`)
+    .bind(...params)
+    .run()
 
   const row = await c.env.DB.prepare(`${TASK_SELECT} WHERE t.id = ?`)
     .bind(existing.id)

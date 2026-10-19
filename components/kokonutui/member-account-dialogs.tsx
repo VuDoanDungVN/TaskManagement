@@ -274,7 +274,7 @@ export function CreateAccountDialog({ open, onClose }: { open: boolean; onClose:
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && !submitting && onClose()}>
-      <DialogContent className={cn("max-w-lg max-h-[90vh] overflow-y-auto", contentClass)}>
+      <DialogContent className={cn("max-w-lg", contentClass)}>
         <DialogHeader>
           <DialogTitle className="text-zinc-900 dark:text-zinc-100">
             {result ? t("access.createdTitle") : t("access.createTitle")}

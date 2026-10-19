@@ -28,6 +28,8 @@ const fieldClass = cn(
   "focus:outline-none focus:ring-2 focus:ring-zinc-500 dark:focus:ring-zinc-400",
 )
 
+const MOBILE_AVATAR_LIMIT = 5
+
 /** Thẻ "Thành viên dự án": customer xem danh sách, admin mở dialog để thêm/gỡ. */
 export default function ProjectMembers({ projectId }: { projectId: string }) {
   const { t } = useI18n()
@@ -46,6 +48,23 @@ export default function ProjectMembers({ projectId }: { projectId: string }) {
           <span className="text-[11px] text-zinc-500 dark:text-zinc-400 shrink-0">
             · {t("access.projectMembersCount", { count: members.length })}
           </span>
+          {/* Mobile: avatar xếp chồng thay cho danh sách tên */}
+          <div className="sm:hidden flex -space-x-1.5 shrink-0">
+            {members.slice(0, MOBILE_AVATAR_LIMIT).map((m) => (
+              <UserAvatar
+                key={m.id}
+                name={m.displayName || m.email}
+                src={m.avatarUrl ?? undefined}
+                size={22}
+                className="ring-2 ring-white dark:ring-[#0F0F12]"
+              />
+            ))}
+            {members.length > MOBILE_AVATAR_LIMIT && (
+              <span className="w-[22px] h-[22px] rounded-full ring-2 ring-white dark:ring-[#0F0F12] bg-zinc-200 dark:bg-zinc-700 text-[9px] font-semibold text-zinc-700 dark:text-zinc-200 flex items-center justify-center">
+                +{members.length - MOBILE_AVATAR_LIMIT}
+              </span>
+            )}
+          </div>
         </div>
         {isAdmin && (
           <button
@@ -63,7 +82,7 @@ export default function ProjectMembers({ projectId }: { projectId: string }) {
         )}
       </div>
 
-      <div className="mt-2.5 flex flex-wrap gap-1.5">
+      <div className="hidden sm:flex mt-2.5 flex-wrap gap-1.5">
         {isLoading ? (
           <Loader2 className="w-4 h-4 animate-spin text-zinc-400" />
         ) : members.length === 0 ? (

@@ -523,6 +523,14 @@ export interface Dictionary {
     removeMember: string
     memberError: string
     assigneeNone: string
+    colUser: string
+    colRole: string
+    colStatus: string
+    colAccess: string
+    colCreated: string
+    colActions: string
+    statusActive: string
+    moreActions: string
   }
   dashboard: {
     title: string

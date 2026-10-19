@@ -4,9 +4,12 @@ export type Bindings = {
   FIREBASE_PROJECT_ID: string
   ALLOWED_ORIGIN: string
   PUBLIC_FILES_BASE_URL: string
-  // Email (Resend)
+  // Email — ưu tiên Gmail SMTP nếu có GMAIL_USER + GMAIL_APP_PASSWORD, ngược lại dùng Resend
+  GMAIL_USER?: string // tài khoản Gmail dùng để gửi, vd "vunhatjp@gmail.com"
+  GMAIL_APP_PASSWORD?: string // secret — App Password 16 ký tự của tài khoản trên
+  MAIL_FROM_NAME?: string // tên hiển thị người gửi, mặc định "Task Management"
   RESEND_API_KEY: string // secret — set bằng `wrangler secret put` hoặc .dev.vars
-  MAIL_FROM: string // địa chỉ gửi đi, vd "Task App <onboarding@resend.dev>"
+  MAIL_FROM: string // địa chỉ gửi đi qua Resend, vd "Task App <onboarding@resend.dev>"
   APP_BASE_URL: string // base URL frontend để dựng link chấp nhận lời mời
   ADMIN_EMAILS: string // danh sách email admin hệ thống, phân tách bằng dấu phẩy
   FIREBASE_SERVICE_ACCOUNT?: string // secret — JSON service account, dùng để admin tạo tài khoản

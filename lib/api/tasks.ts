@@ -22,9 +22,9 @@ export interface ApiTask {
   commentCount: number
 }
 
+/** Không có `no`: server tự cấp số No khi tạo và số này cố định về sau. */
 export interface TaskCreateInput {
   projectId: string
-  no: number
   title: string
   description?: string | null
   status?: ApiTaskStatus
