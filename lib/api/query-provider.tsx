@@ -1,7 +1,8 @@
 "use client"
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { useState, type ReactNode } from "react"
+import { useLayoutEffect, useRef, useState, type ReactNode } from "react"
+import { useAuth } from "@/lib/auth/context"
 
 export function QueryProvider({ children }: { children: ReactNode }) {
   const [client] = useState(
@@ -27,6 +28,19 @@ export function QueryProvider({ children }: { children: ReactNode }) {
         },
       }),
   )
+
+  // Query key (["projects"], ["users","me"]…) không gắn theo user → khi đổi tài khoản
+  // (đăng xuất / đăng nhập người khác trên cùng trình duyệt) phải xoá sạch cache,
+  // nếu không khách sẽ thấy danh sách dự án đã cache của người dùng trước.
+  // useLayoutEffect chạy trước khi trình duyệt vẽ → không lộ dữ liệu cũ dù 1 frame.
+  const { user, loading } = useAuth()
+  const uid = loading ? undefined : (user?.uid ?? null)
+  const lastUid = useRef<string | null | undefined>(undefined)
+  useLayoutEffect(() => {
+    if (uid === undefined || uid === lastUid.current) return
+    if (lastUid.current !== undefined) client.clear()
+    lastUid.current = uid
+  }, [uid, client])
 
   return <QueryClientProvider client={client}>{children}</QueryClientProvider>
 }

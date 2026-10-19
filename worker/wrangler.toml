@@ -6,7 +6,7 @@ compatibility_flags = ["nodejs_compat"]
 # Public env vars (visible in code via c.env.*)
 [vars]
 FIREBASE_PROJECT_ID = "task-management-pro-2026"
-ALLOWED_ORIGIN = "http://localhost:3000,http://localhost:3001,http://localhost:3002"
+ALLOWED_ORIGIN = "http://localhost:3000,https://main.d1oq00m5o7x4xo.amplifyapp.com"
 PUBLIC_FILES_BASE_URL = ""
 # Email — ưu tiên Gmail SMTP: cần GMAIL_USER (dưới đây) + secret GMAIL_APP_PASSWORD
 # (App Password của chính tài khoản GMAIL_USER, tạo tại https://myaccount.google.com/apppasswords).
@@ -16,10 +16,11 @@ GMAIL_USER = "vunhatjp@gmail.com"
 MAIL_FROM_NAME = "Task Management"
 # Dự phòng Resend (chỉ dùng khi chưa có GMAIL_APP_PASSWORD; MAIL_FROM phải thuộc domain đã xác minh trên Resend)
 MAIL_FROM = "vunhatjp@gmail.com"
-APP_BASE_URL = "http://localhost:3000"
+# APP_BASE_URL = "http://localhost:3000"
+APP_BASE_URL = "https://main.d1oq00m5o7x4xo.amplifyapp.com"
 # Danh sách email được tự cấp quyền admin hệ thống (phân tách bằng dấu phẩy).
 # Khi các email này đăng nhập, role trong bảng users sẽ tự được set 'admin'.
-ADMIN_EMAILS = "vudungit92pgmail.com"
+ADMIN_EMAILS = "vudungit92@gmail.com"
 
 # D1 database — bound as `DB` in code (c.env.DB)
 [[d1_databases]]
