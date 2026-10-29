@@ -11,14 +11,12 @@ import {
 } from "lucide-react"
 import Profile01 from "./profile-01"
 import Link from "next/link"
-import { ThemeToggle } from "../theme-toggle"
 import { cn } from "@/lib/utils"
 import type { BreadcrumbItem } from "@/lib/breadcrumbs"
 import UserAvatar from "./user-avatar"
 import { useAuth } from "@/lib/auth/context"
 import { useMe } from "@/lib/users/store"
 import { useI18n } from "@/lib/i18n/context"
-import LanguageToggle from "./language-toggle"
 
 interface TopNavProps {
   onToggleSidebar?: () => void
@@ -139,8 +137,7 @@ export default function TopNav({
           </button>
         )}
 
-        <LanguageToggle />
-        <ThemeToggle />
+        {/* Ngôn ngữ và giao diện sáng/tối đã chuyển vào trang Cài đặt */}
 
         {isLoggedIn ? (
           <DropdownMenu>

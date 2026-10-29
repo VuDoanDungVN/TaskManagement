@@ -2,13 +2,12 @@ import { Hono } from "hono"
 import { HTTPException } from "hono/http-exception"
 import type { AppEnv } from "../types"
 import { requireAuth, requireSystemAdmin } from "../auth-middleware"
-import { requireTaskAccess } from "../access"
 import { buildFileUrl } from "../utils"
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
+export const MAX_IMAGE_SIZE = 5 * 1024 * 1024 // 5MB
 const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"])
 
-function mimeToExt(mime: string): string {
+export function mimeToExt(mime: string): string {
   switch (mime) {
     case "image/jpeg":
       return "jpg"
@@ -23,13 +22,13 @@ function mimeToExt(mime: string): string {
   }
 }
 
-function validateImageFile(file: File) {
+export function validateImageFile(file: File) {
   if (!ALLOWED_MIME.has(file.type)) {
     throw new HTTPException(400, {
       message: `Định dạng không hỗ trợ: ${file.type}. Cho phép JPG/PNG/WEBP/GIF.`,
     })
   }
-  if (file.size > MAX_FILE_SIZE) {
+  if (file.size > MAX_IMAGE_SIZE) {
     throw new HTTPException(413, { message: "File quá lớn (tối đa 5MB)." })
   }
 }
@@ -155,39 +154,6 @@ uploads.post("/teams/:teamId/avatar", async (c) => {
     .run()
 
   return c.json({ avatarKey: key, avatarUrl: buildFileUrl(c.env, c.req.raw, key) })
-})
-
-/**
- * POST /uploads/tasks/:taskId/thumbnail
- */
-uploads.post("/tasks/:taskId/thumbnail", async (c) => {
-  const taskId = c.req.param("taskId")
-  await requireTaskAccess(c, taskId)
-
-  const existing = await c.env.DB.prepare("SELECT thumbnail_key FROM tasks WHERE id = ?")
-    .bind(taskId)
-    .first<{ thumbnail_key: string | null }>()
-  if (!existing) throw new HTTPException(404, { message: "Không tìm thấy task." })
-
-  const file = await extractFile(c.req.raw)
-  const ext = mimeToExt(file.type)
-  const key = `tasks/${taskId}/thumbnail.${ext}`
-
-  if (existing.thumbnail_key && existing.thumbnail_key !== key) {
-    await c.env.FILES.delete(existing.thumbnail_key).catch(() => {})
-  }
-  await c.env.FILES.put(key, file.stream(), {
-    httpMetadata: { contentType: file.type },
-  })
-
-  const now = Date.now()
-  await c.env.DB.prepare(
-    "UPDATE tasks SET thumbnail_key = ?, updated_at = ? WHERE id = ?",
-  )
-    .bind(key, now, taskId)
-    .run()
-
-  return c.json({ thumbnailKey: key, thumbnailUrl: buildFileUrl(c.env, c.req.raw, key) })
 })
 
 export default uploads

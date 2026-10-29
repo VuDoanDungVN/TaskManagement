@@ -6,6 +6,7 @@ import users from "./routes/users"
 import projects from "./routes/projects"
 import teams from "./routes/teams"
 import tasks from "./routes/tasks"
+import taskImages from "./routes/task-images"
 import comments from "./routes/comments"
 import uploads from "./routes/uploads"
 import files from "./routes/files"
@@ -39,6 +40,7 @@ app.route("/users", users)
 app.route("/projects", projects)
 app.route("/teams", teams)
 app.route("/tasks", tasks)
+app.route("/tasks", taskImages) // /tasks/:id/images…
 app.route("/comments", comments)
 app.route("/uploads", uploads)
 app.route("/files", files)

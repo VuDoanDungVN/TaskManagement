@@ -323,6 +323,7 @@ export interface Dictionary {
   tasks: {
     title: string
     createNew: string
+    createShort: string
     filterAll: string
     searchPlaceholder: string
     loading: string
@@ -463,6 +464,26 @@ export interface Dictionary {
       loading: string
       errorFallback: string
     }
+  }
+  taskImages: {
+    label: string
+    hint: string
+    cover: string
+    setCover: string
+    remove: string
+    add: string
+    addHint: string
+    limitReached: string
+    tooLarge: string
+    badType: string
+    tooMany: string
+    uploading: string
+    uploadFailed: string
+    close: string
+    prev: string
+    next: string
+    openFull: string
+    imageCount: string
   }
   access: {
     roleAdmin: string

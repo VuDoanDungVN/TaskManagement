@@ -73,6 +73,43 @@ export async function apiRequest<T = unknown>(
   return (await res.json()) as T
 }
 
+/**
+ * Upload multipart có báo tiến trình (0–1). fetch() không có upload progress nên dùng XHR.
+ * Lỗi HTTP ném ApiError giống apiRequest.
+ */
+export async function uploadWithProgress<T = unknown>(
+  path: string,
+  form: FormData,
+  onProgress?: (fraction: number) => void,
+): Promise<T> {
+  const token = await getAuthToken()
+  return new Promise<T>((resolve, reject) => {
+    const xhr = new XMLHttpRequest()
+    xhr.open("POST", `${API_URL}${path}`)
+    if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`)
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) onProgress?.(e.loaded / e.total)
+    }
+    xhr.onload = () => {
+      let body: unknown = null
+      try {
+        body = JSON.parse(xhr.responseText)
+      } catch {
+        // ignore
+      }
+      if (xhr.status >= 200 && xhr.status < 300) {
+        onProgress?.(1)
+        resolve(body as T)
+      } else {
+        const err = body as { message?: string; error?: string } | null
+        reject(new ApiError(xhr.status, err?.message || err?.error || `HTTP ${xhr.status}`))
+      }
+    }
+    xhr.onerror = () => reject(new ApiError(0, "Lỗi mạng khi upload."))
+    xhr.send(form)
+  })
+}
+
 export const api = {
   get: <T>(path: string, opts?: RequestOptions) =>
     apiRequest<T>(path, { ...opts, method: "GET" }),

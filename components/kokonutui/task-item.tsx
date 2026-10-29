@@ -6,6 +6,7 @@ import {
   Calendar,
   Flag,
   ImageIcon,
+  Images,
   MessageSquare,
   Pencil,
   Trash2,
@@ -59,6 +60,7 @@ export default function TaskItem({ task, no, onEdit, onDelete }: TaskItemProps) 
   const dueShort = formatDateShort(task.dueDate)
   const noLabel = t("taskItem.ariaNumber", { value: no })
   const commentsLabel = t("taskItem.ariaComments", { count: task.commentCount })
+  const imagesLabel = t("taskImages.imageCount", { count: task.imageCount })
 
   const openDetail = () => router.push(`/dashboard/${task.projectId}/${task.id}`)
 
@@ -147,6 +149,16 @@ export default function TaskItem({ task, no, onEdit, onDelete }: TaskItemProps) 
                 {task.commentCount}
               </span>
             )}
+            {task.imageCount > 0 && (
+              <span
+                className="inline-flex items-center gap-1 tabular-nums"
+                aria-label={imagesLabel}
+                title={imagesLabel}
+              >
+                <Images className="w-3 h-3" />
+                {task.imageCount}
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -155,7 +167,7 @@ export default function TaskItem({ task, no, onEdit, onDelete }: TaskItemProps) 
       <div className="hidden sm:flex items-stretch gap-3 p-3">
         <div
           className={cn(
-            "w-14 h-14 shrink-0 rounded-lg overflow-hidden",
+            "relative w-14 h-14 shrink-0 rounded-lg overflow-hidden",
             "border border-zinc-200 dark:border-zinc-700",
             "bg-zinc-100 dark:bg-zinc-800",
             "flex items-center justify-center",
@@ -166,6 +178,14 @@ export default function TaskItem({ task, no, onEdit, onDelete }: TaskItemProps) 
             <img src={task.thumbnailUrl} alt={task.title} className="w-full h-full object-cover" />
           ) : (
             <ImageIcon className="w-5 h-5 text-zinc-400 dark:text-zinc-500" />
+          )}
+          {task.imageCount > 1 && (
+            <span
+              className="absolute bottom-0.5 right-0.5 px-1 rounded bg-black/60 text-white text-[10px] font-semibold tabular-nums leading-4"
+              title={imagesLabel}
+            >
+              +{task.imageCount - 1}
+            </span>
           )}
         </div>
 

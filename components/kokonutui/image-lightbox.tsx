@@ -1,9 +1,9 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
-import { X } from "lucide-react"
+import { ChevronLeft, ChevronRight, X } from "lucide-react"
 import { useI18n } from "@/lib/i18n/context"
 
 interface ImageLightboxProps {
@@ -11,12 +11,26 @@ interface ImageLightboxProps {
   alt: string
   open: boolean
   onClose: () => void
+  /** Có nhiều ảnh: truyền để hiện nút ‹ ›, phím ← →, vuốt trên mobile. */
+  onPrev?: () => void
+  onNext?: () => void
+  /** Vd "2 / 5" */
+  counter?: string
 }
 
-export default function ImageLightbox({ src, alt, open, onClose }: ImageLightboxProps) {
+export default function ImageLightbox({
+  src,
+  alt,
+  open,
+  onClose,
+  onPrev,
+  onNext,
+  counter,
+}: ImageLightboxProps) {
   const { t } = useI18n()
   // Tránh hydration mismatch — chỉ portal sau khi đã mount client.
   const [mounted, setMounted] = useState(false)
+  const touchX = useRef<number | null>(null)
   useEffect(() => {
     setMounted(true)
   }, [])
@@ -25,6 +39,8 @@ export default function ImageLightbox({ src, alt, open, onClose }: ImageLightbox
     if (!open) return
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") onClose()
+      else if (e.key === "ArrowLeft") onPrev?.()
+      else if (e.key === "ArrowRight") onNext?.()
     }
     window.addEventListener("keydown", onKey)
     const prevOverflow = document.body.style.overflow
@@ -33,9 +49,15 @@ export default function ImageLightbox({ src, alt, open, onClose }: ImageLightbox
       window.removeEventListener("keydown", onKey)
       document.body.style.overflow = prevOverflow
     }
-  }, [open, onClose])
+  }, [open, onClose, onPrev, onNext])
 
   if (!open || !mounted) return null
+
+  const navBtn = cn(
+    "absolute top-1/2 -translate-y-1/2 z-10",
+    "inline-flex items-center justify-center w-10 h-10 rounded-full",
+    "bg-white/10 hover:bg-white/20 text-white transition-colors",
+  )
 
   // Portal vào document.body để overlay không bị giam trong ancestor có
   // transform/filter/backdrop-blur (Layout của kokonutui dùng backdrop-blur ở topnav).
@@ -45,6 +67,18 @@ export default function ImageLightbox({ src, alt, open, onClose }: ImageLightbox
       aria-modal="true"
       aria-label={alt}
       onClick={onClose}
+      onTouchStart={(e) => {
+        touchX.current = e.touches[0]?.clientX ?? null
+      }}
+      onTouchEnd={(e) => {
+        const start = touchX.current
+        touchX.current = null
+        const end = e.changedTouches[0]?.clientX
+        if (start == null || end == null) return
+        const dx = end - start
+        if (dx > 50) onPrev?.()
+        else if (dx < -50) onNext?.()
+      }}
       className={cn(
         "fixed inset-0 z-[100]",
         "w-screen h-screen",
@@ -68,6 +102,37 @@ export default function ImageLightbox({ src, alt, open, onClose }: ImageLightbox
       >
         <X className="w-5 h-5" />
       </button>
+      {counter && (
+        <span className="absolute top-4 left-4 z-10 px-2.5 py-1 rounded-full bg-white/10 text-white text-xs tabular-nums">
+          {counter}
+        </span>
+      )}
+      {onPrev && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation()
+            onPrev()
+          }}
+          aria-label={t("taskImages.prev")}
+          className={cn(navBtn, "left-2 sm:left-4")}
+        >
+          <ChevronLeft className="w-6 h-6" />
+        </button>
+      )}
+      {onNext && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation()
+            onNext()
+          }}
+          aria-label={t("taskImages.next")}
+          className={cn(navBtn, "right-2 sm:right-4")}
+        >
+          <ChevronRight className="w-6 h-6" />
+        </button>
+      )}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}

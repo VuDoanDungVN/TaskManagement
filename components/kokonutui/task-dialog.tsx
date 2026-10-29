@@ -1,7 +1,8 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
+import { Loader2 } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -12,7 +13,14 @@ import {
 } from "@/components/ui/dialog"
 import type { Task, TaskDraft, TaskPriority, TaskStatus } from "@/lib/tasks/types"
 import { useI18n } from "@/lib/i18n/context"
-import FileInput from "./file-input"
+import TaskImagesField from "./task-images-field"
+import { useTaskImages } from "@/lib/tasks/store"
+import {
+  existingToItems,
+  type ImageProgressFn,
+  type TaskImageItem,
+  type TaskImagePlan,
+} from "@/lib/tasks/images"
 import { useMe } from "@/lib/users/store"
 
 interface TaskDialogProps {
@@ -21,7 +29,15 @@ interface TaskDialogProps {
   /** Tên thành viên dự án để chọn người phụ trách; không truyền → ô nhập tự do. */
   assigneeOptions?: string[]
   onClose: () => void
-  onSubmit: (draft: TaskDraft, file: File | null) => void
+  /**
+   * Lưu task + đồng bộ ảnh. Dialog chờ hàm này xong mới đóng (để hiện tiến trình upload).
+   * Trả về failedKeys nếu có ảnh upload lỗi → dialog giữ mở và báo lỗi (task đã lưu).
+   */
+  onSubmit: (
+    draft: TaskDraft,
+    images: TaskImagePlan,
+    onProgress: ImageProgressFn,
+  ) => Promise<{ failedKeys: string[] } | void>
 }
 
 const fieldClass = cn(
@@ -75,10 +91,32 @@ export default function TaskDialog({
   const myName = me ? me.displayName || me.email : ""
   const [draft, setDraft] = useState<TaskDraft>(() => emptyDraft())
   const [tagsText, setTagsText] = useState("")
-  const [file, setFile] = useState<File | null>(null)
+  const [images, setImages] = useState<TaskImageItem[]>([])
+  const [removedIds, setRemovedIds] = useState<string[]>([])
+  const [progress, setProgress] = useState<Record<string, number>>({})
+  const [failedKeys, setFailedKeys] = useState<string[]>([])
+  const [phase, setPhase] = useState<"idle" | "saving" | "doneWithErrors">("idle")
+  const [submitError, setSubmitError] = useState<string | null>(null)
+
+  // Ảnh đã lưu của task (khi sửa) — nạp vào form một lần mỗi lần mở dialog
+  const imagesQuery = useTaskImages(initialTask?.id, open && !!initialTask)
+  const imagesLoadedFor = useRef<string | null>(null)
+  useEffect(() => {
+    if (!open || !initialTask || !imagesQuery.data) return
+    if (imagesLoadedFor.current === initialTask.id) return
+    imagesLoadedFor.current = initialTask.id
+    setImages(existingToItems(imagesQuery.data))
+  }, [open, initialTask, imagesQuery.data])
 
   useEffect(() => {
     if (!open) return
+    imagesLoadedFor.current = null
+    setImages([])
+    setRemovedIds([])
+    setProgress({})
+    setFailedKeys([])
+    setPhase("idle")
+    setSubmitError(null)
     if (initialTask) {
       setDraft({
         title: initialTask.title,
@@ -91,11 +129,9 @@ export default function TaskDialog({
         dueDate: initialTask.dueDate ?? "",
       })
       setTagsText(initialTask.tags.join(", "))
-      setFile(null)
     } else {
       setDraft(emptyDraft(myName))
       setTagsText("")
-      setFile(null)
     }
     // myName cố ý không nằm trong deps: chỉ reset form khi mở dialog, không reset khi /users/me refetch
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -113,28 +149,46 @@ export default function TaskDialog({
     return null
   }, [draft.title, t])
 
-  const canSubmit = !titleError
+  const saving = phase === "saving"
+  const loadingImages = !!initialTask && imagesQuery.isLoading
+  const canSubmit = !titleError && !saving && !loadingImages
+  const newCount = images.filter((i) => i.kind === "new").length
+  const uploadedCount = images.filter((i) => i.kind === "new" && progress[i.key] === 1).length
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!canSubmit) return
     const tags = tagsText
       .split(",")
       .map((t) => t.trim().replace(/^#/, ""))
       .filter(Boolean)
-    onSubmit(
-      {
-        ...draft,
-        title: draft.title.trim(),
-        tags,
-      },
-      file,
-    )
-    onClose()
+    setPhase("saving")
+    setSubmitError(null)
+    try {
+      const res = await onSubmit(
+        { ...draft, title: draft.title.trim(), tags },
+        { items: images, removedIds },
+        (key, fraction) => setProgress((p) => ({ ...p, [key]: fraction })),
+      )
+      if (res && res.failedKeys.length > 0) {
+        setFailedKeys(res.failedKeys)
+        setPhase("doneWithErrors")
+      } else {
+        onClose()
+      }
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : t("common.error"))
+      setPhase("idle")
+    }
+  }
+
+  // Đang lưu thì không cho đóng (tránh bỏ dở upload)
+  const requestClose = () => {
+    if (!saving) onClose()
   }
 
   return (
-    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+    <Dialog open={open} onOpenChange={(o) => !o && requestClose()}>
       <DialogContent
         className={cn(
           "max-w-xl",
@@ -281,14 +335,30 @@ export default function TaskDialog({
             </div>
           </div>
 
-          <div className="space-y-1">
-            <label className={labelClass}>{t("taskDialog.thumbnailLabel")}</label>
-            <FileInput
-              size={80}
-              currentUrl={initialTask?.thumbnailUrl ?? null}
-              onFileChange={setFile}
+          {loadingImages ? (
+            <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              {t("common.loading")}
+            </div>
+          ) : (
+            <TaskImagesField
+              items={images}
+              onChange={setImages}
+              onRemoveExisting={(id) => setRemovedIds((ids) => [...ids, id])}
+              progress={progress}
+              failedKeys={failedKeys}
+              disabled={saving || phase === "doneWithErrors"}
             />
-          </div>
+          )}
+
+          {submitError && (
+            <p className="text-[11px] text-red-600 dark:text-red-400">{submitError}</p>
+          )}
+          {phase === "doneWithErrors" && (
+            <p className="text-[11px] text-red-600 dark:text-red-400">
+              {t("taskImages.uploadFailed", { count: failedKeys.length })}
+            </p>
+          )}
 
           {/* Footer dính đáy vùng cuộn → nút Huỷ/Lưu luôn trong tầm tay khi form dài */}
           <DialogFooter
@@ -299,15 +369,35 @@ export default function TaskDialog({
               "border-t border-zinc-100 dark:border-zinc-800",
             )}
           >
+            {saving && newCount > 0 && (
+              <span className="mr-auto self-center text-[11px] text-zinc-500 dark:text-zinc-400 tabular-nums">
+                {t("taskImages.uploading", { done: uploadedCount, total: newCount })}
+              </span>
+            )}
+            {phase === "doneWithErrors" ? (
+              <button
+                type="button"
+                onClick={onClose}
+                className={cn(
+                  "px-4 py-2 rounded-lg text-sm font-medium",
+                  "bg-zinc-900 dark:bg-zinc-50 text-zinc-50 dark:text-zinc-900",
+                  "hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors",
+                )}
+              >
+                {t("taskImages.close")}
+              </button>
+            ) : (
+            <>
             <button
               type="button"
-              onClick={onClose}
+              onClick={requestClose}
+              disabled={saving}
               className={cn(
                 "px-4 py-2 rounded-lg text-sm font-medium",
                 "bg-zinc-100 dark:bg-zinc-800",
                 "text-zinc-900 dark:text-zinc-100",
                 "hover:bg-zinc-200 dark:hover:bg-zinc-700",
-                "transition-colors",
+                "transition-colors disabled:opacity-50",
               )}
             >
               {t("common.cancel")}
@@ -324,8 +414,17 @@ export default function TaskDialog({
                 "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-zinc-900 dark:disabled:hover:bg-zinc-50",
               )}
             >
-              {initialTask ? t("taskDialog.submitEdit") : t("taskDialog.submitCreate")}
+              <span className="inline-flex items-center gap-1.5">
+                {saving && <Loader2 className="w-4 h-4 animate-spin" />}
+                {saving
+                  ? t("common.saving")
+                  : initialTask
+                    ? t("taskDialog.submitEdit")
+                    : t("taskDialog.submitCreate")}
+              </span>
             </button>
+            </>
+            )}
           </DialogFooter>
         </form>
       </DialogContent>

@@ -13,6 +13,18 @@ import { PROJECTS_QUERY_KEY } from "@/lib/projects/store"
 export const TASKS_QUERY_KEY = (projectId: string) => ["tasks", projectId] as const
 export const TASK_QUERY_KEY = (id: string) => ["task", id] as const
 export const ALL_TASKS_QUERY_KEY = ["tasks", "all"] as const
+export const TASK_IMAGES_QUERY_KEY = (id: string) => ["task", id, "images"] as const
+
+/** Ảnh của task theo thứ tự (ảnh đầu = ảnh đại diện). */
+export function useTaskImages(id: string | null | undefined, enabled = true) {
+  const { user, verified, loading: authLoading } = useAuth()
+  return useQuery({
+    queryKey: TASK_IMAGES_QUERY_KEY(id ?? ""),
+    queryFn: async () => (await tasksApi.images(id!)).items,
+    enabled: !authLoading && !!user && verified && !!id && enabled,
+    staleTime: 5 * 60_000,
+  })
+}
 
 export function useTasks(projectId: string | null | undefined) {
   const { user, verified, loading: authLoading } = useAuth()

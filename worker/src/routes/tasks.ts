@@ -9,6 +9,7 @@ import {
   requireProjectAccess,
   requireTaskAccess,
 } from "../access"
+import { deleteTaskImageFiles } from "./task-images"
 import {
   COMMENT_SELECT,
   serializeComment,
@@ -42,11 +43,13 @@ interface TaskRow {
   created_at: number
   updated_at: number
   comment_count: number | null
+  image_count: number | null
 }
 
-// SELECT base kèm subquery đếm comment — dùng cho mọi route đọc task
+// SELECT base kèm subquery đếm comment + ảnh — dùng cho mọi route đọc task
 const TASK_SELECT = `SELECT t.*,
-  (SELECT COUNT(*) FROM task_comments WHERE task_id = t.id) AS comment_count
+  (SELECT COUNT(*) FROM task_comments WHERE task_id = t.id) AS comment_count,
+  (SELECT COUNT(*) FROM task_images WHERE task_id = t.id) AS image_count
 FROM tasks t`
 
 function parseTags(s: string | null): string[] {
@@ -77,6 +80,7 @@ function serializeTask(row: TaskRow, fileUrl: string | null) {
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     commentCount: row.comment_count ?? 0,
+    imageCount: row.image_count ?? 0,
   }
 }
 
@@ -505,6 +509,8 @@ tasks.put("/:id", async (c) => {
 // DELETE /tasks/:id
 tasks.delete("/:id", async (c) => {
   const existing = await loadAccessibleTask(c, c.req.param("id"))
+  // R2 không có cascade → xoá file ảnh trước, rows task_images tự CASCADE theo task
+  await deleteTaskImageFiles(c, existing.id)
   await c.env.DB.prepare("DELETE FROM tasks WHERE id = ?").bind(existing.id).run()
   return c.json({ ok: true })
 })

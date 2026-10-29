@@ -16,7 +16,6 @@ import {
   Timer,
 } from "lucide-react"
 import Layout from "@/components/kokonutui/layout"
-import { StatusDonut, TopProjectsBar } from "@/components/kokonutui/dashboard-charts"
 import { useProjects } from "@/lib/projects/store"
 import { useAllTasks } from "@/lib/tasks/store"
 import { useIsAdmin } from "@/lib/users/store"
@@ -455,12 +454,6 @@ export default function DashboardPage() {
             </div>
               )}
               </SectionCard>
-
-            {/* Charts row */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 [&>*]:min-w-0">
-              <StatusDonut tasks={tasks} />
-              <TopProjectsBar projects={projects} />
-            </div>
 
             {/* Quá hạn, Sắp đến hạn, Hoạt động gần đây */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 [&>*]:min-w-0">

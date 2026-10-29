@@ -13,7 +13,12 @@ import {
 } from "@/lib/tasks/store"
 import type { Task, TaskDraft, TaskStatus } from "@/lib/tasks/types"
 import { STATUS_CONFIG } from "@/lib/tasks/utils"
-import { uploadsApi } from "@/lib/api/uploads"
+import {
+  invalidateTaskImageQueries,
+  saveTaskImages,
+  type ImageProgressFn,
+  type TaskImagePlan,
+} from "@/lib/tasks/images"
 import { useI18n } from "@/lib/i18n/context"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import TaskItem from "./task-item"
@@ -80,7 +85,11 @@ export default function TaskManager({ projectId }: TaskManagerProps) {
     setDialogOpen(true)
   }
 
-  async function handleSubmit(draft: TaskDraft, file: File | null) {
+  async function handleSubmit(
+    draft: TaskDraft,
+    images: TaskImagePlan,
+    onProgress: ImageProgressFn,
+  ) {
     let taskId: string
     if (editing) {
       await updateMutation.mutateAsync({ id: editing.id, patch: draft })
@@ -89,14 +98,9 @@ export default function TaskManager({ projectId }: TaskManagerProps) {
       const created = await createMutation.mutateAsync({ projectId, ...draft })
       taskId = created.id
     }
-    if (file) {
-      try {
-        await uploadsApi.taskThumbnail(taskId, file)
-      } catch (e) {
-        console.error("Upload thumbnail thất bại:", e)
-      }
-      queryClient.invalidateQueries({ queryKey: TASKS_QUERY_KEY(projectId) })
-    }
+    const result = await saveTaskImages(taskId, images, onProgress)
+    invalidateTaskImageQueries(queryClient, taskId, projectId)
+    return result
   }
 
   function handleDelete(id: string) {
@@ -112,7 +116,26 @@ export default function TaskManager({ projectId }: TaskManagerProps) {
   ]
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-16 sm:pb-0">
+      {/* Mobile: nút "Tạo task" cố định dưới đáy, full chiều ngang, cách đáy 10px */}
+      <button
+        type="button"
+        onClick={openCreate}
+        className={cn(
+          "sm:hidden fixed inset-x-4 bottom-[10px] z-40",
+          "flex items-center justify-center gap-2",
+          "h-11 rounded-xl",
+          "text-sm font-semibold",
+          "bg-zinc-900 dark:bg-zinc-50",
+          "text-zinc-50 dark:text-zinc-900",
+          "shadow-lg shadow-black/20",
+          "active:scale-[0.99] transition-transform",
+        )}
+      >
+        <Plus className="w-4 h-4" />
+        <span>{t("tasks.createShort")}</span>
+      </button>
+
       <div className="bg-white dark:bg-[#0F0F12] rounded-xl p-4 sm:p-6 flex flex-col border border-gray-200 dark:border-[#1F1F23]">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -123,7 +146,7 @@ export default function TaskManager({ projectId }: TaskManagerProps) {
             type="button"
             onClick={openCreate}
             className={cn(
-              "flex items-center justify-center gap-2",
+              "hidden sm:flex items-center justify-center gap-2",
               "py-2 px-3 rounded-lg",
               "text-xs font-medium",
               "bg-zinc-900 dark:bg-zinc-50",

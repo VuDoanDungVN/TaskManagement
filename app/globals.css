@@ -140,3 +140,21 @@ html {
     @apply bg-background text-foreground;
   }
 }
+/*
+ * iOS Safari tự phóng to trang khi focus vào ô nhập có font-size < 16px.
+ * Input trong app dùng text-xs/text-sm (12–14px) → ép 16px trên màn hình nhỏ.
+ * !important vì class utility (.text-sm…) có độ ưu tiên cao hơn selector thẻ.
+ * Không dùng maximum-scale=1 trong viewport vì sẽ chặn người dùng chủ động zoom.
+ */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+@media (max-width: 767px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}

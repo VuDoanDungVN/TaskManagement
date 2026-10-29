@@ -21,12 +21,14 @@ import {
   formatDate,
   isOverdue,
 } from "@/lib/tasks/utils"
+import { useDeleteTask, useTaskImages, useUpdateTask } from "@/lib/tasks/store"
+import TaskImageGallery from "./task-image-gallery"
 import {
-  TASKS_QUERY_KEY,
-  useDeleteTask,
-  useUpdateTask,
-} from "@/lib/tasks/store"
-import { uploadsApi } from "@/lib/api/uploads"
+  invalidateTaskImageQueries,
+  saveTaskImages,
+  type ImageProgressFn,
+  type TaskImagePlan,
+} from "@/lib/tasks/images"
 import { useI18n } from "@/lib/i18n/context"
 import TaskDialog from "./task-dialog"
 import { useProjectMembers } from "@/lib/projects/store"
@@ -48,6 +50,8 @@ export default function TaskDetail({ task, projectId, canManage }: TaskDetailPro
   const due = formatDate(task.dueDate)
 
   const [dialogOpen, setDialogOpen] = useState(false)
+  const hasImages = task.imageCount > 0 || !!task.thumbnailUrl
+  const { data: images = [] } = useTaskImages(task.id, hasImages)
   const { data: members = [] } = useProjectMembers(canManage ? projectId : null)
   const assigneeOptions = useMemo(
     () => [...new Set(members.map((m) => m.displayName || m.email))],
@@ -57,17 +61,15 @@ export default function TaskDetail({ task, projectId, canManage }: TaskDetailPro
   const updateMutation = useUpdateTask(projectId)
   const deleteMutation = useDeleteTask(projectId)
 
-  async function handleEditSubmit(draft: TaskDraft, file: File | null) {
+  async function handleEditSubmit(
+    draft: TaskDraft,
+    images: TaskImagePlan,
+    onProgress: ImageProgressFn,
+  ) {
     await updateMutation.mutateAsync({ id: task.id, patch: draft })
-    if (file) {
-      try {
-        await uploadsApi.taskThumbnail(task.id, file)
-      } catch (e) {
-        console.error("Upload thumbnail thất bại:", e)
-      }
-      queryClient.invalidateQueries({ queryKey: TASKS_QUERY_KEY(projectId) })
-    }
-    setDialogOpen(false)
+    const result = await saveTaskImages(task.id, images, onProgress)
+    invalidateTaskImageQueries(queryClient, task.id, projectId)
+    return result
   }
 
   function handleDelete() {
@@ -134,26 +136,25 @@ export default function TaskDetail({ task, projectId, canManage }: TaskDetailPro
         )}
       </div>
 
-      <div className="p-6 flex flex-col md:flex-row gap-6">
-        <div
-          className={cn(
-            "w-full md:w-56 h-40 md:h-44 shrink-0 rounded-xl overflow-hidden",
-            "border border-zinc-200 dark:border-zinc-700",
-            "bg-zinc-100 dark:bg-zinc-800",
-            "flex items-center justify-center",
-          )}
-        >
-          {task.thumbnailUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={task.thumbnailUrl}
-              alt={task.title}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <ImageIcon className="w-8 h-8 text-zinc-400 dark:text-zinc-500" />
-          )}
-        </div>
+      <div className="p-4 sm:p-6 flex flex-col md:flex-row gap-6">
+        {/* Ảnh (phương án A): chỉ hiện khi task có ảnh — không để khung trống */}
+        {hasImages && (
+          <div className="w-full md:w-[45%] lg:w-[420px] shrink-0">
+            {images.length > 0 ? (
+              <TaskImageGallery images={images} alt={task.title} />
+            ) : (
+              // Đang tải danh sách ảnh: hiện tạm ảnh đại diện có sẵn trong task
+              <div className="aspect-[4/3] rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center">
+                {task.thumbnailUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={task.thumbnailUrl} alt={task.title} className="w-full h-full object-contain" />
+                ) : (
+                  <ImageIcon className="w-8 h-8 text-zinc-400 dark:text-zinc-500" />
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="flex-1 min-w-0 flex flex-col gap-3">
           <div className="flex flex-wrap items-center gap-2">
