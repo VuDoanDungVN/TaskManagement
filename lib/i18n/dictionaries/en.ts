@@ -487,6 +487,18 @@ const en: Dictionary = {
     openFull: "View full screen",
     imageCount: "{count} images",
   },
+  mobile: {
+    notificationsSubtitle: "Updates about tasks in your projects.",
+    notificationsAssigned: "Assigned to you",
+    notificationsEmpty: "No new notifications.",
+    configMissingTitle: "Firebase configuration missing",
+    configMissingDesc: "Run the app with --dart-define-from-file=config/firebase.json (see mobile/README.md).",
+    openFile: "Open file",
+    pickFromGallery: "Choose from library",
+    takePhoto: "Take photo",
+    pickFiles: "Choose files",
+    profileTitle: "Account",
+  },
   access: {
     roleAdmin: "Administrator",
     roleCustomer: "Customer",

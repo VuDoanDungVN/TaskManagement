@@ -494,6 +494,18 @@ const ja: Dictionary = {
     openFull: "全画面表示",
     imageCount: "{count}枚",
   },
+  mobile: {
+    notificationsSubtitle: "プロジェクト内のタスクに関する最新情報です。",
+    notificationsAssigned: "あなたに割り当て",
+    notificationsEmpty: "新しい通知はありません。",
+    configMissingTitle: "Firebase の設定がありません",
+    configMissingDesc: "--dart-define-from-file=config/firebase.json を付けてアプリを実行してください（mobile/README.md 参照）。",
+    openFile: "ファイルを開く",
+    pickFromGallery: "ライブラリから選択",
+    takePhoto: "写真を撮る",
+    pickFiles: "ファイルを選択",
+    profileTitle: "アカウント",
+  },
   access: {
     roleAdmin: "管理者",
     roleCustomer: "顧客",

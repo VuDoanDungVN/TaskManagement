@@ -485,6 +485,19 @@ export interface Dictionary {
     openFull: string
     imageCount: string
   }
+  /** Chuỗi chỉ app Flutter (mobile/) dùng — sinh sang ARB bằng mobile/tool/gen_arb.mjs */
+  mobile: {
+    notificationsSubtitle: string
+    notificationsAssigned: string
+    notificationsEmpty: string
+    configMissingTitle: string
+    configMissingDesc: string
+    openFile: string
+    pickFromGallery: string
+    takePhoto: string
+    pickFiles: string
+    profileTitle: string
+  }
   access: {
     roleAdmin: string
     roleCustomer: string

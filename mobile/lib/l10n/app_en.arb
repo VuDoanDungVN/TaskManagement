@@ -1,0 +1,2347 @@
+{
+  "@@locale": "en",
+  "commonSave": "Save",
+  "@commonSave": {
+    "description": "web: common.save"
+  },
+  "commonCancel": "Cancel",
+  "@commonCancel": {
+    "description": "web: common.cancel"
+  },
+  "commonEdit": "Edit",
+  "@commonEdit": {
+    "description": "web: common.edit"
+  },
+  "commonDelete": "Delete",
+  "@commonDelete": {
+    "description": "web: common.delete"
+  },
+  "commonSaving": "Saving…",
+  "@commonSaving": {
+    "description": "web: common.saving"
+  },
+  "commonSending": "Sending…",
+  "@commonSending": {
+    "description": "web: common.sending"
+  },
+  "commonDeleting": "Deleting…",
+  "@commonDeleting": {
+    "description": "web: common.deleting"
+  },
+  "commonLoading": "Loading data…",
+  "@commonLoading": {
+    "description": "web: common.loading"
+  },
+  "commonError": "Error",
+  "@commonError": {
+    "description": "web: common.error"
+  },
+  "commonBack": "Back",
+  "@commonBack": {
+    "description": "web: common.back"
+  },
+  "commonSearch": "Search",
+  "@commonSearch": {
+    "description": "web: common.search"
+  },
+  "commonOptional": "(optional)",
+  "@commonOptional": {
+    "description": "web: common.optional"
+  },
+  "commonClose": "Close",
+  "@commonClose": {
+    "description": "web: common.close"
+  },
+  "commonRetry": "Retry",
+  "@commonRetry": {
+    "description": "web: common.retry"
+  },
+  "navAppName": "Task Management",
+  "@navAppName": {
+    "description": "web: nav.appName"
+  },
+  "navSectionOverview": "Overview",
+  "@navSectionOverview": {
+    "description": "web: nav.sectionOverview"
+  },
+  "navDashboard": "Dashboard",
+  "@navDashboard": {
+    "description": "web: nav.dashboard"
+  },
+  "navAnalytics": "Analytics",
+  "@navAnalytics": {
+    "description": "web: nav.analytics"
+  },
+  "navOrganization": "Organization",
+  "@navOrganization": {
+    "description": "web: nav.organization"
+  },
+  "navProjects": "Projects",
+  "@navProjects": {
+    "description": "web: nav.projects"
+  },
+  "navSectionFinance": "Finance",
+  "@navSectionFinance": {
+    "description": "web: nav.sectionFinance"
+  },
+  "navTransactions": "Transactions",
+  "@navTransactions": {
+    "description": "web: nav.transactions"
+  },
+  "navInvoices": "Invoices",
+  "@navInvoices": {
+    "description": "web: nav.invoices"
+  },
+  "navPayments": "Payments",
+  "@navPayments": {
+    "description": "web: nav.payments"
+  },
+  "navSectionTeam": "Team",
+  "@navSectionTeam": {
+    "description": "web: nav.sectionTeam"
+  },
+  "navCreateTeam": "Create team",
+  "@navCreateTeam": {
+    "description": "web: nav.createTeam"
+  },
+  "navTeamList": "Team",
+  "@navTeamList": {
+    "description": "web: nav.teamList"
+  },
+  "navMembers": "Members",
+  "@navMembers": {
+    "description": "web: nav.members"
+  },
+  "navPermissions": "Permissions",
+  "@navPermissions": {
+    "description": "web: nav.permissions"
+  },
+  "navChat": "Chat",
+  "@navChat": {
+    "description": "web: nav.chat"
+  },
+  "navMeetings": "Meetings",
+  "@navMeetings": {
+    "description": "web: nav.meetings"
+  },
+  "navSettings": "Settings",
+  "@navSettings": {
+    "description": "web: nav.settings"
+  },
+  "navHelp": "Help",
+  "@navHelp": {
+    "description": "web: nav.help"
+  },
+  "topnavOpenSidebar": "Open sidebar",
+  "@topnavOpenSidebar": {
+    "description": "web: topnav.openSidebar"
+  },
+  "topnavCloseSidebar": "Close sidebar",
+  "@topnavCloseSidebar": {
+    "description": "web: topnav.closeSidebar"
+  },
+  "topnavBreadcrumb": "Breadcrumb",
+  "@topnavBreadcrumb": {
+    "description": "web: topnav.breadcrumb"
+  },
+  "topnavOpenUserMenu": "Open user menu",
+  "@topnavOpenUserMenu": {
+    "description": "web: topnav.openUserMenu"
+  },
+  "topnavSignIn": "Sign in",
+  "@topnavSignIn": {
+    "description": "web: topnav.signIn"
+  },
+  "topnavThemeLight": "Light",
+  "@topnavThemeLight": {
+    "description": "web: topnav.themeLight"
+  },
+  "topnavThemeDark": "Dark",
+  "@topnavThemeDark": {
+    "description": "web: topnav.themeDark"
+  },
+  "topnavThemeSystem": "System",
+  "@topnavThemeSystem": {
+    "description": "web: topnav.themeSystem"
+  },
+  "topnavLanguage": "Language",
+  "@topnavLanguage": {
+    "description": "web: topnav.language"
+  },
+  "authLoginTitle": "Sign in",
+  "@authLoginTitle": {
+    "description": "web: auth.login.title"
+  },
+  "authLoginSubtitle": "Welcome back to Task Management",
+  "@authLoginSubtitle": {
+    "description": "web: auth.login.subtitle"
+  },
+  "authLoginEmailLabel": "Email",
+  "@authLoginEmailLabel": {
+    "description": "web: auth.login.emailLabel"
+  },
+  "authLoginEmailPlaceholder": "you@taskmanagement.app",
+  "@authLoginEmailPlaceholder": {
+    "description": "web: auth.login.emailPlaceholder"
+  },
+  "authLoginPasswordLabel": "Password",
+  "@authLoginPasswordLabel": {
+    "description": "web: auth.login.passwordLabel"
+  },
+  "authLoginPasswordPlaceholder": "••••••••",
+  "@authLoginPasswordPlaceholder": {
+    "description": "web: auth.login.passwordPlaceholder"
+  },
+  "authLoginForgotPassword": "Forgot password?",
+  "@authLoginForgotPassword": {
+    "description": "web: auth.login.forgotPassword"
+  },
+  "authLoginShowPassword": "Show password",
+  "@authLoginShowPassword": {
+    "description": "web: auth.login.showPassword"
+  },
+  "authLoginHidePassword": "Hide password",
+  "@authLoginHidePassword": {
+    "description": "web: auth.login.hidePassword"
+  },
+  "authLoginSubmit": "Sign in",
+  "@authLoginSubmit": {
+    "description": "web: auth.login.submit"
+  },
+  "authLoginSubmitting": "Signing in…",
+  "@authLoginSubmitting": {
+    "description": "web: auth.login.submitting"
+  },
+  "authLoginNoAccount": "No account yet?",
+  "@authLoginNoAccount": {
+    "description": "web: auth.login.noAccount"
+  },
+  "authLoginRegister": "Register",
+  "@authLoginRegister": {
+    "description": "web: auth.login.register"
+  },
+  "authLoginFirebaseNotConfigured": "Firebase is not configured. Create .env.local from .env.local.example.",
+  "@authLoginFirebaseNotConfigured": {
+    "description": "web: auth.login.firebaseNotConfigured"
+  },
+  "authLoginForgotEmailPrompt": "Enter your email above then click \"Forgot password\" to get a reset link.",
+  "@authLoginForgotEmailPrompt": {
+    "description": "web: auth.login.forgotEmailPrompt"
+  },
+  "authLoginResetEmailSent": "Reset email sent. Check your inbox.",
+  "@authLoginResetEmailSent": {
+    "description": "web: auth.login.resetEmailSent"
+  },
+  "authRegisterTitle": "Create account",
+  "@authRegisterTitle": {
+    "description": "web: auth.register.title"
+  },
+  "authRegisterSubtitle": "Start managing your projects and tasks",
+  "@authRegisterSubtitle": {
+    "description": "web: auth.register.subtitle"
+  },
+  "authRegisterFullNameLabel": "Full name",
+  "@authRegisterFullNameLabel": {
+    "description": "web: auth.register.fullNameLabel"
+  },
+  "authRegisterFullNamePlaceholder": "e.g. John Doe",
+  "@authRegisterFullNamePlaceholder": {
+    "description": "web: auth.register.fullNamePlaceholder"
+  },
+  "authRegisterEmailLabel": "Email",
+  "@authRegisterEmailLabel": {
+    "description": "web: auth.register.emailLabel"
+  },
+  "authRegisterEmailPlaceholder": "you@taskmanagement.app",
+  "@authRegisterEmailPlaceholder": {
+    "description": "web: auth.register.emailPlaceholder"
+  },
+  "authRegisterPasswordLabel": "Password",
+  "@authRegisterPasswordLabel": {
+    "description": "web: auth.register.passwordLabel"
+  },
+  "authRegisterPasswordPlaceholder": "At least 6 characters",
+  "@authRegisterPasswordPlaceholder": {
+    "description": "web: auth.register.passwordPlaceholder"
+  },
+  "authRegisterConfirmLabel": "Confirm password",
+  "@authRegisterConfirmLabel": {
+    "description": "web: auth.register.confirmLabel"
+  },
+  "authRegisterConfirmPlaceholder": "Re-enter password",
+  "@authRegisterConfirmPlaceholder": {
+    "description": "web: auth.register.confirmPlaceholder"
+  },
+  "authRegisterSubmit": "Sign up",
+  "@authRegisterSubmit": {
+    "description": "web: auth.register.submit"
+  },
+  "authRegisterSubmitting": "Creating account…",
+  "@authRegisterSubmitting": {
+    "description": "web: auth.register.submitting"
+  },
+  "authRegisterDisclaimer": "By creating an account, you agree to Task Management's Terms and Policy.",
+  "@authRegisterDisclaimer": {
+    "description": "web: auth.register.disclaimer"
+  },
+  "authRegisterHaveAccount": "Already have an account?",
+  "@authRegisterHaveAccount": {
+    "description": "web: auth.register.haveAccount"
+  },
+  "authRegisterLogin": "Sign in",
+  "@authRegisterLogin": {
+    "description": "web: auth.register.login"
+  },
+  "authRegisterErrorsFullNameRequired": "Please enter your full name.",
+  "@authRegisterErrorsFullNameRequired": {
+    "description": "web: auth.register.errors.fullNameRequired"
+  },
+  "authRegisterErrorsEmailRequired": "Please enter your email.",
+  "@authRegisterErrorsEmailRequired": {
+    "description": "web: auth.register.errors.emailRequired"
+  },
+  "authRegisterErrorsPasswordMinLength": "Password must be at least 6 characters.",
+  "@authRegisterErrorsPasswordMinLength": {
+    "description": "web: auth.register.errors.passwordMinLength"
+  },
+  "authRegisterErrorsConfirmMismatch": "Password confirmation does not match.",
+  "@authRegisterErrorsConfirmMismatch": {
+    "description": "web: auth.register.errors.confirmMismatch"
+  },
+  "authRegisterErrorsFirebaseNotConfigured": "Firebase is not configured. Create .env.local from .env.local.example.",
+  "@authRegisterErrorsFirebaseNotConfigured": {
+    "description": "web: auth.register.errors.firebaseNotConfigured"
+  },
+  "authVerifyTitle": "Verify email",
+  "@authVerifyTitle": {
+    "description": "web: auth.verify.title"
+  },
+  "authVerifySubtitle": "We sent a verification link to",
+  "@authVerifySubtitle": {
+    "description": "web: auth.verify.subtitle"
+  },
+  "authVerifyInstruction": "Open the email, click the verification link, then come back here and press 'I've verified'. Don't forget to check Spam.",
+  "@authVerifyInstruction": {
+    "description": "web: auth.verify.instruction"
+  },
+  "authVerifyChecking": "Checking…",
+  "@authVerifyChecking": {
+    "description": "web: auth.verify.checking"
+  },
+  "authVerifyIVerified": "I've verified",
+  "@authVerifyIVerified": {
+    "description": "web: auth.verify.iVerified"
+  },
+  "authVerifyResendCountdown": "Resend in {seconds}s",
+  "@authVerifyResendCountdown": {
+    "description": "web: auth.verify.resendCountdown",
+    "placeholders": {
+      "seconds": {
+        "type": "Object"
+      }
+    }
+  },
+  "authVerifyResend": "Resend verification email",
+  "@authVerifyResend": {
+    "description": "web: auth.verify.resend"
+  },
+  "authVerifySignOutAndSwitch": "Sign out and use another account",
+  "@authVerifySignOutAndSwitch": {
+    "description": "web: auth.verify.signOutAndSwitch"
+  },
+  "authVerifySuccess": "Verified! Redirecting…",
+  "@authVerifySuccess": {
+    "description": "web: auth.verify.success"
+  },
+  "authVerifyStillNotVerified": "Email is still not verified. Make sure you clicked the link. If you opened it on another device, sign out and back in to refresh.",
+  "@authVerifyStillNotVerified": {
+    "description": "web: auth.verify.stillNotVerified"
+  },
+  "authVerifyResent": "Verification email re-sent. Check your inbox (and Spam).",
+  "@authVerifyResent": {
+    "description": "web: auth.verify.resent"
+  },
+  "profileStatusActive": "Active",
+  "@profileStatusActive": {
+    "description": "web: profile.statusActive"
+  },
+  "profileStatusAway": "Away",
+  "@profileStatusAway": {
+    "description": "web: profile.statusAway"
+  },
+  "profileStatusOffline": "Offline",
+  "@profileStatusOffline": {
+    "description": "web: profile.statusOffline"
+  },
+  "profileSectionAccount": "Account",
+  "@profileSectionAccount": {
+    "description": "web: profile.sectionAccount"
+  },
+  "profileProfile": "Profile",
+  "@profileProfile": {
+    "description": "web: profile.profile"
+  },
+  "profileSettings": "Settings",
+  "@profileSettings": {
+    "description": "web: profile.settings"
+  },
+  "profileNotifications": "Notifications",
+  "@profileNotifications": {
+    "description": "web: profile.notifications"
+  },
+  "profileSectionSupport": "Support",
+  "@profileSectionSupport": {
+    "description": "web: profile.sectionSupport"
+  },
+  "profileHelp": "Help",
+  "@profileHelp": {
+    "description": "web: profile.help"
+  },
+  "profileTerms": "Terms & Policy",
+  "@profileTerms": {
+    "description": "web: profile.terms"
+  },
+  "profileChangeAvatar": "Change avatar",
+  "@profileChangeAvatar": {
+    "description": "web: profile.changeAvatar"
+  },
+  "profileSignOut": "Sign out",
+  "@profileSignOut": {
+    "description": "web: profile.signOut"
+  },
+  "profileSigningOut": "Signing out…",
+  "@profileSigningOut": {
+    "description": "web: profile.signingOut"
+  },
+  "profileUploadFailed": "Upload failed.",
+  "@profileUploadFailed": {
+    "description": "web: profile.uploadFailed"
+  },
+  "projectsGuestBannerTitle": "You are viewing in guest mode",
+  "@projectsGuestBannerTitle": {
+    "description": "web: projects.guestBannerTitle"
+  },
+  "projectsGuestBannerDesc": "Sign in to see task details for each project, create new projects, and manage your work.",
+  "@projectsGuestBannerDesc": {
+    "description": "web: projects.guestBannerDesc"
+  },
+  "projectsTitle": "Projects",
+  "@projectsTitle": {
+    "description": "web: projects.title"
+  },
+  "projectsCountLabel": "{count} projects",
+  "@projectsCountLabel": {
+    "description": "web: projects.countLabel",
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "projectsCreateNew": "New project",
+  "@projectsCreateNew": {
+    "description": "web: projects.createNew"
+  },
+  "projectsSignInToViewTitle": "Sign in to see your projects",
+  "@projectsSignInToViewTitle": {
+    "description": "web: projects.signInToViewTitle"
+  },
+  "projectsSignInToViewHelp": "Create an account or sign in using the banner above.",
+  "@projectsSignInToViewHelp": {
+    "description": "web: projects.signInToViewHelp"
+  },
+  "projectsLoading": "Loading data…",
+  "@projectsLoading": {
+    "description": "web: projects.loading"
+  },
+  "projectsError": "Error: {message}",
+  "@projectsError": {
+    "description": "web: projects.error",
+    "placeholders": {
+      "message": {
+        "type": "Object"
+      }
+    }
+  },
+  "projectsEmptyTitle": "No projects yet",
+  "@projectsEmptyTitle": {
+    "description": "web: projects.emptyTitle"
+  },
+  "projectsEmptyHelp": "Create your first project to start managing work.",
+  "@projectsEmptyHelp": {
+    "description": "web: projects.emptyHelp"
+  },
+  "projectsCardTasksTotal": "{count} tasks",
+  "@projectsCardTasksTotal": {
+    "description": "web: projects.card.tasksTotal",
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "projectsCardPendingShort": "{count} pending",
+  "@projectsCardPendingShort": {
+    "description": "web: projects.card.pendingShort",
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "projectsCardInProgressShort": "{count} in progress",
+  "@projectsCardInProgressShort": {
+    "description": "web: projects.card.inProgressShort",
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "projectsCardDoneShort": "{count} done",
+  "@projectsCardDoneShort": {
+    "description": "web: projects.card.doneShort",
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "projectsCardProgress": "Progress",
+  "@projectsCardProgress": {
+    "description": "web: projects.card.progress"
+  },
+  "projectsCardViewDetail": "View details",
+  "@projectsCardViewDetail": {
+    "description": "web: projects.card.viewDetail"
+  },
+  "projectDialogCreateTitle": "New project",
+  "@projectDialogCreateTitle": {
+    "description": "web: projectDialog.createTitle"
+  },
+  "projectDialogCreateDesc": "Enter project info to start managing tasks.",
+  "@projectDialogCreateDesc": {
+    "description": "web: projectDialog.createDesc"
+  },
+  "projectDialogNameLabel": "Project name",
+  "@projectDialogNameLabel": {
+    "description": "web: projectDialog.nameLabel"
+  },
+  "projectDialogNamePlaceholder": "e.g. E-commerce website",
+  "@projectDialogNamePlaceholder": {
+    "description": "web: projectDialog.namePlaceholder"
+  },
+  "projectDialogNameRequired": "Project name is required.",
+  "@projectDialogNameRequired": {
+    "description": "web: projectDialog.nameRequired"
+  },
+  "projectDialogDescriptionLabel": "Description",
+  "@projectDialogDescriptionLabel": {
+    "description": "web: projectDialog.descriptionLabel"
+  },
+  "projectDialogDescriptionPlaceholder": "Goals, scope, overall deadline…",
+  "@projectDialogDescriptionPlaceholder": {
+    "description": "web: projectDialog.descriptionPlaceholder"
+  },
+  "projectDialogThumbnailLabel": "Thumbnail (optional)",
+  "@projectDialogThumbnailLabel": {
+    "description": "web: projectDialog.thumbnailLabel"
+  },
+  "projectDialogSubmit": "Create project",
+  "@projectDialogSubmit": {
+    "description": "web: projectDialog.submit"
+  },
+  "teamDialogCreateTitle": "Create team",
+  "@teamDialogCreateTitle": {
+    "description": "web: teamDialog.createTitle"
+  },
+  "teamDialogCreateDesc": "Create a team to collaborate and share projects with members.",
+  "@teamDialogCreateDesc": {
+    "description": "web: teamDialog.createDesc"
+  },
+  "teamDialogNameLabel": "Team name",
+  "@teamDialogNameLabel": {
+    "description": "web: teamDialog.nameLabel"
+  },
+  "teamDialogNamePlaceholder": "e.g. Marketing Team",
+  "@teamDialogNamePlaceholder": {
+    "description": "web: teamDialog.namePlaceholder"
+  },
+  "teamDialogNameRequired": "Team name is required.",
+  "@teamDialogNameRequired": {
+    "description": "web: teamDialog.nameRequired"
+  },
+  "teamDialogDescriptionLabel": "Description",
+  "@teamDialogDescriptionLabel": {
+    "description": "web: teamDialog.descriptionLabel"
+  },
+  "teamDialogDescriptionPlaceholder": "What is this team about?",
+  "@teamDialogDescriptionPlaceholder": {
+    "description": "web: teamDialog.descriptionPlaceholder"
+  },
+  "teamDialogAvatarLabel": "Team avatar (optional)",
+  "@teamDialogAvatarLabel": {
+    "description": "web: teamDialog.avatarLabel"
+  },
+  "teamDialogVisibilityLabel": "Visibility",
+  "@teamDialogVisibilityLabel": {
+    "description": "web: teamDialog.visibilityLabel"
+  },
+  "teamDialogVisibilityPrivate": "Private",
+  "@teamDialogVisibilityPrivate": {
+    "description": "web: teamDialog.visibilityPrivate"
+  },
+  "teamDialogVisibilityPrivateHint": "Only invited members can see and join.",
+  "@teamDialogVisibilityPrivateHint": {
+    "description": "web: teamDialog.visibilityPrivateHint"
+  },
+  "teamDialogVisibilityPublic": "Public",
+  "@teamDialogVisibilityPublic": {
+    "description": "web: teamDialog.visibilityPublic"
+  },
+  "teamDialogVisibilityPublicHint": "Anyone in the workspace can find this team.",
+  "@teamDialogVisibilityPublicHint": {
+    "description": "web: teamDialog.visibilityPublicHint"
+  },
+  "teamDialogInviteLabel": "Invite members (optional)",
+  "@teamDialogInviteLabel": {
+    "description": "web: teamDialog.inviteLabel"
+  },
+  "teamDialogInvitePlaceholder": "Enter an email and press Enter",
+  "@teamDialogInvitePlaceholder": {
+    "description": "web: teamDialog.invitePlaceholder"
+  },
+  "teamDialogInviteHint": "Invitations are sent by email. You can also invite later.",
+  "@teamDialogInviteHint": {
+    "description": "web: teamDialog.inviteHint"
+  },
+  "teamDialogInviteInvalid": "Invalid email address.",
+  "@teamDialogInviteInvalid": {
+    "description": "web: teamDialog.inviteInvalid"
+  },
+  "teamDialogSubmit": "Create team",
+  "@teamDialogSubmit": {
+    "description": "web: teamDialog.submit"
+  },
+  "teamDialogCreating": "Creating…",
+  "@teamDialogCreating": {
+    "description": "web: teamDialog.creating"
+  },
+  "teamDialogCreateError": "Failed to create team. Please try again.",
+  "@teamDialogCreateError": {
+    "description": "web: teamDialog.createError"
+  },
+  "teamsListTitle": "Teams",
+  "@teamsListTitle": {
+    "description": "web: teamsList.title"
+  },
+  "teamsListCountLabel": "{count} teams",
+  "@teamsListCountLabel": {
+    "description": "web: teamsList.countLabel",
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "teamsListLoading": "Loading teams…",
+  "@teamsListLoading": {
+    "description": "web: teamsList.loading"
+  },
+  "teamsListError": "Failed to load: {message}",
+  "@teamsListError": {
+    "description": "web: teamsList.error",
+    "placeholders": {
+      "message": {
+        "type": "Object"
+      }
+    }
+  },
+  "teamsListEmptyTitle": "No teams yet",
+  "@teamsListEmptyTitle": {
+    "description": "web: teamsList.emptyTitle"
+  },
+  "teamsListEmptyHelp": "Create a team using the + button in the sidebar to get started.",
+  "@teamsListEmptyHelp": {
+    "description": "web: teamsList.emptyHelp"
+  },
+  "teamsListLoadMore": "Load more",
+  "@teamsListLoadMore": {
+    "description": "web: teamsList.loadMore"
+  },
+  "teamsListLoadingMore": "Loading…",
+  "@teamsListLoadingMore": {
+    "description": "web: teamsList.loadingMore"
+  },
+  "teamsListEndOfList": "You've reached the end.",
+  "@teamsListEndOfList": {
+    "description": "web: teamsList.endOfList"
+  },
+  "teamsListCardMembersCount": "{count} members",
+  "@teamsListCardMembersCount": {
+    "description": "web: teamsList.card.membersCount",
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "teamsListCardVisibilityPrivate": "Private",
+  "@teamsListCardVisibilityPrivate": {
+    "description": "web: teamsList.card.visibilityPrivate"
+  },
+  "teamsListCardVisibilityPublic": "Public",
+  "@teamsListCardVisibilityPublic": {
+    "description": "web: teamsList.card.visibilityPublic"
+  },
+  "teamsListCardRoleOwner": "Owner",
+  "@teamsListCardRoleOwner": {
+    "description": "web: teamsList.card.roleOwner"
+  },
+  "teamsListCardRoleAdmin": "Admin",
+  "@teamsListCardRoleAdmin": {
+    "description": "web: teamsList.card.roleAdmin"
+  },
+  "teamsListCardRoleMember": "Member",
+  "@teamsListCardRoleMember": {
+    "description": "web: teamsList.card.roleMember"
+  },
+  "teamsListDeleteAria": "Delete team",
+  "@teamsListDeleteAria": {
+    "description": "web: teamsList.deleteAria"
+  },
+  "teamsListDeleteTitle": "Delete team",
+  "@teamsListDeleteTitle": {
+    "description": "web: teamsList.deleteTitle"
+  },
+  "teamsListDeleteMessage": "Are you sure you want to delete the team \"{name}\"? This action cannot be undone.",
+  "@teamsListDeleteMessage": {
+    "description": "web: teamsList.deleteMessage",
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "teamsListDeleteConfirmWord": "DELETE",
+  "@teamsListDeleteConfirmWord": {
+    "description": "web: teamsList.deleteConfirmWord"
+  },
+  "teamsListDeleteConfirmPrompt": "Type {word} to confirm deletion.",
+  "@teamsListDeleteConfirmPrompt": {
+    "description": "web: teamsList.deleteConfirmPrompt",
+    "placeholders": {
+      "word": {
+        "type": "Object"
+      }
+    }
+  },
+  "teamsListDeletePlaceholder": "Type {word}",
+  "@teamsListDeletePlaceholder": {
+    "description": "web: teamsList.deletePlaceholder",
+    "placeholders": {
+      "word": {
+        "type": "Object"
+      }
+    }
+  },
+  "teamsListDeleteSubmit": "Delete team",
+  "@teamsListDeleteSubmit": {
+    "description": "web: teamsList.deleteSubmit"
+  },
+  "teamsListDeleting": "Deleting…",
+  "@teamsListDeleting": {
+    "description": "web: teamsList.deleting"
+  },
+  "teamsListDeleteError": "Failed to delete team. Please try again.",
+  "@teamsListDeleteError": {
+    "description": "web: teamsList.deleteError"
+  },
+  "membersListTitle": "Members",
+  "@membersListTitle": {
+    "description": "web: membersList.title"
+  },
+  "membersListSubtitle": "All users in the system",
+  "@membersListSubtitle": {
+    "description": "web: membersList.subtitle"
+  },
+  "membersListCountLabel": "{count} users",
+  "@membersListCountLabel": {
+    "description": "web: membersList.countLabel",
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "membersListSearchPlaceholder": "Search by name or email…",
+  "@membersListSearchPlaceholder": {
+    "description": "web: membersList.searchPlaceholder"
+  },
+  "membersListLoading": "Loading members…",
+  "@membersListLoading": {
+    "description": "web: membersList.loading"
+  },
+  "membersListError": "Failed to load: {message}",
+  "@membersListError": {
+    "description": "web: membersList.error",
+    "placeholders": {
+      "message": {
+        "type": "Object"
+      }
+    }
+  },
+  "membersListEmptyTitle": "No users yet",
+  "@membersListEmptyTitle": {
+    "description": "web: membersList.emptyTitle"
+  },
+  "membersListEmptyHelp": "There is no user data.",
+  "@membersListEmptyHelp": {
+    "description": "web: membersList.emptyHelp"
+  },
+  "membersListEmptyHelpSearch": "No users match your search.",
+  "@membersListEmptyHelpSearch": {
+    "description": "web: membersList.emptyHelpSearch"
+  },
+  "membersListLoadMore": "Load more",
+  "@membersListLoadMore": {
+    "description": "web: membersList.loadMore"
+  },
+  "membersListLoadingMore": "Loading…",
+  "@membersListLoadingMore": {
+    "description": "web: membersList.loadingMore"
+  },
+  "membersListEndOfList": "End of list.",
+  "@membersListEndOfList": {
+    "description": "web: membersList.endOfList"
+  },
+  "membersListRoleAdmin": "Admin",
+  "@membersListRoleAdmin": {
+    "description": "web: membersList.roleAdmin"
+  },
+  "membersListRoleUser": "Customer",
+  "@membersListRoleUser": {
+    "description": "web: membersList.roleUser"
+  },
+  "membersListTeamCountLabel": "{count} teams",
+  "@membersListTeamCountLabel": {
+    "description": "web: membersList.teamCountLabel",
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "membersListVerified": "Verified",
+  "@membersListVerified": {
+    "description": "web: membersList.verified"
+  },
+  "membersListUnverified": "Unverified",
+  "@membersListUnverified": {
+    "description": "web: membersList.unverified"
+  },
+  "membersListYou": "You",
+  "@membersListYou": {
+    "description": "web: membersList.you"
+  },
+  "membersListActionEdit": "Edit",
+  "@membersListActionEdit": {
+    "description": "web: membersList.actionEdit"
+  },
+  "membersListActionManageTeams": "Manage teams",
+  "@membersListActionManageTeams": {
+    "description": "web: membersList.actionManageTeams"
+  },
+  "membersListEditTitle": "Edit user",
+  "@membersListEditTitle": {
+    "description": "web: membersList.edit.title"
+  },
+  "membersListEditDesc": "Update display name and system role.",
+  "@membersListEditDesc": {
+    "description": "web: membersList.edit.desc"
+  },
+  "membersListEditNameLabel": "Display name",
+  "@membersListEditNameLabel": {
+    "description": "web: membersList.edit.nameLabel"
+  },
+  "membersListEditNamePlaceholder": "Enter display name",
+  "@membersListEditNamePlaceholder": {
+    "description": "web: membersList.edit.namePlaceholder"
+  },
+  "membersListEditRoleLabel": "System role",
+  "@membersListEditRoleLabel": {
+    "description": "web: membersList.edit.roleLabel"
+  },
+  "membersListEditRoleAdmin": "Admin",
+  "@membersListEditRoleAdmin": {
+    "description": "web: membersList.edit.roleAdmin"
+  },
+  "membersListEditRoleUser": "Customer",
+  "@membersListEditRoleUser": {
+    "description": "web: membersList.edit.roleUser"
+  },
+  "membersListEditSubmit": "Save changes",
+  "@membersListEditSubmit": {
+    "description": "web: membersList.edit.submit"
+  },
+  "membersListEditError": "Update failed. Please try again.",
+  "@membersListEditError": {
+    "description": "web: membersList.edit.error"
+  },
+  "membersListTeamsTitle": "{name}'s teams",
+  "@membersListTeamsTitle": {
+    "description": "web: membersList.teams.title",
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "membersListTeamsDesc": "Add or remove the user from teams.",
+  "@membersListTeamsDesc": {
+    "description": "web: membersList.teams.desc"
+  },
+  "membersListTeamsLoading": "Loading teams…",
+  "@membersListTeamsLoading": {
+    "description": "web: membersList.teams.loading"
+  },
+  "membersListTeamsEmpty": "This user is not in any team.",
+  "@membersListTeamsEmpty": {
+    "description": "web: membersList.teams.empty"
+  },
+  "membersListTeamsOwnerBadge": "Owner",
+  "@membersListTeamsOwnerBadge": {
+    "description": "web: membersList.teams.ownerBadge"
+  },
+  "membersListTeamsRoleAdmin": "Admin",
+  "@membersListTeamsRoleAdmin": {
+    "description": "web: membersList.teams.roleAdmin"
+  },
+  "membersListTeamsRoleMember": "Member",
+  "@membersListTeamsRoleMember": {
+    "description": "web: membersList.teams.roleMember"
+  },
+  "membersListTeamsRemove": "Remove from team",
+  "@membersListTeamsRemove": {
+    "description": "web: membersList.teams.remove"
+  },
+  "membersListTeamsRemoveError": "Failed to remove from team. Please try again.",
+  "@membersListTeamsRemoveError": {
+    "description": "web: membersList.teams.removeError"
+  },
+  "membersListTeamsRemoving": "Removing…",
+  "@membersListTeamsRemoving": {
+    "description": "web: membersList.teams.removing"
+  },
+  "membersListTeamsAddTitle": "Add to team",
+  "@membersListTeamsAddTitle": {
+    "description": "web: membersList.teams.addTitle"
+  },
+  "membersListTeamsSelectTeamLabel": "Select team",
+  "@membersListTeamsSelectTeamLabel": {
+    "description": "web: membersList.teams.selectTeamLabel"
+  },
+  "membersListTeamsSelectTeamPlaceholder": "— Select a team —",
+  "@membersListTeamsSelectTeamPlaceholder": {
+    "description": "web: membersList.teams.selectTeamPlaceholder"
+  },
+  "membersListTeamsSearchPlaceholder": "Search teams…",
+  "@membersListTeamsSearchPlaceholder": {
+    "description": "web: membersList.teams.searchPlaceholder"
+  },
+  "membersListTeamsNoTeams": "No matching teams.",
+  "@membersListTeamsNoTeams": {
+    "description": "web: membersList.teams.noTeams"
+  },
+  "membersListTeamsAddRoleLabel": "Role in team",
+  "@membersListTeamsAddRoleLabel": {
+    "description": "web: membersList.teams.addRoleLabel"
+  },
+  "membersListTeamsAddRoleMember": "Member",
+  "@membersListTeamsAddRoleMember": {
+    "description": "web: membersList.teams.addRoleMember"
+  },
+  "membersListTeamsAddRoleAdmin": "Admin",
+  "@membersListTeamsAddRoleAdmin": {
+    "description": "web: membersList.teams.addRoleAdmin"
+  },
+  "membersListTeamsAddSubmit": "Add to team",
+  "@membersListTeamsAddSubmit": {
+    "description": "web: membersList.teams.addSubmit"
+  },
+  "membersListTeamsAdding": "Adding…",
+  "@membersListTeamsAdding": {
+    "description": "web: membersList.teams.adding"
+  },
+  "membersListTeamsAddError": "Failed to add to team. Please try again.",
+  "@membersListTeamsAddError": {
+    "description": "web: membersList.teams.addError"
+  },
+  "teamDetailLoading": "Loading team…",
+  "@teamDetailLoading": {
+    "description": "web: teamDetail.loading"
+  },
+  "teamDetailError": "Failed to load: {message}",
+  "@teamDetailError": {
+    "description": "web: teamDetail.error",
+    "placeholders": {
+      "message": {
+        "type": "Object"
+      }
+    }
+  },
+  "teamDetailNotFound": "Team not found.",
+  "@teamDetailNotFound": {
+    "description": "web: teamDetail.notFound"
+  },
+  "teamDetailVisibilityPrivate": "Private",
+  "@teamDetailVisibilityPrivate": {
+    "description": "web: teamDetail.visibilityPrivate"
+  },
+  "teamDetailVisibilityPublic": "Public",
+  "@teamDetailVisibilityPublic": {
+    "description": "web: teamDetail.visibilityPublic"
+  },
+  "teamDetailMembersTitle": "Members",
+  "@teamDetailMembersTitle": {
+    "description": "web: teamDetail.membersTitle"
+  },
+  "teamDetailMembersCount": "{count} members",
+  "@teamDetailMembersCount": {
+    "description": "web: teamDetail.membersCount",
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "teamDetailRoleOwner": "Owner",
+  "@teamDetailRoleOwner": {
+    "description": "web: teamDetail.roleOwner"
+  },
+  "teamDetailRoleAdmin": "Admin",
+  "@teamDetailRoleAdmin": {
+    "description": "web: teamDetail.roleAdmin"
+  },
+  "teamDetailRoleMember": "Member",
+  "@teamDetailRoleMember": {
+    "description": "web: teamDetail.roleMember"
+  },
+  "teamDetailYou": "You",
+  "@teamDetailYou": {
+    "description": "web: teamDetail.you"
+  },
+  "teamDetailMakeAdmin": "Make admin",
+  "@teamDetailMakeAdmin": {
+    "description": "web: teamDetail.makeAdmin"
+  },
+  "teamDetailMakeMember": "Set as member",
+  "@teamDetailMakeMember": {
+    "description": "web: teamDetail.makeMember"
+  },
+  "teamDetailRemoveMember": "Remove",
+  "@teamDetailRemoveMember": {
+    "description": "web: teamDetail.removeMember"
+  },
+  "teamDetailRemoveConfirm": "Remove this member from the team?",
+  "@teamDetailRemoveConfirm": {
+    "description": "web: teamDetail.removeConfirm"
+  },
+  "teamDetailLeaveTeam": "Leave team",
+  "@teamDetailLeaveTeam": {
+    "description": "web: teamDetail.leaveTeam"
+  },
+  "teamDetailLeaveConfirm": "Are you sure you want to leave this team?",
+  "@teamDetailLeaveConfirm": {
+    "description": "web: teamDetail.leaveConfirm"
+  },
+  "teamDetailInviteTitle": "Add / invite members",
+  "@teamDetailInviteTitle": {
+    "description": "web: teamDetail.inviteTitle"
+  },
+  "teamDetailInvitePlaceholder": "Enter an email and press Enter",
+  "@teamDetailInvitePlaceholder": {
+    "description": "web: teamDetail.invitePlaceholder"
+  },
+  "teamDetailInviteHint": "Invitations are sent by email. Added emails appear as pending below.",
+  "@teamDetailInviteHint": {
+    "description": "web: teamDetail.inviteHint"
+  },
+  "teamDetailInviteSubmit": "Send invites",
+  "@teamDetailInviteSubmit": {
+    "description": "web: teamDetail.inviteSubmit"
+  },
+  "teamDetailInviteSending": "Sending…",
+  "@teamDetailInviteSending": {
+    "description": "web: teamDetail.inviteSending"
+  },
+  "teamDetailInviteInvalid": "Invalid email address.",
+  "@teamDetailInviteInvalid": {
+    "description": "web: teamDetail.inviteInvalid"
+  },
+  "teamDetailInviteError": "Failed to send invites. Please try again.",
+  "@teamDetailInviteError": {
+    "description": "web: teamDetail.inviteError"
+  },
+  "teamDetailPendingTitle": "Pending invites",
+  "@teamDetailPendingTitle": {
+    "description": "web: teamDetail.pendingTitle"
+  },
+  "teamDetailPendingEmpty": "No pending invites.",
+  "@teamDetailPendingEmpty": {
+    "description": "web: teamDetail.pendingEmpty"
+  },
+  "teamDetailStatusPending": "Pending",
+  "@teamDetailStatusPending": {
+    "description": "web: teamDetail.statusPending"
+  },
+  "teamDetailCancelInvite": "Cancel",
+  "@teamDetailCancelInvite": {
+    "description": "web: teamDetail.cancelInvite"
+  },
+  "teamDetailProjectsTitle": "Projects",
+  "@teamDetailProjectsTitle": {
+    "description": "web: teamDetail.projectsTitle"
+  },
+  "teamDetailProjectsEmpty": "No projects assigned to this team yet.",
+  "@teamDetailProjectsEmpty": {
+    "description": "web: teamDetail.projectsEmpty"
+  },
+  "teamDetailAddProject": "Add project",
+  "@teamDetailAddProject": {
+    "description": "web: teamDetail.addProject"
+  },
+  "teamDetailRemoveProject": "Remove",
+  "@teamDetailRemoveProject": {
+    "description": "web: teamDetail.removeProject"
+  },
+  "teamDetailRemoveProjectConfirm": "Remove this project from the team?",
+  "@teamDetailRemoveProjectConfirm": {
+    "description": "web: teamDetail.removeProjectConfirm"
+  },
+  "teamDetailAddProjectTitle": "Add project to team",
+  "@teamDetailAddProjectTitle": {
+    "description": "web: teamDetail.addProjectTitle"
+  },
+  "teamDetailAddProjectDesc": "Choose one of your projects to add to this team.",
+  "@teamDetailAddProjectDesc": {
+    "description": "web: teamDetail.addProjectDesc"
+  },
+  "teamDetailAddProjectEmpty": "You have no projects available to add.",
+  "@teamDetailAddProjectEmpty": {
+    "description": "web: teamDetail.addProjectEmpty"
+  },
+  "teamDetailAddProjectSubmit": "Add",
+  "@teamDetailAddProjectSubmit": {
+    "description": "web: teamDetail.addProjectSubmit"
+  },
+  "teamDetailAddingProject": "Adding…",
+  "@teamDetailAddingProject": {
+    "description": "web: teamDetail.addingProject"
+  },
+  "teamDetailAddProjectError": "Failed to add project. Please try again.",
+  "@teamDetailAddProjectError": {
+    "description": "web: teamDetail.addProjectError"
+  },
+  "invitePageTitle": "Team invitation",
+  "@invitePageTitle": {
+    "description": "web: invitePage.title"
+  },
+  "invitePageDescription": "You've been invited to join a team. Accept to become a member.",
+  "@invitePageDescription": {
+    "description": "web: invitePage.description"
+  },
+  "invitePageMissingToken": "Invalid or missing invitation link.",
+  "@invitePageMissingToken": {
+    "description": "web: invitePage.missingToken"
+  },
+  "invitePageSignInRequired": "Please sign in to accept this invitation.",
+  "@invitePageSignInRequired": {
+    "description": "web: invitePage.signInRequired"
+  },
+  "invitePageSignInButton": "Sign in",
+  "@invitePageSignInButton": {
+    "description": "web: invitePage.signInButton"
+  },
+  "invitePageAccept": "Accept invitation",
+  "@invitePageAccept": {
+    "description": "web: invitePage.accept"
+  },
+  "invitePageAccepting": "Accepting…",
+  "@invitePageAccepting": {
+    "description": "web: invitePage.accepting"
+  },
+  "invitePageSuccessTitle": "You've joined the team!",
+  "@invitePageSuccessTitle": {
+    "description": "web: invitePage.successTitle"
+  },
+  "invitePageSuccessDesc": "You are now a member of this team.",
+  "@invitePageSuccessDesc": {
+    "description": "web: invitePage.successDesc"
+  },
+  "invitePageGoToTeam": "Go to team",
+  "@invitePageGoToTeam": {
+    "description": "web: invitePage.goToTeam"
+  },
+  "invitePageErrorTitle": "Could not accept invitation",
+  "@invitePageErrorTitle": {
+    "description": "web: invitePage.errorTitle"
+  },
+  "invitePageBackToTeams": "Back to teams",
+  "@invitePageBackToTeams": {
+    "description": "web: invitePage.backToTeams"
+  },
+  "tasksTitle": "Task Manager",
+  "@tasksTitle": {
+    "description": "web: tasks.title"
+  },
+  "tasksCreateNew": "New task",
+  "@tasksCreateNew": {
+    "description": "web: tasks.createNew"
+  },
+  "tasksCreateShort": "New task",
+  "@tasksCreateShort": {
+    "description": "web: tasks.createShort"
+  },
+  "tasksFilterAll": "All",
+  "@tasksFilterAll": {
+    "description": "web: tasks.filterAll"
+  },
+  "tasksSearchPlaceholder": "Search tasks by name, tag, assignee…",
+  "@tasksSearchPlaceholder": {
+    "description": "web: tasks.searchPlaceholder"
+  },
+  "tasksLoading": "Loading data…",
+  "@tasksLoading": {
+    "description": "web: tasks.loading"
+  },
+  "tasksErrorPrefix": "Error: {message}",
+  "@tasksErrorPrefix": {
+    "description": "web: tasks.errorPrefix",
+    "placeholders": {
+      "message": {
+        "type": "Object"
+      }
+    }
+  },
+  "tasksEmptyTitle": "No tasks",
+  "@tasksEmptyTitle": {
+    "description": "web: tasks.emptyTitle"
+  },
+  "tasksEmptyHelp": "Create your first task to start managing your work.",
+  "@tasksEmptyHelp": {
+    "description": "web: tasks.emptyHelp"
+  },
+  "tasksEmptyHelpSearch": "Try a different keyword or clear filters.",
+  "@tasksEmptyHelpSearch": {
+    "description": "web: tasks.emptyHelpSearch"
+  },
+  "tasksStatusPending": "Pending",
+  "@tasksStatusPending": {
+    "description": "web: tasks.status.pending"
+  },
+  "tasksStatusInProgress": "In progress",
+  "@tasksStatusInProgress": {
+    "description": "web: tasks.status.inProgress"
+  },
+  "tasksStatusCompleted": "Completed",
+  "@tasksStatusCompleted": {
+    "description": "web: tasks.status.completed"
+  },
+  "tasksPriorityLabel": "Priority: {value}",
+  "@tasksPriorityLabel": {
+    "description": "web: tasks.priority.label",
+    "placeholders": {
+      "value": {
+        "type": "Object"
+      }
+    }
+  },
+  "tasksPriorityLow": "Low",
+  "@tasksPriorityLow": {
+    "description": "web: tasks.priority.low"
+  },
+  "tasksPriorityMedium": "Medium",
+  "@tasksPriorityMedium": {
+    "description": "web: tasks.priority.medium"
+  },
+  "tasksPriorityHigh": "High",
+  "@tasksPriorityHigh": {
+    "description": "web: tasks.priority.high"
+  },
+  "taskDialogCreateTitle": "New task",
+  "@taskDialogCreateTitle": {
+    "description": "web: taskDialog.createTitle"
+  },
+  "taskDialogEditTitle": "Edit task",
+  "@taskDialogEditTitle": {
+    "description": "web: taskDialog.editTitle"
+  },
+  "taskDialogDescription": "Enter the task details.",
+  "@taskDialogDescription": {
+    "description": "web: taskDialog.description"
+  },
+  "taskDialogNoLabel": "Number",
+  "@taskDialogNoLabel": {
+    "description": "web: taskDialog.noLabel"
+  },
+  "taskDialogNoPlaceholder": "e.g. 6",
+  "@taskDialogNoPlaceholder": {
+    "description": "web: taskDialog.noPlaceholder"
+  },
+  "taskDialogNoRequired": "Number is required.",
+  "@taskDialogNoRequired": {
+    "description": "web: taskDialog.noRequired"
+  },
+  "taskDialogNoInvalid": "Number must be a positive integer.",
+  "@taskDialogNoInvalid": {
+    "description": "web: taskDialog.noInvalid"
+  },
+  "taskDialogNoMustGtZero": "Number must be greater than 0.",
+  "@taskDialogNoMustGtZero": {
+    "description": "web: taskDialog.noMustGtZero"
+  },
+  "taskDialogNoDuplicate": "Number #{value} already exists in this project.",
+  "@taskDialogNoDuplicate": {
+    "description": "web: taskDialog.noDuplicate",
+    "placeholders": {
+      "value": {
+        "type": "Object"
+      }
+    }
+  },
+  "taskDialogNoHint": "Suggested: #{value}",
+  "@taskDialogNoHint": {
+    "description": "web: taskDialog.noHint",
+    "placeholders": {
+      "value": {
+        "type": "Object"
+      }
+    }
+  },
+  "taskDialogTitleLabel": "Title",
+  "@taskDialogTitleLabel": {
+    "description": "web: taskDialog.titleLabel"
+  },
+  "taskDialogTitlePlaceholder": "e.g. Finish weekly report",
+  "@taskDialogTitlePlaceholder": {
+    "description": "web: taskDialog.titlePlaceholder"
+  },
+  "taskDialogTitleRequired": "Title is required.",
+  "@taskDialogTitleRequired": {
+    "description": "web: taskDialog.titleRequired"
+  },
+  "taskDialogDescriptionLabel": "Description",
+  "@taskDialogDescriptionLabel": {
+    "description": "web: taskDialog.descriptionLabel"
+  },
+  "taskDialogDescriptionPlaceholder": "Work details, notes…",
+  "@taskDialogDescriptionPlaceholder": {
+    "description": "web: taskDialog.descriptionPlaceholder"
+  },
+  "taskDialogStatusLabel": "Status",
+  "@taskDialogStatusLabel": {
+    "description": "web: taskDialog.statusLabel"
+  },
+  "taskDialogPriorityLabel": "Priority",
+  "@taskDialogPriorityLabel": {
+    "description": "web: taskDialog.priorityLabel"
+  },
+  "taskDialogStartDateLabel": "Start date",
+  "@taskDialogStartDateLabel": {
+    "description": "web: taskDialog.startDateLabel"
+  },
+  "taskDialogDueDateLabel": "Due date",
+  "@taskDialogDueDateLabel": {
+    "description": "web: taskDialog.dueDateLabel"
+  },
+  "taskDialogAssigneeLabel": "Assignee",
+  "@taskDialogAssigneeLabel": {
+    "description": "web: taskDialog.assigneeLabel"
+  },
+  "taskDialogAssigneePlaceholder": "e.g. John",
+  "@taskDialogAssigneePlaceholder": {
+    "description": "web: taskDialog.assigneePlaceholder"
+  },
+  "taskDialogTagsLabel": "Tags (comma separated)",
+  "@taskDialogTagsLabel": {
+    "description": "web: taskDialog.tagsLabel"
+  },
+  "taskDialogTagsPlaceholder": "backend, urgent",
+  "@taskDialogTagsPlaceholder": {
+    "description": "web: taskDialog.tagsPlaceholder"
+  },
+  "taskDialogThumbnailLabel": "Thumbnail (optional)",
+  "@taskDialogThumbnailLabel": {
+    "description": "web: taskDialog.thumbnailLabel"
+  },
+  "taskDialogSubmitCreate": "Create task",
+  "@taskDialogSubmitCreate": {
+    "description": "web: taskDialog.submitCreate"
+  },
+  "taskDialogSubmitEdit": "Save changes",
+  "@taskDialogSubmitEdit": {
+    "description": "web: taskDialog.submitEdit"
+  },
+  "taskItemAriaNumber": "Task number {value}",
+  "@taskItemAriaNumber": {
+    "description": "web: taskItem.ariaNumber",
+    "placeholders": {
+      "value": {
+        "type": "Object"
+      }
+    }
+  },
+  "taskItemAriaComments": "{count} comments",
+  "@taskItemAriaComments": {
+    "description": "web: taskItem.ariaComments",
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "taskItemAriaEdit": "Edit task",
+  "@taskItemAriaEdit": {
+    "description": "web: taskItem.ariaEdit"
+  },
+  "taskItemAriaDelete": "Delete task",
+  "@taskItemAriaDelete": {
+    "description": "web: taskItem.ariaDelete"
+  },
+  "taskDetailBack": "Back",
+  "@taskDetailBack": {
+    "description": "web: taskDetail.back"
+  },
+  "taskDetailEdit": "Edit",
+  "@taskDetailEdit": {
+    "description": "web: taskDetail.edit"
+  },
+  "taskDetailDelete": "Delete",
+  "@taskDetailDelete": {
+    "description": "web: taskDetail.delete"
+  },
+  "taskDetailAssignee": "Assignee:",
+  "@taskDetailAssignee": {
+    "description": "web: taskDetail.assignee"
+  },
+  "taskDetailStartDate": "Start:",
+  "@taskDetailStartDate": {
+    "description": "web: taskDetail.startDate"
+  },
+  "taskDetailDueDate": "Due:",
+  "@taskDetailDueDate": {
+    "description": "web: taskDetail.dueDate"
+  },
+  "taskDetailOverdue": "Overdue",
+  "@taskDetailOverdue": {
+    "description": "web: taskDetail.overdue"
+  },
+  "taskDetailTags": "Tags:",
+  "@taskDetailTags": {
+    "description": "web: taskDetail.tags"
+  },
+  "taskDetailDescriptionHeading": "Description",
+  "@taskDetailDescriptionHeading": {
+    "description": "web: taskDetail.descriptionHeading"
+  },
+  "taskDetailNoDescription": "No description yet.",
+  "@taskDetailNoDescription": {
+    "description": "web: taskDetail.noDescription"
+  },
+  "taskDetailPriorityWithLabel": "Priority: {value}",
+  "@taskDetailPriorityWithLabel": {
+    "description": "web: taskDetail.priorityWithLabel",
+    "placeholders": {
+      "value": {
+        "type": "Object"
+      }
+    }
+  },
+  "taskDetailDeleteConfirm": "Delete this task?",
+  "@taskDetailDeleteConfirm": {
+    "description": "web: taskDetail.deleteConfirm"
+  },
+  "commentsTitle": "Comments",
+  "@commentsTitle": {
+    "description": "web: comments.title"
+  },
+  "commentsYourComment": "Your comment",
+  "@commentsYourComment": {
+    "description": "web: comments.yourComment"
+  },
+  "commentsPlaceholder": "Write a comment…",
+  "@commentsPlaceholder": {
+    "description": "web: comments.placeholder"
+  },
+  "commentsAttach": "Attach",
+  "@commentsAttach": {
+    "description": "web: comments.attach"
+  },
+  "commentsAttachOnlyFallback": "(attachment)",
+  "@commentsAttachOnlyFallback": {
+    "description": "web: comments.attachOnlyFallback"
+  },
+  "commentsUserFallback": "User",
+  "@commentsUserFallback": {
+    "description": "web: comments.userFallback"
+  },
+  "commentsRemoveFile": "Remove file {name}",
+  "@commentsRemoveFile": {
+    "description": "web: comments.removeFile",
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "commentsMaxPerComment": "Maximum {count} files per comment.",
+  "@commentsMaxPerComment": {
+    "description": "web: comments.maxPerComment",
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "commentsLoading": "Loading comments…",
+  "@commentsLoading": {
+    "description": "web: comments.loading"
+  },
+  "commentsEmpty": "No comments yet. Be the first!",
+  "@commentsEmpty": {
+    "description": "web: comments.empty"
+  },
+  "commentsReply": "Reply",
+  "@commentsReply": {
+    "description": "web: comments.reply"
+  },
+  "commentsEdit": "Edit",
+  "@commentsEdit": {
+    "description": "web: comments.edit"
+  },
+  "commentsDelete": "Delete",
+  "@commentsDelete": {
+    "description": "web: comments.delete"
+  },
+  "commentsDeleteConfirm": "Delete this comment?",
+  "@commentsDeleteConfirm": {
+    "description": "web: comments.deleteConfirm"
+  },
+  "commentsSend": "Send comment",
+  "@commentsSend": {
+    "description": "web: comments.send"
+  },
+  "commentsSending": "Sending…",
+  "@commentsSending": {
+    "description": "web: comments.sending"
+  },
+  "commentsSendReply": "Send reply",
+  "@commentsSendReply": {
+    "description": "web: comments.sendReply"
+  },
+  "commentsReplyingTo": "Replying to @{name}",
+  "@commentsReplyingTo": {
+    "description": "web: comments.replyingTo",
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "commentsReplyPlaceholder": "Reply to @{name}…",
+  "@commentsReplyPlaceholder": {
+    "description": "web: comments.replyPlaceholder",
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "commentsCancel": "Cancel",
+  "@commentsCancel": {
+    "description": "web: comments.cancel"
+  },
+  "commentsSave": "Save",
+  "@commentsSave": {
+    "description": "web: comments.save"
+  },
+  "commentsEdited": " (edited)",
+  "@commentsEdited": {
+    "description": "web: comments.edited"
+  },
+  "commentsOpenPdfTitle": "Open PDF in new tab",
+  "@commentsOpenPdfTitle": {
+    "description": "web: comments.openPdfTitle"
+  },
+  "commentsDownloadTitle": "Download: {name} ({size})",
+  "@commentsDownloadTitle": {
+    "description": "web: comments.downloadTitle",
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      },
+      "size": {
+        "type": "Object"
+      }
+    }
+  },
+  "attachmentsErrorEmpty": "File \"{name}\" is empty.",
+  "@attachmentsErrorEmpty": {
+    "description": "web: attachments.errorEmpty",
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "attachmentsErrorTooLarge": "File \"{name}\" exceeds the {limit}MB limit.",
+  "@attachmentsErrorTooLarge": {
+    "description": "web: attachments.errorTooLarge",
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      },
+      "limit": {
+        "type": "Object"
+      }
+    }
+  },
+  "attachmentsErrorBlocked": "Extension .{ext} is not allowed.",
+  "@attachmentsErrorBlocked": {
+    "description": "web: attachments.errorBlocked",
+    "placeholders": {
+      "ext": {
+        "type": "Object"
+      }
+    }
+  },
+  "attachmentsErrorUnsupported": "Extension .{ext} is not supported.",
+  "@attachmentsErrorUnsupported": {
+    "description": "web: attachments.errorUnsupported",
+    "placeholders": {
+      "ext": {
+        "type": "Object"
+      }
+    }
+  },
+  "attachmentsErrorBadMime": "MIME \"{mime}\" of file \"{name}\" is not supported.",
+  "@attachmentsErrorBadMime": {
+    "description": "web: attachments.errorBadMime",
+    "placeholders": {
+      "mime": {
+        "type": "Object"
+      },
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "fileInputPickImage": "Pick image",
+  "@fileInputPickImage": {
+    "description": "web: fileInput.pickImage"
+  },
+  "fileInputChangeImage": "Change image",
+  "@fileInputChangeImage": {
+    "description": "web: fileInput.changeImage"
+  },
+  "fileInputClear": "Clear",
+  "@fileInputClear": {
+    "description": "web: fileInput.clear"
+  },
+  "fileInputHelper": "JPG/PNG/WEBP/GIF, max 5MB",
+  "@fileInputHelper": {
+    "description": "web: fileInput.helper"
+  },
+  "fileInputErrorInvalidType": "Only JPG/PNG/WEBP/GIF supported.",
+  "@fileInputErrorInvalidType": {
+    "description": "web: fileInput.errorInvalidType"
+  },
+  "fileInputErrorTooLarge": "File too large (max 5MB).",
+  "@fileInputErrorTooLarge": {
+    "description": "web: fileInput.errorTooLarge"
+  },
+  "imageLightboxClose": "Close",
+  "@imageLightboxClose": {
+    "description": "web: imageLightbox.close"
+  },
+  "settingsTitle": "Settings",
+  "@settingsTitle": {
+    "description": "web: settings.title"
+  },
+  "settingsSubtitle": "Manage your appearance and language preferences.",
+  "@settingsSubtitle": {
+    "description": "web: settings.subtitle"
+  },
+  "settingsSectionAppearance": "Appearance",
+  "@settingsSectionAppearance": {
+    "description": "web: settings.sectionAppearance"
+  },
+  "settingsTheme": "Theme",
+  "@settingsTheme": {
+    "description": "web: settings.theme"
+  },
+  "settingsThemeLight": "Light",
+  "@settingsThemeLight": {
+    "description": "web: settings.themeLight"
+  },
+  "settingsThemeDark": "Dark",
+  "@settingsThemeDark": {
+    "description": "web: settings.themeDark"
+  },
+  "settingsThemeSystem": "System",
+  "@settingsThemeSystem": {
+    "description": "web: settings.themeSystem"
+  },
+  "settingsSectionLanguage": "Language",
+  "@settingsSectionLanguage": {
+    "description": "web: settings.sectionLanguage"
+  },
+  "settingsLanguage": "Display language",
+  "@settingsLanguage": {
+    "description": "web: settings.language"
+  },
+  "settingsLanguageHelp": "Choose the language used across the interface.",
+  "@settingsLanguageHelp": {
+    "description": "web: settings.languageHelp"
+  },
+  "languagesEn": "English",
+  "@languagesEn": {
+    "description": "web: languages.en"
+  },
+  "languagesVi": "Tiếng Việt",
+  "@languagesVi": {
+    "description": "web: languages.vi"
+  },
+  "languagesJa": "日本語",
+  "@languagesJa": {
+    "description": "web: languages.ja"
+  },
+  "breadcrumbsDashboard": "Dashboard",
+  "@breadcrumbsDashboard": {
+    "description": "web: breadcrumbs.dashboard"
+  },
+  "breadcrumbsProjectFallback": "Project",
+  "@breadcrumbsProjectFallback": {
+    "description": "web: breadcrumbs.projectFallback"
+  },
+  "breadcrumbsTaskFallback": "Task",
+  "@breadcrumbsTaskFallback": {
+    "description": "web: breadcrumbs.taskFallback"
+  },
+  "breadcrumbsTask": "Task",
+  "@breadcrumbsTask": {
+    "description": "web: breadcrumbs.task"
+  },
+  "breadcrumbsSettings": "Settings",
+  "@breadcrumbsSettings": {
+    "description": "web: breadcrumbs.settings"
+  },
+  "pagesTaskLoading": "Loading task…",
+  "@pagesTaskLoading": {
+    "description": "web: pages.task.loading"
+  },
+  "pagesTaskErrorFallback": "Could not load task.",
+  "@pagesTaskErrorFallback": {
+    "description": "web: pages.task.errorFallback"
+  },
+  "taskImagesLabel": "Images",
+  "@taskImagesLabel": {
+    "description": "web: taskImages.label"
+  },
+  "taskImagesHint": "Drag to reorder · The first image is the cover",
+  "@taskImagesHint": {
+    "description": "web: taskImages.hint"
+  },
+  "taskImagesCover": "Cover",
+  "@taskImagesCover": {
+    "description": "web: taskImages.cover"
+  },
+  "taskImagesSetCover": "Set as cover",
+  "@taskImagesSetCover": {
+    "description": "web: taskImages.setCover"
+  },
+  "taskImagesRemove": "Remove image",
+  "@taskImagesRemove": {
+    "description": "web: taskImages.remove"
+  },
+  "taskImagesAdd": "Add images",
+  "@taskImagesAdd": {
+    "description": "web: taskImages.add"
+  },
+  "taskImagesAddHint": "Drop or click",
+  "@taskImagesAddHint": {
+    "description": "web: taskImages.addHint"
+  },
+  "taskImagesLimitReached": "Limit of {count} images reached",
+  "@taskImagesLimitReached": {
+    "description": "web: taskImages.limitReached",
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "taskImagesTooLarge": "{name}: larger than 5MB",
+  "@taskImagesTooLarge": {
+    "description": "web: taskImages.tooLarge",
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "taskImagesBadType": "{name}: unsupported format (JPG/PNG/WEBP/GIF)",
+  "@taskImagesBadType": {
+    "description": "web: taskImages.badType",
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "taskImagesTooMany": "You can add at most {count} more images",
+  "@taskImagesTooMany": {
+    "description": "web: taskImages.tooMany",
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "taskImagesUploading": "Uploading images {done}/{total}…",
+  "@taskImagesUploading": {
+    "description": "web: taskImages.uploading",
+    "placeholders": {
+      "done": {
+        "type": "Object"
+      },
+      "total": {
+        "type": "Object"
+      }
+    }
+  },
+  "taskImagesUploadFailed": "{count} images failed to upload. The task was saved — you can add them again later.",
+  "@taskImagesUploadFailed": {
+    "description": "web: taskImages.uploadFailed",
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "taskImagesClose": "Close",
+  "@taskImagesClose": {
+    "description": "web: taskImages.close"
+  },
+  "taskImagesPrev": "Previous image",
+  "@taskImagesPrev": {
+    "description": "web: taskImages.prev"
+  },
+  "taskImagesNext": "Next image",
+  "@taskImagesNext": {
+    "description": "web: taskImages.next"
+  },
+  "taskImagesOpenFull": "View full screen",
+  "@taskImagesOpenFull": {
+    "description": "web: taskImages.openFull"
+  },
+  "taskImagesImageCount": "{count} images",
+  "@taskImagesImageCount": {
+    "description": "web: taskImages.imageCount",
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "mobileNotificationsSubtitle": "Updates about tasks in your projects.",
+  "@mobileNotificationsSubtitle": {
+    "description": "web: mobile.notificationsSubtitle"
+  },
+  "mobileNotificationsAssigned": "Assigned to you",
+  "@mobileNotificationsAssigned": {
+    "description": "web: mobile.notificationsAssigned"
+  },
+  "mobileNotificationsEmpty": "No new notifications.",
+  "@mobileNotificationsEmpty": {
+    "description": "web: mobile.notificationsEmpty"
+  },
+  "mobileConfigMissingTitle": "Firebase configuration missing",
+  "@mobileConfigMissingTitle": {
+    "description": "web: mobile.configMissingTitle"
+  },
+  "mobileConfigMissingDesc": "Run the app with --dart-define-from-file=config/firebase.json (see mobile/README.md).",
+  "@mobileConfigMissingDesc": {
+    "description": "web: mobile.configMissingDesc"
+  },
+  "mobileOpenFile": "Open file",
+  "@mobileOpenFile": {
+    "description": "web: mobile.openFile"
+  },
+  "mobilePickFromGallery": "Choose from library",
+  "@mobilePickFromGallery": {
+    "description": "web: mobile.pickFromGallery"
+  },
+  "mobileTakePhoto": "Take photo",
+  "@mobileTakePhoto": {
+    "description": "web: mobile.takePhoto"
+  },
+  "mobilePickFiles": "Choose files",
+  "@mobilePickFiles": {
+    "description": "web: mobile.pickFiles"
+  },
+  "mobileProfileTitle": "Account",
+  "@mobileProfileTitle": {
+    "description": "web: mobile.profileTitle"
+  },
+  "accessRoleAdmin": "Administrator",
+  "@accessRoleAdmin": {
+    "description": "web: access.roleAdmin"
+  },
+  "accessRoleCustomer": "Customer",
+  "@accessRoleCustomer": {
+    "description": "web: access.roleCustomer"
+  },
+  "accessNoPermissionTitle": "You don't have access to this page",
+  "@accessNoPermissionTitle": {
+    "description": "web: access.noPermissionTitle"
+  },
+  "accessNoPermissionDesc": "This page is for administrators only. If you need access, please contact your administrator.",
+  "@accessNoPermissionDesc": {
+    "description": "web: access.noPermissionDesc"
+  },
+  "accessBackToDashboard": "Back to Dashboard",
+  "@accessBackToDashboard": {
+    "description": "web: access.backToDashboard"
+  },
+  "accessDeniedLogin": "Your account has not been granted access or has been locked.",
+  "@accessDeniedLogin": {
+    "description": "web: access.deniedLogin"
+  },
+  "accessContactAdmin": "Please contact your administrator for help.",
+  "@accessContactAdmin": {
+    "description": "web: access.contactAdmin"
+  },
+  "accessCreateAccount": "Create account",
+  "@accessCreateAccount": {
+    "description": "web: access.createAccount"
+  },
+  "accessCreateTitle": "Create a new account",
+  "@accessCreateTitle": {
+    "description": "web: access.createTitle"
+  },
+  "accessCreateDesc": "The user will receive an email with a link to set their password.",
+  "@accessCreateDesc": {
+    "description": "web: access.createDesc"
+  },
+  "accessEmailLabel": "Email",
+  "@accessEmailLabel": {
+    "description": "web: access.emailLabel"
+  },
+  "accessEmailPlaceholder": "customer@company.com",
+  "@accessEmailPlaceholder": {
+    "description": "web: access.emailPlaceholder"
+  },
+  "accessNameLabel": "Display name",
+  "@accessNameLabel": {
+    "description": "web: access.nameLabel"
+  },
+  "accessNamePlaceholder": "e.g. John Smith",
+  "@accessNamePlaceholder": {
+    "description": "web: access.namePlaceholder"
+  },
+  "accessRoleLabel": "Role",
+  "@accessRoleLabel": {
+    "description": "web: access.roleLabel"
+  },
+  "accessRoleCustomerHint": "Sees assigned projects only",
+  "@accessRoleCustomerHint": {
+    "description": "web: access.roleCustomerHint"
+  },
+  "accessRoleAdminHint": "Full system access",
+  "@accessRoleAdminHint": {
+    "description": "web: access.roleAdminHint"
+  },
+  "accessProjectsLabel": "Project access",
+  "@accessProjectsLabel": {
+    "description": "web: access.projectsLabel"
+  },
+  "accessProjectsHint": "Customers can only see the projects selected here.",
+  "@accessProjectsHint": {
+    "description": "web: access.projectsHint"
+  },
+  "accessNoProjectsAvailable": "No projects yet.",
+  "@accessNoProjectsAvailable": {
+    "description": "web: access.noProjectsAvailable"
+  },
+  "accessCreating": "Creating…",
+  "@accessCreating": {
+    "description": "web: access.creating"
+  },
+  "accessCreateSubmit": "Create account",
+  "@accessCreateSubmit": {
+    "description": "web: access.createSubmit"
+  },
+  "accessCreateError": "Could not create the account.",
+  "@accessCreateError": {
+    "description": "web: access.createError"
+  },
+  "accessCreatedTitle": "Account created",
+  "@accessCreatedTitle": {
+    "description": "web: access.createdTitle"
+  },
+  "accessCreatedEmailSent": "A set-password email has been sent to {email}.",
+  "@accessCreatedEmailSent": {
+    "description": "web: access.createdEmailSent",
+    "placeholders": {
+      "email": {
+        "type": "Object"
+      }
+    }
+  },
+  "accessCreatedEmailFailed": "Could not send email to {email}. Copy the link below and send it to the user.",
+  "@accessCreatedEmailFailed": {
+    "description": "web: access.createdEmailFailed",
+    "placeholders": {
+      "email": {
+        "type": "Object"
+      }
+    }
+  },
+  "accessSetPasswordLink": "Set-password link",
+  "@accessSetPasswordLink": {
+    "description": "web: access.setPasswordLink"
+  },
+  "accessCopy": "Copy",
+  "@accessCopy": {
+    "description": "web: access.copy"
+  },
+  "accessCopied": "Copied",
+  "@accessCopied": {
+    "description": "web: access.copied"
+  },
+  "accessDone": "Done",
+  "@accessDone": {
+    "description": "web: access.done"
+  },
+  "accessActionProjects": "Projects",
+  "@accessActionProjects": {
+    "description": "web: access.actionProjects"
+  },
+  "accessActionLock": "Lock",
+  "@accessActionLock": {
+    "description": "web: access.actionLock"
+  },
+  "accessActionUnlock": "Unlock",
+  "@accessActionUnlock": {
+    "description": "web: access.actionUnlock"
+  },
+  "accessActionResendLink": "Resend link",
+  "@accessActionResendLink": {
+    "description": "web: access.actionResendLink"
+  },
+  "accessLockConfirm": "Lock account {email}? The user won't be able to sign in until unlocked.",
+  "@accessLockConfirm": {
+    "description": "web: access.lockConfirm",
+    "placeholders": {
+      "email": {
+        "type": "Object"
+      }
+    }
+  },
+  "accessUnlockConfirm": "Unlock account {email}?",
+  "@accessUnlockConfirm": {
+    "description": "web: access.unlockConfirm",
+    "placeholders": {
+      "email": {
+        "type": "Object"
+      }
+    }
+  },
+  "accessStatusDisabled": "Locked",
+  "@accessStatusDisabled": {
+    "description": "web: access.statusDisabled"
+  },
+  "accessProjectCountLabel": "{count} projects",
+  "@accessProjectCountLabel": {
+    "description": "web: access.projectCountLabel",
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "accessResendTitle": "New set-password link",
+  "@accessResendTitle": {
+    "description": "web: access.resendTitle"
+  },
+  "accessResendError": "Could not create a set-password link.",
+  "@accessResendError": {
+    "description": "web: access.resendError"
+  },
+  "accessUserProjectsTitle": "Projects of {name}",
+  "@accessUserProjectsTitle": {
+    "description": "web: access.userProjectsTitle",
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "accessUserProjectsDesc": "Choose which projects this user can access.",
+  "@accessUserProjectsDesc": {
+    "description": "web: access.userProjectsDesc"
+  },
+  "accessSearchProjects": "Search projects…",
+  "@accessSearchProjects": {
+    "description": "web: access.searchProjects"
+  },
+  "accessSaveProjects": "Save",
+  "@accessSaveProjects": {
+    "description": "web: access.saveProjects"
+  },
+  "accessSaveError": "Could not save.",
+  "@accessSaveError": {
+    "description": "web: access.saveError"
+  },
+  "accessSelectedCount": "{count} selected",
+  "@accessSelectedCount": {
+    "description": "web: access.selectedCount",
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "accessProjectMembers": "Project members",
+  "@accessProjectMembers": {
+    "description": "web: access.projectMembers"
+  },
+  "accessProjectMembersCount": "{count} members",
+  "@accessProjectMembersCount": {
+    "description": "web: access.projectMembersCount",
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "accessManageMembers": "Manage",
+  "@accessManageMembers": {
+    "description": "web: access.manageMembers"
+  },
+  "accessMembersDialogTitle": "Project members",
+  "@accessMembersDialogTitle": {
+    "description": "web: access.membersDialogTitle"
+  },
+  "accessMembersDialogDesc": "Only assigned members can see and work in this project.",
+  "@accessMembersDialogDesc": {
+    "description": "web: access.membersDialogDesc"
+  },
+  "accessAddMemberTitle": "Add member",
+  "@accessAddMemberTitle": {
+    "description": "web: access.addMemberTitle"
+  },
+  "accessSearchUsers": "Search by name or email…",
+  "@accessSearchUsers": {
+    "description": "web: access.searchUsers"
+  },
+  "accessNoMembers": "No members yet.",
+  "@accessNoMembers": {
+    "description": "web: access.noMembers"
+  },
+  "accessNoCandidates": "No matching users.",
+  "@accessNoCandidates": {
+    "description": "web: access.noCandidates"
+  },
+  "accessRemoveMember": "Remove from project",
+  "@accessRemoveMember": {
+    "description": "web: access.removeMember"
+  },
+  "accessMemberError": "Action failed.",
+  "@accessMemberError": {
+    "description": "web: access.memberError"
+  },
+  "accessAssigneeNone": "— Unassigned —",
+  "@accessAssigneeNone": {
+    "description": "web: access.assigneeNone"
+  },
+  "accessColUser": "User",
+  "@accessColUser": {
+    "description": "web: access.colUser"
+  },
+  "accessColRole": "Role",
+  "@accessColRole": {
+    "description": "web: access.colRole"
+  },
+  "accessColStatus": "Status",
+  "@accessColStatus": {
+    "description": "web: access.colStatus"
+  },
+  "accessColAccess": "Access",
+  "@accessColAccess": {
+    "description": "web: access.colAccess"
+  },
+  "accessColCreated": "Created",
+  "@accessColCreated": {
+    "description": "web: access.colCreated"
+  },
+  "accessColActions": "Actions",
+  "@accessColActions": {
+    "description": "web: access.colActions"
+  },
+  "accessStatusActive": "Active",
+  "@accessStatusActive": {
+    "description": "web: access.statusActive"
+  },
+  "accessMoreActions": "More actions",
+  "@accessMoreActions": {
+    "description": "web: access.moreActions"
+  },
+  "dashboardTitle": "Dashboard",
+  "@dashboardTitle": {
+    "description": "web: dashboard.title"
+  },
+  "dashboardSubtitle": "An overview of your projects and tasks.",
+  "@dashboardSubtitle": {
+    "description": "web: dashboard.subtitle"
+  },
+  "dashboardStatTotalProjects": "Total projects",
+  "@dashboardStatTotalProjects": {
+    "description": "web: dashboard.statTotalProjects"
+  },
+  "dashboardStatTotalTasks": "Total tasks",
+  "@dashboardStatTotalTasks": {
+    "description": "web: dashboard.statTotalTasks"
+  },
+  "dashboardStatInProgress": "In progress",
+  "@dashboardStatInProgress": {
+    "description": "web: dashboard.statInProgress"
+  },
+  "dashboardStatCompleted": "Completed",
+  "@dashboardStatCompleted": {
+    "description": "web: dashboard.statCompleted"
+  },
+  "dashboardStatCompletionPct": "{value}% completion rate",
+  "@dashboardStatCompletionPct": {
+    "description": "web: dashboard.statCompletionPct",
+    "placeholders": {
+      "value": {
+        "type": "Object"
+      }
+    }
+  },
+  "dashboardSectionOverdue": "Overdue",
+  "@dashboardSectionOverdue": {
+    "description": "web: dashboard.sectionOverdue"
+  },
+  "dashboardSectionUpcoming": "Upcoming",
+  "@dashboardSectionUpcoming": {
+    "description": "web: dashboard.sectionUpcoming"
+  },
+  "dashboardUpcomingWindow": "Next {days} days",
+  "@dashboardUpcomingWindow": {
+    "description": "web: dashboard.upcomingWindow",
+    "placeholders": {
+      "days": {
+        "type": "Object"
+      }
+    }
+  },
+  "dashboardSectionRecent": "Recent activity",
+  "@dashboardSectionRecent": {
+    "description": "web: dashboard.sectionRecent"
+  },
+  "dashboardSectionActiveProjects": "Active projects",
+  "@dashboardSectionActiveProjects": {
+    "description": "web: dashboard.sectionActiveProjects"
+  },
+  "dashboardViewAll": "View all",
+  "@dashboardViewAll": {
+    "description": "web: dashboard.viewAll"
+  },
+  "dashboardEmptyOverdue": "No overdue tasks. Great job!",
+  "@dashboardEmptyOverdue": {
+    "description": "web: dashboard.emptyOverdue"
+  },
+  "dashboardEmptyUpcoming": "No tasks due in the coming week.",
+  "@dashboardEmptyUpcoming": {
+    "description": "web: dashboard.emptyUpcoming"
+  },
+  "dashboardEmptyRecent": "No recent activity yet.",
+  "@dashboardEmptyRecent": {
+    "description": "web: dashboard.emptyRecent"
+  },
+  "dashboardEmptyProjects": "No projects yet.",
+  "@dashboardEmptyProjects": {
+    "description": "web: dashboard.emptyProjects"
+  },
+  "dashboardEmptyProjectsCta": "Create your first project",
+  "@dashboardEmptyProjectsCta": {
+    "description": "web: dashboard.emptyProjectsCta"
+  },
+  "dashboardDueToday": "Due today",
+  "@dashboardDueToday": {
+    "description": "web: dashboard.dueToday"
+  },
+  "dashboardDueTomorrow": "Due tomorrow",
+  "@dashboardDueTomorrow": {
+    "description": "web: dashboard.dueTomorrow"
+  },
+  "dashboardDueInDays": "Due in {days} days",
+  "@dashboardDueInDays": {
+    "description": "web: dashboard.dueInDays",
+    "placeholders": {
+      "days": {
+        "type": "Object"
+      }
+    }
+  },
+  "dashboardOverdueByDays": "{days} days overdue",
+  "@dashboardOverdueByDays": {
+    "description": "web: dashboard.overdueByDays",
+    "placeholders": {
+      "days": {
+        "type": "Object"
+      }
+    }
+  },
+  "dashboardLoading": "Loading data…",
+  "@dashboardLoading": {
+    "description": "web: dashboard.loading"
+  },
+  "dashboardError": "Error: {message}",
+  "@dashboardError": {
+    "description": "web: dashboard.error",
+    "placeholders": {
+      "message": {
+        "type": "Object"
+      }
+    }
+  },
+  "dashboardSectionStatusDistribution": "Status distribution",
+  "@dashboardSectionStatusDistribution": {
+    "description": "web: dashboard.sectionStatusDistribution"
+  },
+  "dashboardSectionTopProjects": "Top projects by tasks",
+  "@dashboardSectionTopProjects": {
+    "description": "web: dashboard.sectionTopProjects"
+  },
+  "dashboardSectionPriorityBreakdown": "Priority breakdown",
+  "@dashboardSectionPriorityBreakdown": {
+    "description": "web: dashboard.sectionPriorityBreakdown"
+  },
+  "dashboardChartTasksLabel": "Tasks",
+  "@dashboardChartTasksLabel": {
+    "description": "web: dashboard.chartTasksLabel"
+  },
+  "dashboardChartNoData": "Not enough data to render this chart.",
+  "@dashboardChartNoData": {
+    "description": "web: dashboard.chartNoData"
+  },
+  "dashboardChartTotalLabel": "Total",
+  "@dashboardChartTotalLabel": {
+    "description": "web: dashboard.chartTotalLabel"
+  }
+}

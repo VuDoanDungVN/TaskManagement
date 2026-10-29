@@ -489,6 +489,18 @@ const vi: Dictionary = {
     openFull: "Xem toàn màn hình",
     imageCount: "{count} ảnh",
   },
+  mobile: {
+    notificationsSubtitle: "Cập nhật về các task trong dự án của bạn.",
+    notificationsAssigned: "Được giao cho bạn",
+    notificationsEmpty: "Không có thông báo mới.",
+    configMissingTitle: "Thiếu cấu hình Firebase",
+    configMissingDesc: "Chạy app với --dart-define-from-file=config/firebase.json (xem mobile/README.md).",
+    openFile: "Mở file",
+    pickFromGallery: "Chọn từ thư viện",
+    takePhoto: "Chụp ảnh",
+    pickFiles: "Chọn file",
+    profileTitle: "Tài khoản",
+  },
   access: {
     roleAdmin: "Quản trị viên",
     roleCustomer: "Khách hàng",
