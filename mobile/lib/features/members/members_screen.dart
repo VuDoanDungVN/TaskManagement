@@ -14,6 +14,7 @@ import '../../data/repositories.dart';
 import '../../l10n/app_localizations.dart';
 import '../../widgets/app_bar.dart';
 import '../../widgets/common.dart';
+import '../shell/app_shell.dart';
 
 const _pageSize = 20;
 
@@ -128,7 +129,7 @@ class _MembersScreenState extends ConsumerState<MembersScreen> {
         onRefresh: _reload,
         child: ListView(
           controller: _scroll,
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + navBarClearance(context)),
           children: [
             AppCard(
               child: Column(

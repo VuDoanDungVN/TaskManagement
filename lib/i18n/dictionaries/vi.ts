@@ -129,6 +129,11 @@ const vi: Dictionary = {
     signOut: "Đăng xuất",
     signingOut: "Đang đăng xuất…",
     uploadFailed: "Upload thất bại.",
+    joinedOn: "Tham gia {date}",
+    emailVerified: "Email đã xác minh",
+    emailNotVerified: "Email chưa xác minh",
+    statProjects: "Dự án",
+    statTeams: "Nhóm",
   },
   projects: {
     guestBannerTitle: "Bạn đang xem ở chế độ khách",
@@ -500,6 +505,8 @@ const vi: Dictionary = {
     takePhoto: "Chụp ảnh",
     pickFiles: "Chọn file",
     profileTitle: "Tài khoản",
+    navOverviewTab: "Tổng quan",
+    appBarBrand: "Task Manager",
   },
   access: {
     roleAdmin: "Quản trị viên",

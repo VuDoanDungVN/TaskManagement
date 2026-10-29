@@ -718,6 +718,36 @@ abstract class AppLocalizations {
   /// **'Upload failed.'**
   String get profileUploadFailed;
 
+  /// web: profile.joinedOn
+  ///
+  /// In en, this message translates to:
+  /// **'Joined {date}'**
+  String profileJoinedOn(Object date);
+
+  /// web: profile.emailVerified
+  ///
+  /// In en, this message translates to:
+  /// **'Email verified'**
+  String get profileEmailVerified;
+
+  /// web: profile.emailNotVerified
+  ///
+  /// In en, this message translates to:
+  /// **'Email not verified'**
+  String get profileEmailNotVerified;
+
+  /// web: profile.statProjects
+  ///
+  /// In en, this message translates to:
+  /// **'Projects'**
+  String get profileStatProjects;
+
+  /// web: profile.statTeams
+  ///
+  /// In en, this message translates to:
+  /// **'Teams'**
+  String get profileStatTeams;
+
   /// web: projects.guestBannerTitle
   ///
   /// In en, this message translates to:
@@ -2601,6 +2631,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Account'**
   String get mobileProfileTitle;
+
+  /// web: mobile.navOverviewTab
+  ///
+  /// In en, this message translates to:
+  /// **'Overview'**
+  String get mobileNavOverviewTab;
+
+  /// web: mobile.appBarBrand
+  ///
+  /// In en, this message translates to:
+  /// **'Task Manager'**
+  String get mobileAppBarBrand;
 
   /// web: access.roleAdmin
   ///

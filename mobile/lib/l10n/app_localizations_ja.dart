@@ -327,6 +327,23 @@ class AppLocalizationsJa extends AppLocalizations {
   String get profileUploadFailed => 'アップロードに失敗しました。';
 
   @override
+  String profileJoinedOn(Object date) {
+    return '$date に参加';
+  }
+
+  @override
+  String get profileEmailVerified => 'メール確認済み';
+
+  @override
+  String get profileEmailNotVerified => 'メール未確認';
+
+  @override
+  String get profileStatProjects => 'プロジェクト';
+
+  @override
+  String get profileStatTeams => 'チーム';
+
+  @override
   String get projectsGuestBannerTitle => 'ゲストモードで閲覧中です';
 
   @override
@@ -1353,6 +1370,12 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get mobileProfileTitle => 'アカウント';
+
+  @override
+  String get mobileNavOverviewTab => '概要';
+
+  @override
+  String get mobileAppBarBrand => 'Task Manager';
 
   @override
   String get accessRoleAdmin => '管理者';

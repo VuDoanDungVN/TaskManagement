@@ -332,6 +332,23 @@ class AppLocalizationsVi extends AppLocalizations {
   String get profileUploadFailed => 'Upload thất bại.';
 
   @override
+  String profileJoinedOn(Object date) {
+    return 'Tham gia $date';
+  }
+
+  @override
+  String get profileEmailVerified => 'Email đã xác minh';
+
+  @override
+  String get profileEmailNotVerified => 'Email chưa xác minh';
+
+  @override
+  String get profileStatProjects => 'Dự án';
+
+  @override
+  String get profileStatTeams => 'Nhóm';
+
+  @override
   String get projectsGuestBannerTitle => 'Bạn đang xem ở chế độ khách';
 
   @override
@@ -1382,6 +1399,12 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get mobileProfileTitle => 'Tài khoản';
+
+  @override
+  String get mobileNavOverviewTab => 'Tổng quan';
+
+  @override
+  String get mobileAppBarBrand => 'Task Manager';
 
   @override
   String get accessRoleAdmin => 'Quản trị viên';

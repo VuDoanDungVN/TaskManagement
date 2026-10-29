@@ -47,8 +47,8 @@ app.*.map.json
 # Widget Preview related
 .widget_preview/
 
-# Firebase config theo nền tảng — tải từ Firebase Console, KHÔNG commit
+# Firebase config theo nền tảng — sinh bởi `flutterfire configure`, KHÔNG commit
 android/app/google-services.json
 ios/Runner/GoogleService-Info.plist
 lib/firebase_options.dart
-config/firebase.json
+firebase.json

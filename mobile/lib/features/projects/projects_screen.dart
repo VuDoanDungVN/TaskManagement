@@ -17,6 +17,7 @@ import '../../l10n/app_localizations.dart';
 import '../../widgets/app_bar.dart';
 import '../../widgets/common.dart';
 import '../../widgets/task_widgets.dart';
+import '../shell/app_shell.dart';
 
 /// Danh sách dự án — port components/kokonutui/project-list.tsx.
 /// Khách hàng chỉ thấy dự án được gán; chỉ admin thấy nút tạo dự án.
@@ -40,7 +41,7 @@ class ProjectsScreen extends ConsumerWidget {
       body: RefreshIndicator(
         onRefresh: refresh,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + navBarClearance(context)),
           children: [
             AppCard(
               child: Column(
@@ -48,12 +49,27 @@ class ProjectsScreen extends ConsumerWidget {
                 children: [
                   Row(
                     children: [
-                      Icon(LucideIcons.folderKanban, size: 14, color: context.tw(Tw.zinc900, Tw.zinc50)),
+                      Icon(
+                        LucideIcons.folderKanban,
+                        size: 14,
+                        color: context.tw(Tw.zinc900, Tw.zinc50),
+                      ),
                       const SizedBox(width: 8),
-                      Text(t.projectsTitle, style: const TextStyle(fontSize: TwSize.textLg, fontWeight: FontWeight.w700)),
+                      Text(
+                        t.projectsTitle,
+                        style: const TextStyle(
+                          fontSize: TwSize.textLg,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                       const Spacer(),
-                      Text(t.projectsCountLabel(projects.length),
-                          style: TextStyle(fontSize: TwSize.textXs, color: context.tw(Tw.zinc600, Tw.zinc400))),
+                      Text(
+                        t.projectsCountLabel(projects.length),
+                        style: TextStyle(
+                          fontSize: TwSize.textXs,
+                          color: context.tw(Tw.zinc600, Tw.zinc400),
+                        ),
+                      ),
                     ],
                   ),
                   if (isAdmin) ...[
@@ -61,7 +77,10 @@ class ProjectsScreen extends ConsumerWidget {
                     FilledButton.icon(
                       onPressed: () => showCreateProjectSheet(context),
                       icon: const Icon(LucideIcons.plus, size: 14),
-                      label: Text(t.projectsCreateNew, style: const TextStyle(fontSize: TwSize.textXs)),
+                      label: Text(
+                        t.projectsCreateNew,
+                        style: const TextStyle(fontSize: TwSize.textXs),
+                      ),
                     ),
                   ],
                   const SizedBox(height: 16),
@@ -70,9 +89,17 @@ class ProjectsScreen extends ConsumerWidget {
                   else if (q.hasError)
                     ErrorView(error: q.error!, onRetry: refresh)
                   else if (projects.isEmpty)
-                    EmptyView(title: t.projectsEmptyTitle, help: isAdmin ? t.projectsEmptyHelp : t.accessContactAdmin)
+                    EmptyView(
+                      title: t.projectsEmptyTitle,
+                      help: isAdmin
+                          ? t.projectsEmptyHelp
+                          : t.accessContactAdmin,
+                    )
                   else
-                    for (final p in projects) ...[ProjectCard(project: p), const SizedBox(height: 12)],
+                    for (final p in projects) ...[
+                      ProjectCard(project: p),
+                      const SizedBox(height: 12),
+                    ],
                 ],
               ),
             ),
@@ -109,57 +136,131 @@ class ProjectCard extends StatelessWidget {
             border: Border.all(color: context.tw(Tw.zinc100, Tw.zinc800)),
           ),
           clipBehavior: Clip.antiAlias,
-          child: IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(width: 112, child: NetImage(url: project.thumbnailUrl, iconSize: 32)),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(project.name, maxLines: 1, overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontSize: TwSize.textSm, fontWeight: FontWeight.w600)),
-                        if (project.description?.isNotEmpty ?? false) ...[
-                          const SizedBox(height: 4),
-                          Text(project.description!, maxLines: 2, overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontSize: TwSize.text11, color: context.tw(Tw.zinc600, Tw.zinc400))),
-                        ],
-                        if (project.teamName != null) ...[
-                          const SizedBox(height: 6),
-                          neutralPill(context, project.teamName!, icon: LucideIcons.usersRound),
-                        ],
-                        const SizedBox(height: 8),
-                        Wrap(spacing: 6, runSpacing: 6, children: [
-                          neutralPill(context, t.projectsCardTasksTotal(s.total), icon: LucideIcons.listChecks),
-                          if (s.pending > 0) statChip(TaskStatus.pending, t.projectsCardPendingShort(s.pending)),
-                          if (s.inProgress > 0) statChip(TaskStatus.inProgress, t.projectsCardInProgressShort(s.inProgress)),
-                          if (s.completed > 0) statChip(TaskStatus.completed, t.projectsCardDoneShort(s.completed)),
-                        ]),
-                        if (s.total > 0) ...[
-                          const SizedBox(height: 8),
-                          Row(children: [
-                            Text(t.projectsCardProgress, style: TextStyle(fontSize: TwSize.text11, color: context.tw(Tw.zinc600, Tw.zinc400))),
-                            const Spacer(),
-                            Text('$progress%', style: const TextStyle(fontSize: TwSize.text11)),
-                          ]),
-                          const SizedBox(height: 4),
-                          // Ngưỡng màu của project-list web: ≤30 đỏ, <60 vàng, còn lại xanh
-                          ProgressBar(percent: progress, height: 6, thresholds: (31, 60)),
-                        ],
-                        const SizedBox(height: 8),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: Row(mainAxisSize: MainAxisSize.min, children: [
-                            Text(t.projectsCardViewDetail, style: TextStyle(fontSize: TwSize.text11, color: context.tw(Tw.zinc500, Tw.zinc400))),
-                            const SizedBox(width: 4),
-                            Icon(LucideIcons.arrowRight, size: 14, color: context.tw(Tw.zinc500, Tw.zinc400)),
-                          ]),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(TwSize.radiusMd),
+                      child: SizedBox.square(
+                        dimension: 36,
+                        child: NetImage(
+                          url: project.thumbnailUrl,
+                          iconSize: 16,
                         ),
-                      ],
+                      ),
                     ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        project.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: TwSize.textSm,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                if (project.description?.isNotEmpty ?? false) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    project.description!,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: TwSize.text11,
+                      color: context.tw(Tw.zinc600, Tw.zinc400),
+                    ),
+                  ),
+                ],
+                if (project.teamName != null) ...[
+                  const SizedBox(height: 6),
+                  neutralPill(
+                    context,
+                    project.teamName!,
+                    icon: LucideIcons.usersRound,
+                  ),
+                ],
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    neutralPill(
+                      context,
+                      t.projectsCardTasksTotal(s.total),
+                      icon: LucideIcons.listChecks,
+                    ),
+                    if (s.pending > 0)
+                      statChip(
+                        TaskStatus.pending,
+                        t.projectsCardPendingShort(s.pending),
+                      ),
+                    if (s.inProgress > 0)
+                      statChip(
+                        TaskStatus.inProgress,
+                        t.projectsCardInProgressShort(s.inProgress),
+                      ),
+                    if (s.completed > 0)
+                      statChip(
+                        TaskStatus.completed,
+                        t.projectsCardDoneShort(s.completed),
+                      ),
+                  ],
+                ),
+                if (s.total > 0) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Text(
+                        t.projectsCardProgress,
+                        style: TextStyle(
+                          fontSize: TwSize.text11,
+                          color: context.tw(Tw.zinc600, Tw.zinc400),
+                        ),
+                      ),
+                      const Spacer(),
+                      Text(
+                        '$progress%',
+                        style: const TextStyle(fontSize: TwSize.text11),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  // Ngưỡng màu của project-list web: ≤30 đỏ, <60 vàng, còn lại xanh
+                  ProgressBar(
+                    percent: progress,
+                    height: 6,
+                    thresholds: (31, 60),
+                  ),
+                ],
+                const SizedBox(height: 8),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        t.projectsCardViewDetail,
+                        style: TextStyle(
+                          fontSize: TwSize.text11,
+                          color: context.tw(Tw.zinc500, Tw.zinc400),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(
+                        LucideIcons.arrowRight,
+                        size: 14,
+                        color: context.tw(Tw.zinc500, Tw.zinc400),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -172,7 +273,8 @@ class ProjectCard extends StatelessWidget {
 }
 
 /// Tạo dự án (admin) — ProjectDialog của web: tên, mô tả, thumbnail.
-Future<void> showCreateProjectSheet(BuildContext context) => showModalBottomSheet(
+Future<void> showCreateProjectSheet(BuildContext context) =>
+    showModalBottomSheet(
       context: context,
       useRootNavigator: true,
       isScrollControlled: true,
@@ -183,7 +285,8 @@ class _CreateProjectSheet extends ConsumerStatefulWidget {
   const _CreateProjectSheet();
 
   @override
-  ConsumerState<_CreateProjectSheet> createState() => _CreateProjectSheetState();
+  ConsumerState<_CreateProjectSheet> createState() =>
+      _CreateProjectSheetState();
 }
 
 class _CreateProjectSheetState extends ConsumerState<_CreateProjectSheet> {
@@ -209,15 +312,23 @@ class _CreateProjectSheetState extends ConsumerState<_CreateProjectSheet> {
       _error = null;
     });
     try {
-      final p = await ref.read(projectsRepoProvider).create(
+      final p = await ref
+          .read(projectsRepoProvider)
+          .create(
             name: _name.text.trim(),
             description: _desc.text.trim().isEmpty ? null : _desc.text.trim(),
           );
       if (_image != null) {
         try {
-          await ref.read(uploadsRepoProvider).projectThumbnail(
+          await ref
+              .read(uploadsRepoProvider)
+              .projectThumbnail(
                 p.id,
-                LocalFile(path: _image!.path, name: _image!.name, size: await _image!.length()),
+                LocalFile(
+                  path: _image!.path,
+                  name: _image!.name,
+                  size: await _image!.length(),
+                ),
               );
         } catch (_) {
           // Ảnh lỗi không chặn việc tạo dự án (giống web)
@@ -235,19 +346,37 @@ class _CreateProjectSheetState extends ConsumerState<_CreateProjectSheet> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final label = TextStyle(fontSize: TwSize.textXs, fontWeight: FontWeight.w500, color: context.tw(Tw.zinc700, Tw.zinc300));
+    final label = TextStyle(
+      fontSize: TwSize.textXs,
+      fontWeight: FontWeight.w500,
+      color: context.tw(Tw.zinc700, Tw.zinc300),
+    );
     final nameError = _touched && _name.text.trim().isEmpty;
     return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(t.projectDialogCreateTitle, style: const TextStyle(fontSize: TwSize.textLg, fontWeight: FontWeight.w600)),
+              Text(
+                t.projectDialogCreateTitle,
+                style: const TextStyle(
+                  fontSize: TwSize.textLg,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               const SizedBox(height: 4),
-              Text(t.projectDialogCreateDesc, style: TextStyle(fontSize: TwSize.textSm, color: context.tw(Tw.zinc600, Tw.zinc400))),
+              Text(
+                t.projectDialogCreateDesc,
+                style: TextStyle(
+                  fontSize: TwSize.textSm,
+                  color: context.tw(Tw.zinc600, Tw.zinc400),
+                ),
+              ),
               const SizedBox(height: 16),
               Text('${t.projectDialogNameLabel} *', style: label),
               const SizedBox(height: 4),
@@ -255,48 +384,80 @@ class _CreateProjectSheetState extends ConsumerState<_CreateProjectSheet> {
                 controller: _name,
                 autofocus: true,
                 onChanged: (_) => setState(() {}),
-                decoration: InputDecoration(hintText: t.projectDialogNamePlaceholder, errorText: nameError ? t.projectDialogNameRequired : null),
+                decoration: InputDecoration(
+                  hintText: t.projectDialogNamePlaceholder,
+                  errorText: nameError ? t.projectDialogNameRequired : null,
+                ),
               ),
               const SizedBox(height: 12),
               Text(t.projectDialogDescriptionLabel, style: label),
               const SizedBox(height: 4),
-              TextField(controller: _desc, maxLines: 3, decoration: InputDecoration(hintText: t.projectDialogDescriptionPlaceholder)),
+              TextField(
+                controller: _desc,
+                maxLines: 3,
+                decoration: InputDecoration(
+                  hintText: t.projectDialogDescriptionPlaceholder,
+                ),
+              ),
               const SizedBox(height: 12),
               Text(t.projectDialogThumbnailLabel, style: label),
               const SizedBox(height: 6),
-              Row(children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(TwSize.radiusLg),
-                  child: SizedBox.square(
-                    dimension: 80,
-                    child: _image == null ? const NetImage(url: null) : Image.file(File(_image!.path), fit: BoxFit.cover),
+              Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(TwSize.radiusLg),
+                    child: SizedBox.square(
+                      dimension: 80,
+                      child: _image == null
+                          ? const NetImage(url: null)
+                          : Image.file(File(_image!.path), fit: BoxFit.cover),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                SoftButton(
-                  label: t.mobilePickFromGallery,
-                  icon: LucideIcons.imagePlus,
-                  onPressed: () async {
-                    final x = await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 90, maxWidth: 2048);
-                    if (x != null) setState(() => _image = x);
-                  },
-                ),
-              ]),
+                  const SizedBox(width: 12),
+                  SoftButton(
+                    label: t.mobilePickFromGallery,
+                    icon: LucideIcons.imagePlus,
+                    onPressed: () async {
+                      final x = await ImagePicker().pickImage(
+                        source: ImageSource.gallery,
+                        imageQuality: 90,
+                        maxWidth: 2048,
+                      );
+                      if (x != null) setState(() => _image = x);
+                    },
+                  ),
+                ],
+              ),
               if (_error != null) ...[
                 const SizedBox(height: 12),
-                Text(_error!, style: TextStyle(fontSize: TwSize.text11, color: context.tw(Tw.red600, Tw.red400))),
-              ],
-              const SizedBox(height: 20),
-              Row(children: [
-                Expanded(child: OutlinedButton(onPressed: _saving ? null : () => Navigator.pop(context), child: Text(t.commonCancel))),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: FilledButton(
-                    onPressed: _saving ? null : _submit,
-                    child: Text(_saving ? t.commonSaving : t.projectDialogSubmit),
+                Text(
+                  _error!,
+                  style: TextStyle(
+                    fontSize: TwSize.text11,
+                    color: context.tw(Tw.red600, Tw.red400),
                   ),
                 ),
-              ]),
+              ],
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: _saving ? null : () => Navigator.pop(context),
+                      child: Text(t.commonCancel),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: _saving ? null : _submit,
+                      child: Text(
+                        _saving ? t.commonSaving : t.projectDialogSubmit,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),

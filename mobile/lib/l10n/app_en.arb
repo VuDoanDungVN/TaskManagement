@@ -417,6 +417,31 @@
   "@profileUploadFailed": {
     "description": "web: profile.uploadFailed"
   },
+  "profileJoinedOn": "Joined {date}",
+  "@profileJoinedOn": {
+    "description": "web: profile.joinedOn",
+    "placeholders": {
+      "date": {
+        "type": "Object"
+      }
+    }
+  },
+  "profileEmailVerified": "Email verified",
+  "@profileEmailVerified": {
+    "description": "web: profile.emailVerified"
+  },
+  "profileEmailNotVerified": "Email not verified",
+  "@profileEmailNotVerified": {
+    "description": "web: profile.emailNotVerified"
+  },
+  "profileStatProjects": "Projects",
+  "@profileStatProjects": {
+    "description": "web: profile.statProjects"
+  },
+  "profileStatTeams": "Teams",
+  "@profileStatTeams": {
+    "description": "web: profile.statTeams"
+  },
   "projectsGuestBannerTitle": "You are viewing in guest mode",
   "@projectsGuestBannerTitle": {
     "description": "web: projects.guestBannerTitle"
@@ -1894,6 +1919,14 @@
   "mobileProfileTitle": "Account",
   "@mobileProfileTitle": {
     "description": "web: mobile.profileTitle"
+  },
+  "mobileNavOverviewTab": "Overview",
+  "@mobileNavOverviewTab": {
+    "description": "web: mobile.navOverviewTab"
+  },
+  "mobileAppBarBrand": "Task Manager",
+  "@mobileAppBarBrand": {
+    "description": "web: mobile.appBarBrand"
   },
   "accessRoleAdmin": "Administrator",
   "@accessRoleAdmin": {

@@ -331,6 +331,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileUploadFailed => 'Upload failed.';
 
   @override
+  String profileJoinedOn(Object date) {
+    return 'Joined $date';
+  }
+
+  @override
+  String get profileEmailVerified => 'Email verified';
+
+  @override
+  String get profileEmailNotVerified => 'Email not verified';
+
+  @override
+  String get profileStatProjects => 'Projects';
+
+  @override
+  String get profileStatTeams => 'Teams';
+
+  @override
   String get projectsGuestBannerTitle => 'You are viewing in guest mode';
 
   @override
@@ -1384,6 +1401,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mobileProfileTitle => 'Account';
+
+  @override
+  String get mobileNavOverviewTab => 'Overview';
+
+  @override
+  String get mobileAppBarBrand => 'Task Manager';
 
   @override
   String get accessRoleAdmin => 'Administrator';

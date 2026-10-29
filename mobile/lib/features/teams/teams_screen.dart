@@ -11,6 +11,7 @@ import '../../data/repositories.dart';
 import '../../l10n/app_localizations.dart';
 import '../../widgets/app_bar.dart';
 import '../../widgets/common.dart';
+import '../shell/app_shell.dart';
 
 String teamRoleLabel(AppLocalizations t, String? role) => switch (role) {
       'owner' => t.teamsListCardRoleOwner,
@@ -43,7 +44,7 @@ class TeamsScreen extends ConsumerWidget {
       body: RefreshIndicator(
         onRefresh: refresh,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + navBarClearance(context)),
           children: [
             AppCard(
               child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [

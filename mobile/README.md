@@ -30,37 +30,45 @@ Giao diện bám 1-1 bản mobile web (màu, font Inter, icon Lucide); menu dạ
 
 ```
 lib/
-  core/        env, firebase_config, api client, router, state (Riverpod), theme (token Tailwind), utils
+  core/        env, api client, router, state (Riverpod), theme (token Tailwind), utils
   data/        models.dart + repositories.dart — map 1-1 với lib/api/*.ts của web
-  features/    auth, shell, dashboard, projects, tasks, notifications, members, teams, settings
+  features/    auth, shell, dashboard, projects, tasks, notifications, members, teams, settings, profile
   widgets/     component dùng chung (AppCard, Pill, UserAvatar, Collapse, trình xem ảnh…)
   l10n/        ARB + AppLocalizations (SINH TỰ ĐỘNG — không sửa tay)
+  firebase_options.dart   sinh bởi FlutterFire CLI (đã gitignore — xem bước 1)
 assets/fonts/  Inter 400/500/600/700 (OFL)
-config/        firebase.example.json (mẫu) → firebase.json (của bạn, đã gitignore)
 tool/          gen_arb.mjs — sinh ARB từ i18n của web
 ```
 
 ## 1. Cấu hình Firebase (một lần)
 
-1. Firebase Console → project `task-management-pro-2026` → **Add app**:
-   - **Android**, package `jp.co.occ.taskmanagement` → tải `google-services.json`
-   - **iOS**, bundle ID `jp.co.occ.taskmanagement` → tải `GoogleService-Info.plist`
-2. `cp config/firebase.example.json config/firebase.json` rồi điền giá trị từ 2 file trên
-   (chỉ dẫn từng trường nằm ngay trong file mẫu). **Không cần** đặt 2 file đó vào Xcode/Gradle.
-3. `config/firebase.json` đã nằm trong `.gitignore` — không commit.
+Dùng FlutterFire CLI — tự tải `GoogleService-Info.plist` (iOS), `google-services.json` (Android),
+gắn vào Xcode/Gradle, và sinh `lib/firebase_options.dart`. Cả 3 file này đã nằm trong `.gitignore`,
+mỗi máy dev chạy lệnh dưới một lần (cần đăng nhập `firebase login` trước nếu chưa có CLI):
 
-Thiếu cấu hình → app vẫn chạy và hiện màn hướng dẫn thay vì crash.
+```bash
+dart pub global activate flutterfire_cli   # nếu chưa cài
+cd mobile
+flutterfire configure -p task-management-pro-2026 --platforms=ios,android \
+  -i jp.co.occ.taskmanagement --android-package-name=jp.co.occ.taskmanagement
+```
+
+Sau bước này app chạy/build bình thường như mọi app Flutter khác — **không cần** truyền thêm cờ gì.
 
 ## 2. Chạy app
 
 ```bash
 cd mobile
 flutter pub get
-flutter run --dart-define-from-file=config/firebase.json
+flutter run
 ```
 
-`API_URL` trong `config/firebase.json` mặc định là Worker production. Gọi Worker local:
-Android emulator `http://10.0.2.2:8787`, iOS simulator `http://localhost:8787`.
+`API_URL` mặc định trỏ Worker production (`lib/core/env.dart`). Gọi Worker local khi cần:
+
+```bash
+flutter run --dart-define=API_URL=http://10.0.2.2:8787      # Android emulator
+flutter run --dart-define=API_URL=http://localhost:8787     # iOS simulator
+```
 
 ### iOS (macOS)
 
@@ -68,16 +76,16 @@ Android emulator `http://10.0.2.2:8787`, iOS simulator `http://localhost:8787`.
 cd mobile
 flutter pub get
 cd ios && pod install && cd ..          # lần đầu (cần Xcode + CocoaPods)
-flutter run --dart-define-from-file=config/firebase.json
+flutter run
 ```
 
 Nếu `pod install` báo deployment target, mở `ios/Podfile` và đặt `platform :ios, '15.0'`.
-Build phát hành: `flutter build ipa --dart-define-from-file=config/firebase.json` (cần Apple Developer account, chọn Team trong Xcode → Runner → Signing).
+Build phát hành: `flutter build ipa` (cần Apple Developer account, chọn Team trong Xcode → Runner → Signing).
 
 ### Android
 
 ```bash
-flutter build apk --dart-define-from-file=config/firebase.json
+flutter build apk
 ```
 
 ## Checklist test trên máy thật

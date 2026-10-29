@@ -8,6 +8,7 @@ import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../../widgets/app_bar.dart';
 import '../../widgets/common.dart';
+import '../shell/app_shell.dart';
 
 /// Cài đặt — bản mobile của app/dashboard/settings: danh sách mở/đóng
 /// Giao diện (Sáng/Tối/Theo hệ thống) và Ngôn ngữ (3 ngôn ngữ), lựa chọn full chiều ngang.
@@ -44,7 +45,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     return Scaffold(
       appBar: TabAppBar(title: t.settingsTitle),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + navBarClearance(context)),
         children: [
           AppCard(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

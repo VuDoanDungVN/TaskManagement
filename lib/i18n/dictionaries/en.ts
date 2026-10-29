@@ -127,6 +127,11 @@ const en: Dictionary = {
     signOut: "Sign out",
     signingOut: "Signing out…",
     uploadFailed: "Upload failed.",
+    joinedOn: "Joined {date}",
+    emailVerified: "Email verified",
+    emailNotVerified: "Email not verified",
+    statProjects: "Projects",
+    statTeams: "Teams",
   },
   projects: {
     guestBannerTitle: "You are viewing in guest mode",
@@ -498,6 +503,8 @@ const en: Dictionary = {
     takePhoto: "Take photo",
     pickFiles: "Choose files",
     profileTitle: "Account",
+    navOverviewTab: "Overview",
+    appBarBrand: "Task Manager",
   },
   access: {
     roleAdmin: "Administrator",

@@ -129,6 +129,11 @@ const ja: Dictionary = {
     signOut: "ログアウト",
     signingOut: "ログアウト中…",
     uploadFailed: "アップロードに失敗しました。",
+    joinedOn: "{date} に参加",
+    emailVerified: "メール確認済み",
+    emailNotVerified: "メール未確認",
+    statProjects: "プロジェクト",
+    statTeams: "チーム",
   },
   projects: {
     guestBannerTitle: "ゲストモードで閲覧中です",
@@ -505,6 +510,8 @@ const ja: Dictionary = {
     takePhoto: "写真を撮る",
     pickFiles: "ファイルを選択",
     profileTitle: "アカウント",
+    navOverviewTab: "概要",
+    appBarBrand: "Task Manager",
   },
   access: {
     roleAdmin: "管理者",

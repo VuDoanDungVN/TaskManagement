@@ -12,6 +12,7 @@ import '../../l10n/app_localizations.dart';
 import '../../widgets/app_bar.dart';
 import '../../widgets/common.dart';
 import '../../widgets/task_widgets.dart';
+import '../shell/app_shell.dart';
 
 /// Thông báo (tab của khách hàng). Backend chưa có hệ thống thông báo → tổng hợp từ
 /// dữ liệu sẵn có: task giao cho bạn, quá hạn, sắp đến hạn, cập nhật gần đây (7 ngày).
@@ -103,7 +104,7 @@ class NotificationsScreen extends ConsumerWidget {
       body: RefreshIndicator(
         onRefresh: refresh,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + navBarClearance(context)),
           children: [
             Text(t.mobileNotificationsSubtitle, style: TextStyle(fontSize: TwSize.textXs, color: context.tw(Tw.zinc600, Tw.zinc400))),
             const SizedBox(height: 12),
